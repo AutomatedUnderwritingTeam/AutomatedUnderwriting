@@ -7,7 +7,7 @@ rule "BR__Residence Num of Families Has Decreased And More Than 2__ASST(Change)~
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		Dwelling( previousNumberOfFamilies != null , numberOfFamilies > 2 , numberOfFamilies < ( previousNumberOfFamilies ) , unitAtRiskNumber : unitAtRiskNumber)
+		Dwelling( previousNumberOfFamilies != null , numberOfFamilies > "2" , numberOfFamilies < ( previousNumberOfFamilies ) , unitAtRiskNumber : unitAtRiskNumber)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
