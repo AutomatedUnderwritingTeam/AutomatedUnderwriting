@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Condo has a dwelling value of les than 10,000__UND(New Business)~6521~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		dwelling : Dwelling( dwellingType == "C1"  || == "C2" , unitAtRiskNumber : unitAtRiskNumber)
+		exists (		Coverage( coverageCode == "CONDO" , limit1 < 10001 ) from dwelling.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6521: Condo dwelling coverage amount is 10,000 or less." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

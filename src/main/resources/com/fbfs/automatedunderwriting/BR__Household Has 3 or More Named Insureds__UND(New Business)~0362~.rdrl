@@ -1,0 +1,27 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.au.model.count.CntHousehold;
+
+rule "BR__Household Has 3 or More Named Insureds__UND(New Business)~0362~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		householdMember : HouseholdMember( clientReference : clientReference)
+		Household( headOfHousehold == householdMember )
+		CntHousehold( clientReference == clientReference , cntHouseholdNamedInsured > 2 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0362: Household has 3 or more named insureds." );
+		fact0.setAddAction( "Review Client Relationship" );
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( clientReference );
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( clientReference );
+		insert( fact0 );
+end

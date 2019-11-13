@@ -1,0 +1,36 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.PriorLoss;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.trap.model.AutoClaim;
+
+rule "BR__Comprehensive Deductible Has Decreased(MN)__UND(Change)~4885~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Policy( state == "MN" )
+		>Term( effectiveDate : effectiveDate)
+		>vehicle : Vehicle( unitAtRiskNumber : unitAtRiskNumber)
+		>(coverage : Coverage( deleted != true , coverageCode == "COMP" , eval( deductable < previousDeductable )) from vehicle.coverageList)
+		There is a comp Loss Occurrence and Prior Loss within 48 months or 2 comp Loss Occurrences or 2 Prior Losses within 48 months or 2 comp Trap Auto Claims within 48 months
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "4885: Comprehensive deductible has decreased." );
+		>fact0.setAddAction( "Review Photo" );
+		>fact0.setAddAction( "Review for Claims" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

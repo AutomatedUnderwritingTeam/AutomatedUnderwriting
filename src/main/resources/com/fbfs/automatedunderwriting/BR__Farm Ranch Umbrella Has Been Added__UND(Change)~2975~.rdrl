@@ -1,0 +1,24 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+
+rule "BR__Farm Ranch Umbrella Has Been Added__UND(Change)~2975~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( added == true , policyType == "F" , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "2975: Farm/Ranch Umbrella has been added." );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

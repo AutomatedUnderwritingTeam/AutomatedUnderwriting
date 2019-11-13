@@ -1,0 +1,37 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.au.model.trap.TrapCluePropertyReport;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Household Has Been Added Without A Property CLUE Report__ASST(Change)~5783~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>PropertyLineOfBusiness( deleted != true )
+		>household : Household( hhClientReference : headOfHousehold.clientReference, $householdNumber : householdNumber, $addedHouseholdMemberList : householdMemberList)
+		>Client( supplementList : supplementList, clientReference : clientReference == ( hhClientReference ) )
+		>(ClientSupplement( clientClass == "IN", $dateOfBirth : dateOfBirth ) from supplementList)
+		R5783 The household added or the head of household added        
+		R5783 The household does not have an Property Clue Report
+		R5783 None of the household members have been on the policy prior
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "5783: Household has been added without a Property CLUE report." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Property/Liability link" );
+		>fact0.setAddBookmark( "PropertyLiability" );
+		>fact0.setAddBookmarkUnit( clientReference );
+		>fact0.setMgmtReportingCategory( "PLOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		>fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		>insert( fact0 );
+end

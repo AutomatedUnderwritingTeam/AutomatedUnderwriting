@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusinessSupplement;
+import com.fbfs.pc.ecd.model.BusinessLiability;
+
+rule "BR__Business Operations__Question Has Changed To No__UND(Change)~4132~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( supplementList : supplementList != null )
+		(PropertyLineOfBusinessSupplement( hasBusinessOperations == false , previousHasBusinessOperations == true ) from supplementList)
+		exists (BusinessLiability( businessType != "63007", businessType != "63008", businessType != "63010", businessType != "63011", businessType  != "63012", businessType != "63013"  , deleted == false )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4132: Business operations-- question has changed to 'No'." );
+		fact0.setAddAction( "Review for Business Liability" );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Property/Liability Information link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

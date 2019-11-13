@@ -1,0 +1,24 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+
+rule "BR__FOIT Coverage Has Been Added__UND(Change)~1511~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Coverage( added == true , coverageCode == "FOIT" , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "1511: Farm Operations Interruption Tenant has been added." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Farm/ranch operations interruption tenant link" );
+		fact0.setAddBookmark( "FOIT" );
+		fact0.setAddBookmarkUnit( coverageNumber );
+		fact0.setMgmtReportingCategory( "FPPO" );
+		fact0.setMgmtReportingUnitAtRisk( "FPPO" );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.FarmWageAmount;
+
+rule "BR__Farm Ranch Employer Liability - Household Member Total Annual Payroll Has Increased__UND(Change)~5584~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber)
+		coverage : Coverage( coverageCode == "MDPYE" , $coverageNumber : coverageNumber)
+		exists (		Coverage( coverageNumber == $coverageNumber ) from liability.coverageList
+) 
+		exists (		FarmWageAmount( wageType == "HH" , added != true , previousWageAmount != null , eval( wageAmount > previousWageAmount )) from coverage.farmWageAmountList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5584: Farm/ranch Employer Liability--household member total annual payroll has increased." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Person For Any Pre-existing Conditions" );
+		fact0.setAddLink( "Farm/ranch liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

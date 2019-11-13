@@ -1,0 +1,36 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+
+rule "BR__Household Has married member but no spouse and vehicle LOB added__ASST(Change)~7513~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>VehicleLineOfBusiness( added == true )
+		>Policy( clientRelationshipList : clientRelationshipList)
+		>householdMember : HouseholdMember( $clientReference : clientReference)
+		>household : Household( headOfHousehold == householdMember || householdMemberList contains householdMember , householdMemberList : householdMemberList, hhClientReference : headOfHousehold.clientReference)
+		>(ClientRelationship( clientReference == $clientReference , type == "IN" ) from clientRelationshipList)
+		>Client( clientReference == $clientReference , supplementList : supplementList)
+		>(ClientSupplement( maritalStatus == "M" ) from supplementList)
+		The household does not have another household member that has a spouse relationship or marital status of married
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "7513: Vehicle LOB added and household with married member but has no spouse on policy." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( $clientReference );
+		>fact0.setMgmtReportingCategory( "INSD" );
+		>fact0.setMgmtReportingUnitAtRisk( $clientReference );
+		>insert( fact0 );
+end

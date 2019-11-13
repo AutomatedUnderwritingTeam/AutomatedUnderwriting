@@ -1,0 +1,23 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.MountedEquipment;
+
+rule "BR__Farm Truck Mounted Equipment Has Increased And Limit Over $5,000__ASST(Change)~3706~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : MountedEquipment( mountedEquipmentCost > 5000 , unitAtRiskNumber : unitAtRiskNumber, $previousMountedEquipmentCost : previousMountedEquipmentCost != null , previousMountedEquipmentCost > 0 , mountedEquipmentCost > $previousMountedEquipmentCost )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setReason( "3706: Farm truck mounted equipment has increased and over $5.000." );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

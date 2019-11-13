@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+
+rule "BR__Express Related Cancellation__PAYREC(Cancellation)~7881~"
+	agenda-group "BR_Cancel"
+	dialect "mvel"
+	when
+		DM_CancellationTransaction( )
+		Term( cancelReason == "CM" || cancelReason == "CU" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "PayRec" );
+		fact0.setQueue( "PayRec" );
+		fact0.setReason( "7881: Express related Cancel/Rewrite." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PayR" );
+		fact0.setMgmtReportingUnitAtRisk( "PayR" );
+		fact0.setTaskType( "PMP_T_EXP_REW" );
+		insert( fact0 );
+end

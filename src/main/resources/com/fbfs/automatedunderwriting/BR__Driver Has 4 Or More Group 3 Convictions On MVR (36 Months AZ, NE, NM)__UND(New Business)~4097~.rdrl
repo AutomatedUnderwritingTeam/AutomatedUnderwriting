@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.count.CntDriver;
+
+rule "BR__Driver Has 4 Or More Group 3 Convictions On MVR (36 Months AZ, NE, NM)__UND(New Business)~4097~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Policy( state == "AZ"  || == "NE"  || == "NM" )
+		Driver( driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber)
+		Client( clientReference == driverReference )
+		CntDriver( unitAtRiskNumber == unitAtRiskNumber , cntTrapGroup3ConvictionsWithin36 > 3 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4097: Driver has 4 or more group 3 convictons on MVR (36 months AZ, NE, NM)." );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		fact0.setAddAction( "Remove Household" );
+		fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

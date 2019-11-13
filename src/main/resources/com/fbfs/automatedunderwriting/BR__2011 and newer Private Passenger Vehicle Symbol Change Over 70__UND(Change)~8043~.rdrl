@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__2011 and newer Private Passenger Vehicle Symbol Change Over 70__UND(Change)~8043~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( type == "PP"  || == "PF" , unitAtRiskNumber : unitAtRiskNumber, vehYear : year > 2010 , previousCollSymbol != null || previousCompSymbol != null )
+		exists (Vehicle( unitAtRiskNumber == unitAtRiskNumber , previousCompSymbol != null , eval( convertToDouble(compSymbol)> 70 && convertToDouble(previousCompSymbol) < 71 )) and Vehicle( unitAtRiskNumber == unitAtRiskNumber , previousCollSymbol != null , eval( convertToDouble(collSymbol)> 70 && convertToDouble(previousCollSymbol) < 71 )))
+(
+(Term(effectiveDate < "30-Sep-2018") and 
+Policy($state : state == "KS" || == "MN" || == "NM" || == "UT"))  or
+(Term(effectiveDate < "23-Jun-2019") and
+(Policy(state == "AZ" || == "IA" || == "NE" || == "SD" )))
+)
+		
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8043: 2011 and newer Private passenger vehicle with symbol change over 70." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

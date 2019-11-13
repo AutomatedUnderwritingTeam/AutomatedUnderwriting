@@ -1,0 +1,26 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+
+rule "BR__Government and Occationally Leased Acres Have Been Added or Increased For A Location__UND(Change)~5968~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		location : Location( locationNumber : locationNumber)
+		(LocationSupplement( governmentAcres != null ) from location.supplement)
+		(LocationSupplement( previousGovernmentAcres != null ) from location.supplement)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5968: Government/occasionally leased acres have been added/increased for a location." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Location link" );
+		fact0.setAddBookmark( "PropLocation" );
+		fact0.setAddBookmarkUnit( locationNumber );
+		fact0.setMgmtReportingCategory( "LOC" );
+		fact0.setMgmtReportingUnitAtRisk( locationNumber );
+		insertLogical( fact0 );
+end

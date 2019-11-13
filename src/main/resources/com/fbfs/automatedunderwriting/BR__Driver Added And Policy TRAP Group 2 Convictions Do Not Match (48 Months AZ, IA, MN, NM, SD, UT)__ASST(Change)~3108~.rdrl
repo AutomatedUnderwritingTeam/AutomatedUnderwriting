@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.count.CntDriver;
+import com.fbfs.pc.au.model.trap.TrapMvrReport;
+
+rule "BR__Driver Added And Policy TRAP Group 2 Convictions Do Not Match (48 Months AZ, IA, MN, NM, SD, UT)__ASST(Change)~3108~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Policy( state == "IA"  || == "MN"  || == "NM"  || == "SD"  || == "UT" )
+		Driver( $driverReference : driverReference, $unitAtRiskNumber : unitAtRiskNumber, added == true )
+		Client( clientReference == $driverReference , $trapId : trapId)
+		TrapMvrReport( trapId == $trapId , mvrReport.returnInfo != null )
+		CntDriver( unitAtRiskNumber == $unitAtRiskNumber , eval( cntCogenGroup2ConvictionsWithin48 != cntTrapGroup2ConvictionsWithin48 ))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "3108: Driver has been added and the policy/UW Rpt group 2 convictions do not match (48 months AZ, IA, MN, NM, SD, UT)." );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( $driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

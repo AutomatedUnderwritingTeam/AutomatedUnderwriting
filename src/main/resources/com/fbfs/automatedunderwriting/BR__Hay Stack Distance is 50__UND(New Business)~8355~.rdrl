@@ -1,0 +1,26 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Hay;
+
+rule "BR__Hay Stack Distance is 50__UND(New Business)~8355~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Hay( unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber, coverageList : coverageList, stackingDistance == "50" )
+		(Coverage( coverageCode == "FPPS" ) from coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw Farm" );
+		fact0.setReason( "8355:  Hay stack distance is 50 feet." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Stack Distance" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode+unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

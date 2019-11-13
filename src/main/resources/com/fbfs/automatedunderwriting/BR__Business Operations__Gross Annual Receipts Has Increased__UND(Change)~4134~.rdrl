@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusinessSupplement;
+
+rule "BR__Business Operations__Gross Annual Receipts Has Increased__UND(Change)~4134~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( supplementList : supplementList != null )
+		(supplement : PropertyLineOfBusinessSupplement( previousAnnualGrossBusinessReceipts != null , annualGrossBusinessReceipts > 20000 , previousAnnualGrossBusinessReceipts > 0 ) from supplementList)
+		eval( supplement.getAnnualGrossBusinessReceipts() > supplement.getPreviousAnnualGrossBusinessReceipts() )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4134: Business operations--gross annual receipts has increased." );
+		fact0.setAddAction( "Review for Business Liability" );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Property/Liability Information link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

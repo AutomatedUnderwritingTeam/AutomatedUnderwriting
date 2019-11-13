@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.count.CntDriver;
+
+rule "BR__Driver Has 1 Or More Group 1 Convictions On MVR (60 months AZ, IA, MN, NE, NM, SD, UT)__UND(New Business)~0944~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Policy( state == "AZ"  || == "IA"  || == "MN"  || == "NM"  || == "NE"  || == "SD"  || == "UT" )
+		Driver( driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber)
+		Client( clientReference == driverReference )
+		CntDriver( unitAtRiskNumber == unitAtRiskNumber , cntTrapGroup1ConvictionsWithin60 > 0 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0944: Driver has 1 or more group 1 convictions on MVR (60 months AZ, IA, MN, NE, NM, SD, UT)." );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		fact0.setAddAction( "Remove Driver" );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

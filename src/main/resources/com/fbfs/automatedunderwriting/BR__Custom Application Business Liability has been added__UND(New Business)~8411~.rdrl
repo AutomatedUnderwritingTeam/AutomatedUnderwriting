@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.BusinessLiability;
+import com.fbfs.pc.ecd.model.Coverage;
+
+rule "BR__Custom Application Business Liability has been added__UND(New Business)~8411~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		Term( effectiveDate > "14-Mar-2020" )
+		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber)
+		BusinessLiability ( businessType == "00032", $coverageNumber : coverageNumber )
+		(Coverage( coverageNumber == $coverageNumber ) from liability.coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8411: Custom Application Business Liability has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Custom Application Risk Survey" );
+		fact0.setAddLink( "Business liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+
+rule "BR__Client has changed and is a Driver with Financial Responsibility__UND(Change All)~8344~"
+	agenda-group "BR_Change_All"
+	dialect "mvel"
+	when
+		>DM_CurrentTransaction( dmEffectiveDate : effectiveDate)
+		>Driver( sr22FilingDate : sr22FilingDate, driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber, eval( isValidDate(sr22FilingDate) ))
+		>Client( clientReference == driverReference , nameList : nameList, supplementList : supplementList)
+		R8344 - The client has changed
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8344: Client first, middle, last name, SSN, or DOB may have changed and is a driver with Financial Responsibility Filing/SR-22." );
+		>fact0.setAddAction( "File SR-22/MN Insurance Certification" );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( driverReference );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>fact0.setPriority( "High" );
+		>insertLogical( fact0 );
+end

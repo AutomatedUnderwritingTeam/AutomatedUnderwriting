@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.ConfinedLivestock;
+
+
+rule "BR__Farm Ranch PP Confined Livestock Item Type of Other__UND(Change)~8274~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>ConfinedLivestock( itemType : itemType == "OT" , unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber)
+		R8274 - Item type changed or confined livestock is added
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8274: Confined Livestock's item type is 'Other' ." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review FPP Item(s)" );
+		>fact0.setAddLink( "Farm/ranch personal property link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( unitAtRiskCode+unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

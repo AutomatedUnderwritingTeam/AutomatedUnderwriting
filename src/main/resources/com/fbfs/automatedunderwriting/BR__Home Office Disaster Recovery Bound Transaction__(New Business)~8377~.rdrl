@@ -1,0 +1,27 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_HDRUser;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Home Office Disaster Recovery Bound Transaction__(New Business)~8377~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		DM_HDRUser( )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8377:  Home Office Disaster Recovery Bound Transaction." );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		insertLogical( fact0 );
+		AutoAcceptor fact1 = new AutoAcceptor();
+		fact1.setAutoAcceptable( false );
+		insertLogical( fact1 );
+end

@@ -1,0 +1,35 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Household Has Been Added Without An Auto CLUE Report__ASST(Change)~5782~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>household : Household( headOfHousehold : headOfHousehold != null , hhClientReference : headOfHousehold.clientReference, deleted != true, $householdNumber : householdNumber, $addedHouseholdMemberList : householdMemberList )
+		>Client( supplementList : supplementList, clientReference : clientReference == ( hhClientReference ) )
+		>(ClientSupplement( clientClass == "IN", $dateOfBirth : dateOfBirth ) from supplementList)
+		R5782 The household has a driver
+		R5782 The household does not have an Auto Clue Report		
+		R5782 None of the household members have been on the policy prior
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "5782: Household has been added without an Auto CLUE report." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Household link" );
+		>fact0.setAddBookmark( "Household" );
+		>fact0.setAddBookmarkUnit( hhClientReference );
+		>fact0.setMgmtReportingCategory( "VLOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		>fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		>insert( fact0 );
+end

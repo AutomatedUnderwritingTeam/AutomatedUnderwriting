@@ -1,0 +1,35 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.au.model.count.CntHousehold;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientName;
+
+rule "BR__Household Has Been Added With 3 or More Named Insureds__UND(Change)~3100~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>$household : Household( $clientReference : headOfHousehold.clientReference)
+		R3100 The household added or the head of household added
+		>CntHousehold( clientReference == ( $clientReference ) , cntHouseholdNamedInsured > 2 )
+		Unless a household member's last name contains the phrase Corp
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "3100: Household has been added with 3 or more named insureds." );
+		>fact0.setAddAction( "Review Client Relationship" );
+		>fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		>fact0.setAddLink( "Household link" );
+		>fact0.setAddBookmark( "Household" );
+		>fact0.setAddBookmarkUnit( $clientReference );
+		>fact0.setAddLink( "Policy Level Information link" );
+		>fact0.setAddBookmark( "PolicyLevelInformation" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "INSD" );
+		>fact0.setMgmtReportingUnitAtRisk( $clientReference );
+		>fact0.setPriority( "High" );
+		>insert( fact0 );
+end

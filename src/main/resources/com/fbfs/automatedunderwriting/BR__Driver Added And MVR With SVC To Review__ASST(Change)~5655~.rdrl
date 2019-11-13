@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapDrivingRecord;
+
+rule "BR__Driver Added And MVR With SVC To Review__ASST(Change)~5655~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Driver( driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber, added == true )
+		Client( clientReference == driverReference , trapId : trapId)
+		exists (TrapDrivingRecord( trapId == trapId , svcCodeNeedsReviewed == true )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "5655: Driver has been added and MVR with SVC code to review." );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Liability;
+
+
+rule "BR__Custom Feeding Business Liability Care, Custody, and Control Coverage__UND(Change)~8293~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Coverage( added == true , coverageCode == "LCCC" , $coverageNumber : coverageNumber)
+		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber)
+		coverage : Coverage( coverageNumber == $coverageNumber ) from liability.coverageList
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8293: Custom Feeding Business Liability with Care, Custody and Control." );
+		fact0.setAddAction( "Order field inspection to be completed" );
+		fact0.setAddAction( "Obtain copy of feeding contract" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

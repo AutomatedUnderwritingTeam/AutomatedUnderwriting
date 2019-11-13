@@ -1,0 +1,33 @@
+package automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+
+
+rule "BR__Household Has Two Named Insureds That Are Not Married__ASST(New Business)~6267~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Policy( clientRelationshipList : clientRelationshipList)
+		>householdMember : HouseholdMember( hhClientReference : clientReference)
+		>Household( headOfHousehold == householdMember , householdMemberList : householdMemberList)
+		>ClientRelationship( clientReference == hhClientReference , type == "IN" ) from clientRelationshipList
+		>Client( supplementList : supplementList, clientReference == hhClientReference )
+		Another household member has a Named Insured and Spouse relationship and the household does not have a married couple
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "6267: Household has two named insureds that are not married." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( hhClientReference );
+		>fact0.setMgmtReportingCategory( "INSD" );
+		>fact0.setMgmtReportingUnitAtRisk( hhClientReference );
+		>insert( fact0 );
+end

@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.BusinessLiability;
+
+rule "BR__Business Liability Seed Dealers Products and Completed Operations Has Been Added__UND(Change)~0605~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		liability : Liability( added != true , $unitAtRiskNumber : unitAtRiskNumber)
+		BusinessLiability( coverageCode == "BSIL" , businessType == "00005" , added == true , $coverageNumber : coverageNumber)
+		exists (		Coverage( coverageNumber == $coverageNumber ) from liability.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0605: Business liaiblity Seed Dealers Products and Completed Operations has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Business liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

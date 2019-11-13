@@ -1,0 +1,28 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+
+rule "BR__Farm Ranch PP Freezing and Smothering Coverage on added UAR__UND(Change)~6309~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		unitAtRisk : UnitAtRisk( added == true , unitAtRiskNumber : unitAtRiskNumber, unitAtRiskCode : unitAtRiskCode)
+		exists (		Coverage( coverageCode == "LVFRZ" ) from unitAtRisk.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6309: UAR added with Livestock freezing or Smothering coverage" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Claims" );
+		fact0.setAddAction( "Check For Adverse Selection" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode + unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

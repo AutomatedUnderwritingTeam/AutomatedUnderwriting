@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Dwelling Classification__Wiring Year Has Changed And Class Increased__ASST(Change)~4935~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Dwelling( previousWiringYear != null , previousDwellingClass != null , wiringYear != ( previousWiringYear ) , eval( convertToDouble(dwellingClass) < convertToDouble(previousDwellingClass) ), unitAtRiskNumber : unitAtRiskNumber)
+		Term( effectiveDate < "23-Jun-2017" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "4935: Dwelling Classification--wiring year has changed and class increased." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

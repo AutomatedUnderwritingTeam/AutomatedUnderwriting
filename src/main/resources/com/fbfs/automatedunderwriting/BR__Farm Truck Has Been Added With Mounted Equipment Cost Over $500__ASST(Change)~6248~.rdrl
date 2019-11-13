@@ -1,0 +1,24 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.MountedEquipment;
+
+rule "BR__Farm Truck Has Been Added With Mounted Equipment Cost Over $500__ASST(Change)~6248~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : MountedEquipment( added == true , mountedEquipmentCost > 500 , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setAddAction( "Review Equipment Cost" );
+		fact0.setAddAction( "Review Symbol" );
+		fact0.setReason( "6248: Farm truck has been added with mounted equipment over $500." );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

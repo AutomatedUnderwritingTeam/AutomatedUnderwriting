@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+ 
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__1990 to 2010 Private Passenger Vehicle Has Been Added With Symbol Over 26__UND(Change)~3035~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>vehicle : Vehicle( type == "PP"  || == "PF" , unitAtRiskNumber : unitAtRiskNumber, added == true , vehYear : year, eval( vehYear > 1989  && vehYear < 2011 ))
+		The vehicle has a collision symbol, a comp symbol or a symbol and that symbol is greater than 26
+		R3035 Effective till 09/29/2018 for states KS, MN, NM, UT and Effective for all terms for states AZ, IA, NE, SD
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "3035: 1990 to 2010 Private passenger vehicle has been added with symbol over 26." );
+		>fact0.setAddAction( "General Review" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

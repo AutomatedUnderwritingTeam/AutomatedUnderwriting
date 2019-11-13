@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.au.model.count.CntPolicy;
+import com.fbfs.pc.ecd.model.AggregateFarm;
+import com.fbfs.pc.ecd.model.ConfinedLivestock;
+import com.fbfs.pc.ecd.model.MajorMachinery;
+import com.fbfs.pc.ecd.model.FarmMachinery;
+
+
+
+rule "BR__Farm Ranch PP Blanket Limit Increased__ASST(Change)~1506~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>$coverage : Coverage( coverageCode == "FPPB" , $coverageNumber : coverageNumber, previousLimit1 != null, limit1 > previousLimit1, coverageNumber : coverageNumber)
+	    >CntPolicy( $cntTotalAcres : cntTotalAcres)
+		R1506 There is less than 100 acres and limit increased more than $150,000  or  added blanket item is more than 30% of blanket total		
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "1506: Blanket farm/ranch personal property amount of insurance has increased." );
+		>fact0.setAddAction( "Review Inventory" );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Farm/ranch personal property link" );
+		>fact0.setAddBookmark( "FarmBlanket" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		>insertLogical( fact0 );
+end

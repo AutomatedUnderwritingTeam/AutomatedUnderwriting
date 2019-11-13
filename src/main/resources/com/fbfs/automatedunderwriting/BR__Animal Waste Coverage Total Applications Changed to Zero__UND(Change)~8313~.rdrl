@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.AnimalWasteCoverage;
+
+rule "BR__Animal Waste Coverage Total Applications Changed to Zero__UND(Change)~8313~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		UnitAtRisk( unitAtRiskNumber : unitAtRiskNumber, unitAtRiskCode : unitAtRiskCode, coverageList : coverageList)
+		(Coverage( coverageCode == "POLUT" ) from coverageList)
+		AnimalWasteCoverage( coverageCode == "POLUT" , previousNumberOfApplications : previousNumberOfApplications > 0 , numberOfApplications == 0 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8313:   Animal Waste Liability Coverage's total number of applications per year has changed to zero." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Farm/ranch liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

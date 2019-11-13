@@ -1,0 +1,25 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Farm Truck Has Been Added With Seasonal Harvest Coverage__UND(Change)~5542~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( added == true , coverageList : coverageList, unitAtRiskNumber : unitAtRiskNumber)
+		(Coverage( coverageCode == "SEAHV" ) from coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setReason( "5542: Farm truck with Seasonal Harvest has been added." );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

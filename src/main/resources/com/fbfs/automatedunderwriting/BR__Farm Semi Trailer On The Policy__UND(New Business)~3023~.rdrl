@@ -1,0 +1,27 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Farm Semi Trailer On The Policy__UND(New Business)~3023~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		not(exists(Vehicle( type == "ST")))
+		vehicle : Vehicle( type == "TR" , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "3023: Policy includes a farm semi-trailer." );
+		fact0.setAddAction( "Review Vehicle Use" );
+		fact0.setAddAction( "Review Radius of Operation" );
+		fact0.setAddAction( "Review Farm/Ranch Operation" );
+		fact0.setAddAction( "Review for Form E Filing" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

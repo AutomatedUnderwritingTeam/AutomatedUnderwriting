@@ -1,0 +1,39 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.count.CntHousehold;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+
+rule "BR__Driver Has Been Added And Household TRAP Group 2 Losses Do Not Match (36 months KS, NE)__ASST(Change)~3104~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Policy( state == "KS"  || == "NE" )
+		Driver( $driverReference : driverReference, added == true )
+		householdMember : HouseholdMember( clientReference == $driverReference )
+		Household( headOfHousehold != null , hhClientReference : headOfHousehold.clientReference, headOfHousehold == householdMember || householdMemberList contains householdMember )
+		Client( clientReference == ( hhClientReference ) , $trapId : trapId)
+		CntHousehold( clientReference == ( hhClientReference ) , $cntTrapGroup2AutoLossesWithin36 : cntTrapGroup2AutoLossesWithin36, cntCogenGroup2AutoLossesWithin36 != $cntTrapGroup2AutoLossesWithin36 )
+		TrapClueAutoReport( trapId == $trapId )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "3104: Driver has been added and the household/UW Rpt group 2 losses do not match (36 months KS, NE)." );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddAction( "Review -Other- Losses on Policy" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( $driverReference );
+		fact0.setMgmtReportingCategory( "VLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( hhClientReference );
+		insert( fact0 );
+end

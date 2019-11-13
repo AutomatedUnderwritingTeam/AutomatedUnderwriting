@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Dwelling Classification__ACV Has Decreased And Class Increased__UND(Change)~4943~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Dwelling( previousActualCashValue != null , previousDwellingClass != null , actualCashValue < ( previousActualCashValue ) , eval( convertToDouble(dwellingClass) < convertToDouble(previousDwellingClass) ), unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4943: Dwelling Classification--ACV has decreased and class increased." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Marshall and Swift" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

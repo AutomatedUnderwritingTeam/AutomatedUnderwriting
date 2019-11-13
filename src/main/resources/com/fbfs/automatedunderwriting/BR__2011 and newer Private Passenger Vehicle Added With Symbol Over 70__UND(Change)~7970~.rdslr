@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__2011 and newer Private Passenger Vehicle Added With Symbol Over 70__UND(Change)~7970~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>vehicle : Vehicle( type == "PP"  || == "PF" , added == true , unitAtRiskNumber : unitAtRiskNumber, vehYear : year, eval( vehYear > 2010 ))
+		The vehicle has a collision symbol, a comp symbol or a symbol and that symbol is greater than 70
+		R7970 Effective till 09/29/2018 for states KS, MN, NM, UT and Effective for all terms for states AZ, IA, NE, SD
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "7970: 2011 or after Private passenger vehicle has been added with symbol over 70." );
+		>fact0.setAddAction( "General Review" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

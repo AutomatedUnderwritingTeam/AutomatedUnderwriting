@@ -1,0 +1,35 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.PriorLoss;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.trap.model.AutoClaim;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Full Glass Has Been Added__ASST(Change)~0729~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Term( effectiveDate : effectiveDate)
+		>Vehicle( coverageList : coverageList, unitAtRiskNumber : unitAtRiskNumber, added != true )
+		The vehicle has a full glass coverage that has been added
+		There is not another vehicle with previous full glass coverage
+		There is a glass Prior Loss or Auto Claim within 36 months or a comp Prior Loss or Auto Claim with payment under $100
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "0729: Full glass has been added." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>fact0.setAddAction( "Review for Claims" );
+		>insertLogical( fact0 );
+end

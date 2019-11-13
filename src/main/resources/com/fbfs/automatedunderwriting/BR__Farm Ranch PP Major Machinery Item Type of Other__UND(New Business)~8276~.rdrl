@@ -1,0 +1,25 @@
+package automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.MajorMachinery;
+
+
+rule "BR__Farm Ranch PP Major Machinery Item Type of Other__UND(New Business)~8276~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		MajorMachinery( itemType == "OT" , unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber)
+		Term( effectiveDate < "23-Jun-2018" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8276: Major Machinery's item type is 'Other'." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review FPP Item(s)" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode+unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

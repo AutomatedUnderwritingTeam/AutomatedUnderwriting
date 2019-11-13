@@ -1,0 +1,24 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.FormHeader;
+
+rule "BR__FPP has a manuscript endorsement added or deleted__UND(Change)~8306~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		FormHeader( formNumber matches ".*EX005(.|\n|\r)*" , unitAtRiskNumber : unitAtRiskNumber, unitAtRiskCode : unitAtRiskCode == "F4"  || == "F5"  || == "F3" , added == true || deleted == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8306: FPP has a manuscript endorsement that has been added or deleted." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode + unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

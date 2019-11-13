@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Driver or Vehicle has Financial Responsibility added__UND(Change All)~8346~"
+	agenda-group "BR_Change_All"
+	dialect "mvel"
+	when
+		( Driver( sr22FilingDate1 : sr22FilingDate, eval( isValidDate(sr22FilingDate1) ), previousSr22FilingDate == "01-Jan-0001" ) or Vehicle( variationCode == "I" , previousVariationCode == "N" ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8346:  Driver or vehicle has Financial Responsibility/SR22 added." );
+		fact0.setAddAction( "File SR-22/MN Insurance Certification" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "VLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Dwelling Classification - Wiring Year is not the Construction Year and Dwelling added or Year changed__BCD(Change All)~8386~"
+	agenda-group "BR_Change_All"
+	dialect "mvel"
+	when
+		Dwelling( unitAtRiskNumber : unitAtRiskNumber, yearBuild : yearBuild > 0, wiringYear > 0, wiringYear != yearBuild ,  added == true || previousYearBuild != null || previousWiringYear != null )
+		Term( effectiveDate >= "23-Jun-2017" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "BCD" );
+		fact0.setQueue( "BCD" );
+		fact0.setReason( "8386: Wiring year is not construction year and dwelling added or year changed." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setMemoDescription( "Verify Wiring year and wiring year statement on file (" + yearBuild + " Dwelling)" );
+		insertLogical( fact0 );
+end

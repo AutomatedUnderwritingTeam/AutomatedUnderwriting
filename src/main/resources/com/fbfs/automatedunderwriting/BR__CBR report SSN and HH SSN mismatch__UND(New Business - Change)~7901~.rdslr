@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.au.model.trap.TrapCbrReport;
+import com.fbfs.pc.trap.model.ReturnedClient;
+
+rule "BR__CBR report SSN and HH SSN mismatch__UND(New Business - Change)~7901~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>householdMember : HouseholdMember( clientReference : clientReference)
+		>Household( headOfHousehold == householdMember )
+		>Client( clientReference == clientReference , trapId : trapId, supplementList : supplementList)
+		>TrapCbrReport( trapId == trapId , cbrReport : cbrReport != null , cbrReport.returnedClientList != null )
+		>Term( effectiveDate < "30-Sep-2018" )
+		The CbrReport returned client SSN is not equal to head of household SSN
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "7901: CBR returned SSN not Head of household SSN." );
+		>fact0.setAddAction( "Review Client" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( clientReference );
+		>fact0.setMgmtReportingCategory( "INSD" );
+		>fact0.setMgmtReportingUnitAtRisk( clientReference );
+		>insert( fact0 );
+end

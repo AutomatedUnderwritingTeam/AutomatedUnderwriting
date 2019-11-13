@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.count.CntDriver;
+
+rule "BR__Driver Has 1 Or More Group 1 Convictions On MVR (36 months KS)__UND(New Business)~4084~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Policy( state == "KS" )
+		Driver( driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber)
+		Client( clientReference == driverReference )
+		CntDriver( unitAtRiskNumber == unitAtRiskNumber , cntTrapGroup1ConvictionsWithin36 > 0 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4084: Driver has 1 or more group 1 convictions on MVR (36 months KS)." );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		fact0.setAddAction( "Remove Driver" );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

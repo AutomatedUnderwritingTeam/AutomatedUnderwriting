@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.AnimalWasteCoverage;
+import com.fbfs.pc.ecd.model.AnimalWasteDescription;
+
+rule "BR__Animal Waste Coverage Number of Animals Changed and Greater than 5000__UND(Change)~8315~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		UnitAtRisk( unitAtRiskNumber : unitAtRiskNumber, coverageList : coverageList, unitAtRiskCode : unitAtRiskCode)
+		(Coverage( coverageCode == "POLUT" ) from coverageList)
+		animalWasteCoverage : AnimalWasteCoverage( coverageCode == "POLUT" )
+		( 		AnimalWasteDescription( quantity >= 5000 , added == true ) from animalWasteCoverage.animalWasteDescriptionList
+ or 		AnimalWasteDescription( quantity >= 5000 , previousQuantity != null ) from animalWasteCoverage.animalWasteDescriptionList
+ )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8315:  Animal Waste Liability Coverage's added or changed and quantity is 5,000 or greater." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review for Reinsurance" );
+		fact0.setAddLink( "Farm/ranch liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

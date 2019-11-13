@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Classic I With Comp coverage and a stated amount over $14,999 Has Been Added__ASST(Change)~3052~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( type == "PC" , added == true , unitAtRiskNumber : unitAtRiskNumber, statedAmount > 14999 , coverageList : coverageList)
+		(Coverage( coverageCode == "COMP" ) from coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "3052: Classic I with Comp has been added with stated amount over $14,999." );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddAction( "Review Stated Amount" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapMvrReport;
+import com.fbfs.pc.trap.model.DriversLicense;
+
+rule "BR__Driver Added And Policy MVR Drivers License Do Not Match__CSR(Change)~5775~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Driver( $driverReference : driverReference, $unitAtRiskNumber : unitAtRiskNumber,  added == true )
+		>Client( clientReference == $driverReference , $trapId : trapId)
+		Mvr Report was returned for the wrong driver
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "CSR" );
+		>fact0.setReason( "5775: Driver has been added and Driver's MVR returned with wrong driver information." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( $driverReference );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insert( fact0 );
+end

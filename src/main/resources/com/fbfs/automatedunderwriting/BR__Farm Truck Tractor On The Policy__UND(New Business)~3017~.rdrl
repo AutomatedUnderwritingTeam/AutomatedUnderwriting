@@ -1,0 +1,28 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Farm Truck Tractor On The Policy__UND(New Business)~3017~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( type == "ST" , unitAtRiskNumber : unitAtRiskNumber )
+		CntPolicy( $cntTotalAcres : cntTotalAcres )
+		((eval( $cntTotalAcres < 500 )) or eval(vehicle.getRadiusOperation() > 100))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "3017: Policy includes a farm truck tractor." );
+		fact0.setAddAction( "Review Radius of Operation" );
+		fact0.setAddAction( "Review Farm/Ranch Operation" );
+		fact0.setAddAction( "Review Vehicle Use" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

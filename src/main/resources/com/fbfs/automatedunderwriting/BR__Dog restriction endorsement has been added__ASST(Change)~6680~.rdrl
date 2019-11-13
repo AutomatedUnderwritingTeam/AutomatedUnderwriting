@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.FormHeader;
+
+
+rule "BR__Dog restriction endorsement has been added__ASST(Change)~6680~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		liability : Liability( unitAtRiskNumber : unitAtRiskNumber, added != true )
+		FormHeader( formNumber matches ".*EX001(.|\n|\r)*" , unitAtRiskNumber == unitAtRiskNumber , added == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "6680: Dog restriction endorsement has been added. " );
+		fact0.setAddAction( "Review Endorsement" );
+		fact0.setAddAction( "Review Comments" );
+		fact0.setAddLink( "Liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

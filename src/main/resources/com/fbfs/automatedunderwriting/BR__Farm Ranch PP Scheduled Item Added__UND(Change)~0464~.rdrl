@@ -1,0 +1,28 @@
+package automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+
+rule "BR__Farm Ranch PP Scheduled Item Added__UND(Change)~0464~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		unitAtRisk : UnitAtRisk( added == true , $unitAtRiskNumber : unitAtRiskNumber, unitAtRiskCode : unitAtRiskCode)
+		CntPolicy( $cntTotalAcres : cntTotalAcres )
+		(((Coverage( coverageCode == "FPPS", limit1 > 49999 ) from unitAtRisk.coverageList) and (eval( $cntTotalAcres < 100 ))) or (Coverage( coverageCode == "FPPS", limit1 > 250000 ) from unitAtRisk.coverageList))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0464: Scheduled farm/ranch personal property item has been added." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode + $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

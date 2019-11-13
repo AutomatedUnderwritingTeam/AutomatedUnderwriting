@@ -1,0 +1,28 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+
+rule "BR__Head of Household wth school farm permit - HH added - DR added or permit added__ASST(Change)~8129~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Driver( $driverReference : driverReference, $unitAtRiskNumber : unitAtRiskNumber, isSchoolFarmPermit == true , $drvAdded : added, $previousIsSchoolFarmPermit : previousIsSchoolFarmPermit)
+		householdMember : HouseholdMember( $hmAdded : added, clientReference == $driverReference )
+		Household( headOfHousehold != null , headOfHousehold == householdMember )
+		eval( $drvAdded == true || $previousIsSchoolFarmPermit == false || $hmAdded == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8129: Head of Household driver with a school/farm permit." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( $driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insert( fact0 );
+end

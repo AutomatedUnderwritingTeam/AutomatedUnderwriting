@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.AnimalWasteCoverage;
+import com.fbfs.pc.ecd.model.AnimalWasteDescription;
+
+rule "BR__Animal Waste Coverage Item Type is Other__UND(Change)~8316~"
+	dialect "mvel"
+	when
+		UnitAtRisk( unitAtRiskNumber : unitAtRiskNumber, unitAtRiskCode : unitAtRiskCode, coverageList : coverageList)
+		(Coverage( coverageCode == "POLUT" ) from coverageList)
+		animalWasteCoverage : AnimalWasteCoverage( coverageCode == "POLUT" )
+		( 		AnimalWasteDescription( itemType == "OT" , added == true ) from animalWasteCoverage.animalWasteDescriptionList
+ or 		AnimalWasteDescription( itemType == "OT" , previousItemType != null ) from animalWasteCoverage.animalWasteDescriptionList
+ )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8316:  Animal Waste Liability Coverage's  Item Type added or changed to Other." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Farm/ranch liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

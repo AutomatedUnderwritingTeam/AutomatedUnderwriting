@@ -1,0 +1,34 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.TransactionRecord;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Change Transaction Backdated 30 or More Days (Provisional)__UND(Change)~0359~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		DM_CurrentTransaction( currentTransactionNumber : transactionNumber)
+		Policy( transactionList : transactionList)
+		( 		TransactionRecord( transactionNumber == currentTransactionNumber , increasedNetPremium == 0 , eval( calculateDaysBetween(effectiveDate, creationDate) > 59 ), eval( effectiveDate.before(creationDate) )) from transactionList
+ or 		TransactionRecord( transactionNumber == currentTransactionNumber , increasedNetPremium != 0 , eval( calculateDaysBetween(effectiveDate, creationDate) > 29 ), eval( effectiveDate.before(creationDate) )) from transactionList
+ )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0359: Change transaction backdated 30 or more days (Provisional)." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		insert( fact0 );
+		AutoAcceptor fact1 = new AutoAcceptor();
+		fact1.setAutoAcceptable( false );
+		insert( fact1 );
+end

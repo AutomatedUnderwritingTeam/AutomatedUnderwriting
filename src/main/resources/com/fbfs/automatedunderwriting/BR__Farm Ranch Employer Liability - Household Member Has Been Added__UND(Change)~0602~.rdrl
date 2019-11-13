@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Farm Ranch Employer Liability - Household Member Has Been Added__UND(Change)~0602~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		liability : Liability( unitAtRiskNumber : unitAtRiskNumber, added != true )
+		coverage : Coverage( coverageNumber : coverageNumber, added != true , coverageCode == "MDPYE" )
+		exists (		Coverage( coverageNumber == coverageNumber ) from liability.coverageList
+) 
+		exists (		ClientRelationship( added == true ) from coverage.clientRelationshipList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0602: Farm/Ranch Employer Liability--household member has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		fact0.setAddLink( "Farm/ranch liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

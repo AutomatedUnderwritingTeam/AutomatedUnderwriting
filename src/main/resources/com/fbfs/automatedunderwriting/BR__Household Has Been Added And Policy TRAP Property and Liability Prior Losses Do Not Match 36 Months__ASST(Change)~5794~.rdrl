@@ -1,0 +1,38 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Household Has Been Added And Policy TRAP Property and Liability Prior Losses Do Not Match 36 Months__ASST(Change)~5794~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( )
+		householdMember : HouseholdMember( $clientReference : clientReference)
+		household : Household( headOfHousehold : headOfHousehold != null , headOfHousehold == householdMember )
+		eval( headOfHousehold.isAdded() || household.isAdded() )
+		Client( clientReference == $clientReference , trapId : trapId, supplementList : supplementList)
+		(ClientSupplement( clientClass == "IN" ) from supplementList)
+		CntPolicy( countTrapPRPLLosses : countTrapPRPLLosses, countCogenPRPLLosses < countTrapPRPLLosses )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "5794: Household has been added and the UW Rpt/Policy property and liability losses do not match." );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( $clientReference );
+		fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

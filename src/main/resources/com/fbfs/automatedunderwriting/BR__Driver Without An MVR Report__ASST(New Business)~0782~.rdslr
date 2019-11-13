@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapMvrReport;
+
+rule "BR__Driver Without An MVR Report__ASST(New Business)~0782~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Policy( state : state)
+		>Driver( $driverReference : driverReference, $unitAtRiskNumber : unitAtRiskNumber, age : age, isSchoolFarmPermit == false )
+		>Client( clientReference == $driverReference , $trapId : trapId)
+		The MVR report for the driver is bad
+		The driver age > 14 and the state is SD OR age > 16 and the state is IA, MN, NE, AZ, NM, UT OR age > 17 and the state is KS
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "0782: Driver without an MVR report." );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( $driverReference );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

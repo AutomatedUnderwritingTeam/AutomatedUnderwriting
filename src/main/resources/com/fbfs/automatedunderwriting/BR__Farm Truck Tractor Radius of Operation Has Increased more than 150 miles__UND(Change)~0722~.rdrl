@@ -1,0 +1,23 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Farm Truck Tractor Radius of Operation Has Increased more than 150 miles__UND(Change)~0722~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( type == "ST" , radiusOperation : radiusOperation > 150 , previousRadiusOperation < radiusOperation , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0722: Farm truck tractor radius of operation has increased more than 150 miles." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

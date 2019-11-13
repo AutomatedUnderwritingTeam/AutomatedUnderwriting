@@ -1,0 +1,25 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Farm Truck Tractor Has Been Deleted(IA, MN, NE, NM, SD, UT)__UND(Change)~6179~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Policy( state == "AZ"  || == "IA"  || == "MN"  || == "NE"  || == "NM"  || == "SD"  || == "UT" )
+		vehicle : Vehicle( type == "ST" , deleted == true , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Undw Farm" );
+		fact0.setReason( "6179: Farm Truck Tractor has been deleted." );
+		fact0.setAddAction( "Review for Form E Filing" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

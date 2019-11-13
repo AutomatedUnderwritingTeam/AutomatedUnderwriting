@@ -1,0 +1,29 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.ConfinedLivestock;
+import com.fbfs.pc.ecd.model.AggregateFarm;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+
+rule "BR__Farm Ranch PP Livestock in Confinement Added__ASST(Change)~0465~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		UnitAtRisk( added == true , $unitAtRiskNumber : unitAtRiskNumber, unitAtRiskCode : unitAtRiskCode)
+		( ConfinedLivestock( unitAtRiskNumber == ( $unitAtRiskNumber ) ) or AggregateFarm( unitAtRiskNumber == ( $unitAtRiskNumber ) , inventoryClass == "06" ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0465: Livestock in Confinement has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review for Multiple Livestock in Confinement" );
+		fact0.setAddAction( "Change Multiple Livestock In Confinement From Blanket To Scheduled" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode + $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,27 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+
+rule "BR__Head of Household wth school farm permit__ASST(New Business)~8128~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Driver( $driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber, isSchoolFarmPermit == true )
+		householdMember : HouseholdMember( clientReference == $driverReference )
+		Household( headOfHousehold != null , headOfHousehold == householdMember )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8128: Head of Household driver with a school/farm permit." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( $driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insert( fact0 );
+end

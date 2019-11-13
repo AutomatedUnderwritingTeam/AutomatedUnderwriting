@@ -1,0 +1,27 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+
+rule "BR__Farm Use Vehicle And Policy Does Not Have FarmRanch Liability__ASST(New Business)~0758~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Vehicle( vehicleUse == "F" , unitAtRiskNumber : unitAtRiskNumber)
+		>not (Coverage( coverageCode == "BIPDF" )) 
+		The policy contains personal liab coverage or does not contain a property LOB
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "0758: Farm use vehicle and policy does not have farm/ranch liability coverage." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insert( fact0 );
+end

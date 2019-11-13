@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+
+
+
+rule "BR__Farm Ranch PP Blanket Has Been Added__UND(Change)~2936~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Coverage( added == true , coverageCode == "FPPB" , coverageNumber : coverageNumber)
+		not (Coverage( added != true , coverageCode == "FPPB" )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "2936: Blanket farm/ranch personal property coverage has been added for the first time." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "FarmBlanket" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

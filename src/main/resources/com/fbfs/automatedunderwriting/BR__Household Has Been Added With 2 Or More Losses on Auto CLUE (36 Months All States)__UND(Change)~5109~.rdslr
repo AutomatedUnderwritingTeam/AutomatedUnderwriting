@@ -1,0 +1,43 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.au.model.count.CntHousehold;
+import com.fbfs.pc.trap.model.ClueAutoReport;
+
+rule "BR__Household Has Been Added With 2 Or More Losses on Auto CLUE (36 Months All States)__UND(Change)~5109~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Term( effectiveDate : effectiveDate)
+		>Driver( driverReference : driverReference)
+		>householdMember : HouseholdMember( clientReference == driverReference )
+		>household : Household( headOfHousehold : headOfHousehold != null , hhClientReference : headOfHousehold.clientReference, headOfHousehold == householdMember || householdMemberList contains householdMember )
+		>eval( headOfHousehold.isAdded() || household.isAdded() )
+		>Client( clientReference == ( hhClientReference ) , trapId : trapId)
+		>TrapClueAutoReport( trapId == trapId , clueAutoReport : clueAutoReport)
+		The household total trap group 1, group 2 and group 3 auto losses within 36 months is > 1
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "5109: Household has been added with 2 or more losses on Auto CLUE (36 months all states)." );
+		>fact0.setAddAction( "Cancel Entire Policy" );
+		>fact0.setAddAction( "Remove Household" );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		>fact0.setAddLink( "Household link" );
+		>fact0.setAddBookmark( "Household" );
+		>fact0.setAddBookmarkUnit( hhClientReference );
+		>fact0.setMgmtReportingCategory( "VLOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		>fact0.setAddLink( "Policy Level Information link" );
+		>fact0.setAddBookmark( "PolicyLevelInformation" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>insert( fact0 );
+end

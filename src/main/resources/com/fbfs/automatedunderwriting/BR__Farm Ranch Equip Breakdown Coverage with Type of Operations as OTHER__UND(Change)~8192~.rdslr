@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusinessSupplement;
+
+
+rule "BR__Farm Ranch Equip Breakdown Coverage with Type of Operations as OTHER__UND(Change)~8192~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Coverage( deleted != true , coverageCode == "EBRKF" , coverageAdded : added)
+		>propertyLineOfBusiness : PropertyLineOfBusiness( )
+		>propertyLobSupplement : PropertyLineOfBusinessSupplement( farmOperationType == "OT"  || == "OC"  || == "OL" ) from propertyLineOfBusiness.supplementList
+		The F&R Equipment Breakdown Coverage has been addd   or  the farm operation type has changed
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8192: Type of Operation Indicator is Other/Other Crop/Other Livestock and policy has Farm/Ranch Equipment Breakdown Coverage." );
+		>fact0.setAddAction( "Verify Operation Type" );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Property/Liability Information link" );
+		>fact0.setAddBookmark( "PropertyLiability" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "PLOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		>insertLogical( fact0 );
+end

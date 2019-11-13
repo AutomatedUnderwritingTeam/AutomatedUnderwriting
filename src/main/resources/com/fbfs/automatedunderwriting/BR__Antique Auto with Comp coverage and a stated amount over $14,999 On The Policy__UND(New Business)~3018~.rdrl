@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Antique Auto with Comp coverage and a stated amount over $14,999 On The Policy__UND(New Business)~3018~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( type == "VA" , unitAtRiskNumber : unitAtRiskNumber, statedAmount > 14999 , coverageList : coverageList)
+		(Coverage( coverageCode == "COMP" ) from coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "3018: Antique Auto with Comp and a stated amount over $14,999." );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddAction( "Review Stated Amount" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setAddAction( "Review Registration as Antique Auto" );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

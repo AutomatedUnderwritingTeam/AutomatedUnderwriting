@@ -1,0 +1,45 @@
+package automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.au.model.count.CntHousehold;
+import java.lang.Number;
+import java.lang.Integer;
+import java.lang.Double;
+import java.util.Date;
+import com.fbfs.pc.trap.model.ClueAutoReport;
+import com.fbfs.pc.trap.model.AutoClaim;
+
+rule "BR__Household Has 2 Or More Losses On Auto CLUE (36 Months All States)__UND(New Business)~0934~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Term( effectiveDate : effectiveDate)
+		>Driver( driverReference : driverReference)
+		>householdMember : HouseholdMember( clientReference == driverReference )
+		>Household( headOfHousehold != null , hhClientReference : headOfHousehold.clientReference, headOfHousehold == householdMember || householdMemberList contains householdMember )
+		>Client( clientReference == ( hhClientReference ) , trapId : trapId)
+		>TrapClueAutoReport( trapId == trapId , clueAutoReport : clueAutoReport)
+		The Clue Auto Report has more than 0 of Auto Claims within 18 months
+		The household total trap group 1 and group 2 auto losses within 36 months is > 1
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "0934: Household has 2 or more losses on Auto CLUE (36 months all states)." );
+		>fact0.setAddAction( "Cancel Entire Policy" );
+		>fact0.setAddAction( "Remove Household" );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddAction( "Review vehicles and drivers for losses" );
+		>fact0.setAddLink( "Household link" );
+		>fact0.setAddBookmark( "Household" );
+		>fact0.setAddBookmarkUnit( hhClientReference );
+		>fact0.setMgmtReportingCategory( "VLOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		>insert( fact0 );
+end

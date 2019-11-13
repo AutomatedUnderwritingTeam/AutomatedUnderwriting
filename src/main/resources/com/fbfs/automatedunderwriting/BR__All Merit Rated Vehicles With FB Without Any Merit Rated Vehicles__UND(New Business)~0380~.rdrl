@@ -1,0 +1,34 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusinessSupplement;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__All Merit Rated Vehicles With FB Without Any Merit Rated Vehicles__UND(New Business)~0380~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( supplementList : supplementList != null )
+		(PropertyLineOfBusinessSupplement( areAllMeritRatedVehiclesFBInsured == true ) from supplementList)
+		(
+		(not (Vehicle( type == "PP"  || == "PC"  || == "PF"  || == "PN"  || == "PT" ))) or
+		(not (exists(LineOfBusiness(lineOfBusiness  == "VEH")))) 				
+		)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0380: Property account discount without a merit rated vehicle." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Remove Discount" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Main Overview link" );
+		fact0.setAddBookmark( "MainOverview" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

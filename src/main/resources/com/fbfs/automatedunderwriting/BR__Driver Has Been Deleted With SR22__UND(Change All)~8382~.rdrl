@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+
+rule "BR__Driver Has Been Deleted With SR22__UND(Change All)~8382~"
+	agenda-group "BR_Change_All"
+	dialect "mvel"
+	when
+		Driver( deleted == true , sr22FilingDate != null , sr22FilingDate != "01-Jan-0001" , driverReference : driverReference, driverUAR : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8382: Driver has been deleted with SR-22." );
+		fact0.setAddAction( "File SR-26" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( driverUAR );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapClient;
+import com.fbfs.pc.au.model.trap.TrapMvrReport;
+
+rule "BR__Drivers MVR Returned With Wrong Driver Information__ASST(New Business)~6173~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Driver( $driverReference : driverReference, $unitAtRiskNumber : unitAtRiskNumber)
+		>Client( clientReference == $driverReference , $trapId : trapId)
+		Mvr Report was returned for the wrong driver
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "6173: Driver's MVR returned with wrong driver information." );
+		>fact0.setAddAction( "Review for MVR" );
+		>fact0.setAddAction( "Review Driver" );
+		>fact0.setAddAction( "Review Driving Information" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( $driverReference );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insert( fact0 );
+end
+
