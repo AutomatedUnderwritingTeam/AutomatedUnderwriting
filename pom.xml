@@ -45,6 +45,24 @@
       <version>7.26.0.Final-redhat-00005</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>fbfs</groupId>
+      <artifactId>AURulesModel-2019.03.6</artifactId>
+      <version>2019.03.6</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>fbfs</groupId>
+      <artifactId>ecd-2019.11.23</artifactId>
+      <version>2019.11.23</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>fbfs</groupId>
+      <artifactId>trapobjects-2019.08.38</artifactId>
+      <version>2019.08.38</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
