@@ -1,0 +1,18 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.ecd.model.User;
+import com.fbfs.pc.au.model.declarativemodel.DM_HDRUser;
+
+
+
+rule "TR__Definition HDR User"
+
+agenda-group "IT_Rules"
+when
+	currentTransaction : DM_CurrentTransaction ( )
+	user : User ( branch == "HDR")  from currentTransaction.user
+then
+	DM_HDRUser hdr = new DM_HDRUser();
+	insert(hdr);
+
+end

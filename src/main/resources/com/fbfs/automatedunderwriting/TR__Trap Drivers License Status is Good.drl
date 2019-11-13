@@ -1,0 +1,16 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.trap.TrapClient;
+import com.fbfs.pc.au.model.trap.TrapDriversLicense;
+
+import com.fbfs.pc.au.model.trap.TrapDriversLicense;
+
+rule "TR__Trap Drivers License Status is Good"
+
+agenda-group "IT_Rules"
+when
+	trapDriversLicense : TrapDriversLicense ( goodLicense == false, (driversLicense.status == null || == " " || == "") || (oldLicense == true) )
+then
+	trapDriversLicense.setGoodLicense(true);
+	update(trapDriversLicense);
+
+end

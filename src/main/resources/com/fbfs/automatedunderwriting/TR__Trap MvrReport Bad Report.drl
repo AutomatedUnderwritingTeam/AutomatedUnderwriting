@@ -1,0 +1,17 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.trap.model.DrivingRecord
+
+
+rule "TR__Trap MvrReport Bad Report"
+
+agenda-group "IT_Rules"
+when
+	trapMvrReport : TrapMvrReport ( badMvrReport == false, mvrReport.returnInfo == null || mvrReport.returnInfo == "" )
+	not (DrivingRecord ( svcCode == "08110" || == "08120" || == "XXXXX" ) from trapMvrReport.mvrReport.drivingRecordList)
+then
+	trapMvrReport.setBadMvrReport(true);
+	update(trapMvrReport);
+
+
+end

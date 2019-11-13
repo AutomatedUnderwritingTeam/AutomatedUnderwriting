@@ -1,0 +1,17 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_FarmRanchLiabilityCoverage;
+
+
+
+rule "TR__WorkItem Routing BCD Farm"
+
+agenda-group "IT_FinalRules"
+when
+	exists(DM_FarmRanchLiabilityCoverage())
+	workItem : WorkItem( type == "BCD" )
+	
+then
+	workItem.setQueue("BCD Farm");
+
+end

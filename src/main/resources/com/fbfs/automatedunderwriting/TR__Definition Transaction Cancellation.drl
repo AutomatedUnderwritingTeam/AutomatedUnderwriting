@@ -1,0 +1,17 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+
+
+
+rule "TR__Definition Transaction Cancellation"
+
+agenda-group "IT_Rules"
+when
+	DM_CurrentTransaction ( type == "08" || == "09" || == "10" )
+then
+	DM_CancellationTransaction ct = new DM_CancellationTransaction();
+	insertLogical(ct);
+
+
+end

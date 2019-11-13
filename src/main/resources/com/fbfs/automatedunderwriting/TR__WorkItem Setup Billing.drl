@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Billing;
+
+
+
+rule "TR__WorkItem Setup Billing"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( )
+        policy : Policy( )
+	billing : Billing ( ) from policy.billingList
+then
+     	workItem.setDunningCode(billing.getDunningCode());
+     	workItem.setPlanCode(billing.getPlanCode());
+
+
+end

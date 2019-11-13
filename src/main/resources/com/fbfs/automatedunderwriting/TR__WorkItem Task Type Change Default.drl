@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_ChangeTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_FarmRanchLiabilityCoverage;
+import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+
+
+rule "TR__WorkItem Task Type Change Default"
+
+agenda-group "IT_FinalRules"
+when
+	DM_ChangeTransaction()
+        not(DM_FarmRanchLiabilityCoverage())
+	workItem : WorkItem( type == "Policy")
+        not (DM_TaskType())
+	
+	
+then
+	workItem.setTaskType("PMP_CHANGE");
+        DM_TaskType taskType = new DM_TaskType("PMP_CHANGE");
+	insert(taskType);
+
+
+end

@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_RewriteTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+
+
+
+rule "TR__WorkItem Task Type PMP_REWRITE"
+
+agenda-group "IT_WorkItem" 
+when
+	workItem : WorkItem( type == "Policy")
+	DM_RewriteTransaction()
+	(exists(workItemReason : WorkItemReason( workItemReasonType : type == "Policy", reason != null )) or
+	 exists(workItemPendReason : WorkItemPendReason (type == "Policy")))
+then
+	workItem.setTaskType("PMP_REWRITE");
+        DM_TaskType taskType = new DM_TaskType("PMP_REWRITE");
+	insert(taskType);
+
+
+end

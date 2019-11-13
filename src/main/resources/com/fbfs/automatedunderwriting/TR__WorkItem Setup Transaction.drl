@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+
+
+
+rule "TR__WorkItem Setup Transaction"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( )
+	transaction : DM_CurrentTransaction()
+then
+     	workItem.setTransactionNumber(transaction.getTransactionNumber());
+     	workItem.setTransactionCreateDate(transaction.getCreationDate());
+     	workItem.setTransactionEffDate(transaction.getEffectiveDate());
+
+
+end

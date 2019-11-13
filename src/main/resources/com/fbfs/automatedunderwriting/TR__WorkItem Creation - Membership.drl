@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+rule "TR__WorkItem Creation - Membership"
+
+agenda-group "IT_WorkItem"
+when
+	Policy ()
+	not (WorkItem( type == "Membership" )) 
+then
+	WorkItem workItem = new WorkItem();
+	workItem.setType( "Membership" );
+	workItem.setQueue("Membership");
+        workItem.setPriority("Medium");
+	insert(workItem);
+
+
+end

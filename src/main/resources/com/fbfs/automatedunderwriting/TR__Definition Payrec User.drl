@@ -1,0 +1,17 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_PayrecUser;
+import com.fbfs.pc.ecd.model.User;
+
+
+rule "TR__Definition Payrec User"
+
+agenda-group "IT_Rules"
+when
+	currentTransaction : DM_CurrentTransaction ( )
+	user : User ( branch == "HO2") from currentTransaction.user
+then
+	DM_PayrecUser pru = new DM_PayrecUser();
+	insert(pru);
+
+end

@@ -1,0 +1,21 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Policy;
+
+
+
+rule "TR__WorkItem Setup Policy"
+
+agenda-group "IT_WorkItem"
+when
+	policy : Policy( )
+	workItem : WorkItem( )
+then
+	workItem.setPolicyNumber( policy.getPolicyNumber() );
+	workItem.setProductCode( policy.getProductCode() );
+	workItem.setCompany( policy.getCompany() );
+	workItem.setAccountNumber( policy.getMembershipAccountNumber() );
+	workItem.setRatingState( policy.getState() );
+        
+
+end

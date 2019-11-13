@@ -1,0 +1,17 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__WorkItem Setup Owner"
+
+agenda-group "IT_WorkItem"
+when
+	workItemReason : WorkItemReason( wirType : type, owner != null, owner != "CancellationUser")
+	workItem : WorkItem( type == wirType)
+then
+	workItem.setOwner(workItemReason.getOwner());
+
+
+end

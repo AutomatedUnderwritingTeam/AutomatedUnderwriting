@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Comment;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+
+
+rule "TR__WorkItem Setup Comment"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( )
+        DM_CurrentTransaction (creationDate : creationDate )
+	policy : Policy()
+        comment : Comment ( code == "GC", comment != null, commentDate != null,  commentDate >= creationDate ) from policy.commentList
+then
+     	workItem.setTransactionComment(comment.getComment());
+
+
+end

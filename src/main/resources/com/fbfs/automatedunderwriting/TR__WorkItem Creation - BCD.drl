@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__WorkItem Creation - BCD"
+
+agenda-group "IT_WorkItem"
+when
+	Policy ()
+	not (WorkItem( type == "BCD" )) 
+then
+	WorkItem workItem = new WorkItem();
+	workItem.setType( "BCD" );
+	workItem.setQueue("BCD");
+        workItem.setPriority("Medium");
+	insert(workItem);
+
+
+end

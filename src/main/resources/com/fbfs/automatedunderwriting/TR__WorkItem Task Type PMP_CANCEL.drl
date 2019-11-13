@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+
+
+rule "TR__WorkItem Task Type PMP_CANCEL"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( type == "Policy")
+	DM_CancellationTransaction()
+then
+	workItem.setTaskType("PMP_CANCEL");
+	DM_TaskType taskType = new DM_TaskType("PMP_CANCEL");
+	insert(taskType);
+
+
+end

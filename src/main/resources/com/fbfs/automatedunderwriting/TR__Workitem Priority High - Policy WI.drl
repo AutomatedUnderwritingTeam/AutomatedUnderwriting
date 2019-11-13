@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__Workitem Priority High - Policy WI"
+
+agenda-group "IT_FinalRules"
+when
+	workItem : WorkItem( type == "Policy" )		
+	(exists(WorkItemReason( type == "Policy", priority == "High" )))	
+then
+	workItem.setPriority("High");
+
+end

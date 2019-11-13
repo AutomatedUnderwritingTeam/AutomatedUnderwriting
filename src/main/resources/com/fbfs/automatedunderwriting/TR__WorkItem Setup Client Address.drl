@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+import com.fbfs.pc.ecd.model.ClientAddress;
+
+
+rule "TR__WorkItem Setup Client Address"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( )
+        policy : Policy( )
+	clientRelationship : ClientRelationship( deleted == false, type == "40") from policy.clientRelationshipList
+	client : Client ( clientReference == clientRelationship.clientReference ) from policy.clientList
+	clientAddress : ClientAddress ( ) from client.addressList
+then
+    	workItem.setInsStreet( clientAddress.getStreet() );
+     	workItem.setInsCity( clientAddress.getCity() );
+     	workItem.setInsState( clientAddress.getState() );
+     	workItem.setInsZipCode( clientAddress.getZipCode() );
+
+
+end

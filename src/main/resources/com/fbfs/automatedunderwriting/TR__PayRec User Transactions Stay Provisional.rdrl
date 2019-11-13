@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.declarativemodel.DM_PayrecUser;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "TR__PayRec User Transactions Stay Provisional"
+	agenda-group "IT_Rules"
+	dialect "mvel"
+	when
+		DM_PayrecUser( )
+	then
+		AutoAcceptor fact0 = new AutoAcceptor();
+		fact0.setAutoAcceptable( false );
+		insert( fact0 );
+end

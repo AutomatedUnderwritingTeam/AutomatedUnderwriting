@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_RewriteTransaction;
+
+rule "TR__Definition Transaction Rewrite"
+
+agenda-group "IT_Rules"
+when
+	DM_CurrentTransaction(type == "14")
+then
+	DM_RewriteTransaction rt = new DM_RewriteTransaction();
+	insertLogical(rt);
+
+
+end

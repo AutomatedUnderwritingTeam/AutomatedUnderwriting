@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk; 
+
+
+rule "TR - Trap Mvr License Weight Returned DOB contains Client DOB"
+
+agenda-group "IT_Rules"
+when
+	TrapClient ( $trapId : trapId, dateOfBirth : client.dateOfBirth )	
+	trapMvrReport : TrapMvrReport ( trapId == $trapId, licenseWeight == 0, eval(areDatesSame(mvrReport.getReturnDateOfBirth(), dateOfBirth)))
+    
+then
+	trapMvrReport.setLicenseWeight(1);
+	update(trapMvrReport);
+
+
+end

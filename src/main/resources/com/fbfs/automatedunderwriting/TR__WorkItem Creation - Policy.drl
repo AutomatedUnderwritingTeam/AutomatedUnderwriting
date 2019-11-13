@@ -1,0 +1,21 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+
+
+rule "TR__WorkItem Creation - Policy"
+
+agenda-group "IT_WorkItem"
+when
+	Policy () 
+	not (WorkItem( type == "Policy" )) 
+then
+	WorkItem workItem = new WorkItem();
+	workItem.setType( "Policy" );
+	workItem.setQueue("Policy");
+        workItem.setPriority("Medium");
+	insert(workItem);
+
+
+end

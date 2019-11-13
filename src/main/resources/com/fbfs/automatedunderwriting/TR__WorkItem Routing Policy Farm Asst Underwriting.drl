@@ -1,0 +1,22 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_FarmRanchLiabilityCoverage;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+
+rule "TR__WorkItem Routing Policy Farm Asst Underwriting"
+
+agenda-group "IT_FinalRules"
+when
+	DM_FarmRanchLiabilityCoverage()
+	workItem : WorkItem( type == "Policy" )
+        not (DM_NewBusinessTransaction())
+	WorkItemReason( type == "Policy", queue == "Asst Undw Farm" || == "Asst Undw" )
+	not (exists(WorkItemReason( type == "Policy", owner != null )))
+	not (exists(WorkItemReason( type == "Policy", queue == "Undw" )))
+	not (exists(WorkItemReason( type == "Policy", queue == "Undw Farm" )))	        
+	
+then
+	workItem.setQueue("Asst Undw Farm");
+
+end

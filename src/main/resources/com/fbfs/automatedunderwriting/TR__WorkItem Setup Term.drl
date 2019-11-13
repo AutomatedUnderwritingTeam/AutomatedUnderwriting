@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Policy;
+
+
+
+rule "TR__WorkItem Setup Term"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( )
+	policy : Policy( term : term != null)
+then
+     	workItem.setTerm(term.getTerm());
+    	workItem.setTermEffDate(term.getEffectiveDate());
+	workItem.setTermExpDate(term.getExpirationDate());
+
+
+end

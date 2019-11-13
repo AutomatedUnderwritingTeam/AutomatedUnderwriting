@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+
+
+rule "TR__WorkItem Task Type PMP_T_DNR_NB"
+
+agenda-group "IT_WorkItem"
+when
+	not (exists(workItemReason : WorkItemReason( type == "Policy", reason != null)))
+	workItemPendReason : WorkItemPendReason (type == "Policy", pendReason != null)
+	workItem : WorkItem( type == "Policy" )
+	DM_NewBusinessTransaction()
+	//DM_AutomatedUnderwritingUser()
+	DM_CurrentTransaction (effectiveDate : effectiveDate ) 
+	eval(calculateDaysBetween(effectiveDate, new Date()) < 40)
+then
+	workItem.setTaskType("PMP_T_DNR_NB");
+        DM_TaskType taskType = new DM_TaskType("PMP_T_DNR_NB");
+	insert(taskType);
+
+end

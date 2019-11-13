@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.au.model.declarativemodel.DM_ReinstatementTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+
+
+
+
+rule "TR__WorkItem Task Type PMP_REINSTATE"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( type == "Policy")
+	DM_ReinstatementTransaction()
+then
+	workItem.setTaskType("PMP_REINSTATE");
+	DM_TaskType taskType = new DM_TaskType("PMP_REINSTATE");
+	insert(taskType);
+
+
+
+end

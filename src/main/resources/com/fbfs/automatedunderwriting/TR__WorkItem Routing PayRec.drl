@@ -1,0 +1,14 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__WorkItem Routing PayRec"
+
+agenda-group "IT_FinalRules"
+when
+	workItem : WorkItem( type == "PayRec", queue == "PayRec" )
+then
+	workItem.setQueue("EXCEED Cashier");
+
+end

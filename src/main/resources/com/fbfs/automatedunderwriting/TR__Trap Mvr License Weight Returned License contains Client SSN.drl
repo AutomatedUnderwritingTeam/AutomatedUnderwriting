@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+
+
+rule "TR - Trap Mvr License Weight Returned License contains Client SSN"
+
+agenda-group "IT_Rules"
+when
+	TrapClient ( $trapId : trapId, ssn : client.ssn )
+	TrapDriversLicense ( trapId == $trapId, eval(isSubstringOfString(driversLicense.getReturnedLicenseNumber(), ssn)) )
+	trapMvrReport : TrapMvrReport ( trapId == $trapId, licenseWeight == 0)
+	
+then
+	trapMvrReport.setLicenseWeight(1);
+	update(trapMvrReport);
+
+
+end

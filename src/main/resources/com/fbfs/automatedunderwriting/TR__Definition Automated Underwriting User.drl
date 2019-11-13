@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_TenantOnlyPolicy;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+import com.fbfs.pc.ecd.model.User;
+
+
+rule "TR__Definition Automated Underwriting User"
+dialect 'mvel'
+agenda-group "IT_Rules"
+when
+		(currentTransaction : DM_CurrentTransaction ( ) and
+	user : User ( (userId == "15A00003") || (branch == "HO1" && subBranch == "CTR") || (branch != "HO1" && branch != "HO2" && branch != "HO3") ) from currentTransaction.user) or
+
+
+	(exists(DM_TenantOnlyPolicy()) and
+        exists(DM_NewBusinessTransaction()))    or
+
+        (DM_CurrentTransaction( user2 : user) and
+         User( userDelegationList : userDelegationList) from user2 and
+	         UserDelegation( delegation == "AGENT1" ) from userDelegationList)
+
+then
+	DM_AutomatedUnderwritingUser auu = new DM_AutomatedUnderwritingUser();
+	insert(auu);
+end

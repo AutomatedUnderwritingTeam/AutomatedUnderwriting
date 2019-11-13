@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_RenewalTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+
+
+rule "TR__WorkItem Task Type PMP_RENEWAL"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( type == "Policy")
+	DM_RenewalTransaction()
+then
+	workItem.setTaskType("PMP_RENEWAL");
+	DM_TaskType taskType = new DM_TaskType("PMP_RENEWAL");
+	insert(taskType);
+
+
+end

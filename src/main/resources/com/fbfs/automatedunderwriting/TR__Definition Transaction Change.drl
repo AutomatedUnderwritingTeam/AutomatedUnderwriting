@@ -1,0 +1,16 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_ChangeTransaction;
+
+
+rule "TR__Definition Transaction Change"
+
+agenda-group "IT_Rules"
+when
+	DM_CurrentTransaction (type == "03")
+then
+	DM_ChangeTransaction ct = new DM_ChangeTransaction();
+	insertLogical(ct);
+
+
+end

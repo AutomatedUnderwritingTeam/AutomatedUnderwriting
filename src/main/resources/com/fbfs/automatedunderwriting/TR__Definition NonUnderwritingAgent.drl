@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_NonUnderwritingAgent;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.ecd.model.User;
+import com.fbfs.pc.ecd.model.UserDelegation;
+
+
+rule "TR__Definition NonUnderwritingAgent"
+
+agenda-group "IT_Rules"
+when
+	currentTransaction : DM_CurrentTransaction ( )
+	user : User ( ) from currentTransaction.user
+        UserDelegation( delegation == "AGENT2" ) from user.userDelegationList
+
+then
+	DM_NonUnderwritingAgent nonUnderwritingAgent = new DM_NonUnderwritingAgent();
+	insert(nonUnderwritingAgent);
+
+end

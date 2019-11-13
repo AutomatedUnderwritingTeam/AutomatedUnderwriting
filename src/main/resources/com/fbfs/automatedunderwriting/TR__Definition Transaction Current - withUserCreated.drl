@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.TransactionRecord;
+
+
+rule "TR__Definition Transaction Current - withUserCreated"
+
+agenda-group "IT_Rules"
+when
+	policy : Policy( )
+	transaction : TransactionRecord ( status == "P") from policy.transactionList
+	TransactionRecord(userUpdated == null  || userUpdated.branch == null) from transaction
+	
+then
+	DM_CurrentTransaction ct = new DM_CurrentTransaction();
+	ct.setType(transaction.getType());
+	ct.setEffectiveDate(transaction.getEffectiveDate());
+	ct.setCreationDate(transaction.getCreationDate());
+	ct.setTransactionNumber(transaction.getTransactionNumber());
+	ct.setTermIdent(transaction.getTermIdent());
+	ct.setUserCreated(transaction.getUserCreated());
+	ct.setUserUpdated(transaction.getUserUpdated()); 
+	ct.setUser(transaction.getUserCreated());
+ 
+	insertLogical(ct);
+
+
+end

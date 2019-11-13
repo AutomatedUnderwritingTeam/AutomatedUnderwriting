@@ -1,0 +1,17 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__WorkItem Setup WorkItemReason"
+
+agenda-group "IT_WorkItem"
+when
+	workItemReason : WorkItemReason( workItemReasonType : type)
+	workItem : WorkItem( type == workItemReasonType )
+then
+	workItem.addReason(workItemReason);
+
+
+end

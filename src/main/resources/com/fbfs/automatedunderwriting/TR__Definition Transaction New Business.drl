@@ -1,0 +1,16 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+
+
+rule "TR__Definition Transaction New Business"
+
+agenda-group "IT_Rules"
+when
+	DM_CurrentTransaction(type == "01")
+then
+	DM_NewBusinessTransaction nbt = new DM_NewBusinessTransaction();
+	insertLogical(nbt);
+
+
+end

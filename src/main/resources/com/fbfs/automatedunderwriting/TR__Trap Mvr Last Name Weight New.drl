@@ -1,0 +1,18 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.trap.TrapClient;
+import com.fbfs.pc.au.model.trap.TrapMvrReport;
+
+
+rule "TR__Trap Mvr Last Name Weight New"
+
+agenda-group "IT_Rules"
+when	
+	TrapClient ( $trapId : trapId, $lastName : client.lastName )		
+	trapMvrReport : TrapMvrReport( $trapId == trapId, lastNameWeight < 1, $returnInfo : mvrReport.returnInfo)   
+	eval(isSubstringOfString($returnInfo, $lastName))
+then	
+	trapMvrReport.setLastNameWeight(1);	
+	update(trapMvrReport);
+
+end

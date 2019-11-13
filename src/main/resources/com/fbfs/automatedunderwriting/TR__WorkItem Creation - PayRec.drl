@@ -1,0 +1,21 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+
+
+rule "TR__WorkItem Creation - PayRec"
+
+agenda-group "IT_WorkItem"
+when
+	Policy ()
+	not (WorkItem( type == "PayRec" )) 
+then
+	WorkItem workItem = new WorkItem();
+	workItem.setType( "PayRec" );
+	workItem.setQueue("PayRec");
+        workItem.setPriority("Medium");
+	insert(workItem);
+
+
+end

@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.trap.TrapDriversLicense;
+import com.fbfs.pc.au.model.trap.TrapClient;
+import com.fbfs.pc.au.model.trap.TrapMvrReport;
+
+rule "TR__Trap Mvr License Weight Client License contains Returned License"
+
+agenda-group "IT_Rules"
+when
+	TrapDriversLicense ( $trapId : trapId, returnedLicenseNumber : driversLicense.returnedLicenseNumber )
+	TrapClient ( trapId == $trapId, eval(isSubstring(client.getLicenseNumber(), returnedLicenseNumber)) )
+	trapMvrReport : TrapMvrReport ( trapId == $trapId, licenseWeight == 0)
+	
+then
+	trapMvrReport.setLicenseWeight(1);
+	update(trapMvrReport);
+
+
+end

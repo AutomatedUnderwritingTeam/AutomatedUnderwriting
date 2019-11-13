@@ -1,0 +1,18 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.trap.TrapDriversLicense;
+import com.fbfs.pc.au.model.trap.TrapDrivingRecord;
+
+
+rule "TR__Trap Drivers License Status is Good 2"
+
+agenda-group "IT_Rules"
+when
+	trapDriversLicense : TrapDriversLicense ( trapId : trapId, goodLicense == false, oldLicense == false, driversLicense.status not matches ".*NOT VALID(.|\n|\r)*" )
+	TrapDrivingRecord( trapId == trapId, drivingRecord.description matches ".*MVR RECORD CLEAR(.|\n|\r)*" ) 
+then
+	trapDriversLicense.setGoodLicense(true);
+	update(trapDriversLicense);
+
+
+end

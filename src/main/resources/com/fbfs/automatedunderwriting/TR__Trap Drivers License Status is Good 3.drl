@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.trap.TrapDriversLicense;
+
+
+
+rule "TR__Trap Drivers License Status is Good 3"
+dialect 'mvel'
+agenda-group "IT_Rules"
+when
+	trapDriversLicense : TrapDriversLicense ( trapId : trapId, goodLicense == false, (driversLicense.status not matches ".*NOT VALID(.|\n|\r)*" && oldLicense == false), driversLicense.status in ("ACTIVE", "ACTIVE/ELIGIBLE", "CDL: VALID", "CDL: VALID KANSAS", "CDL:CURRENT", "CDL:VALID", "CLEAR", "CLEARED", "CURRENT", "CURRENT LICENSE", "ELIGIBLE", "IN FORCE", "IN GOOD STANDING", "LICENSED", "PDL: VALID KANSAS", "VALID", "VALID KANSAS", "VALID OPER LICENSE", "VALID W/O PHOTO",  "1  VALID", "U  UNAVAILABLE") )
+then
+	trapDriversLicense.setGoodLicense(true);
+	update(trapDriversLicense);
+
+end

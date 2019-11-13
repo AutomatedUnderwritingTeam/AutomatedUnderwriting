@@ -1,0 +1,13 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+rule "TR__WorkItem Task Type Membership PMP_REVIEW_MEMBERSHIP"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( type == "Membership" )
+then
+	workItem.setTaskType("PMP_REVIEW_MEMBERSHIP");
+
+end

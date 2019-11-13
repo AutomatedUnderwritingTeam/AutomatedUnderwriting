@@ -1,0 +1,17 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__WorkItem Task Type PayRec PMP_PAYREC_PROC"
+
+agenda-group "IT_WorkItem"
+when
+	(not (exists (workItemReason : WorkItemReason( type == "PayRec", taskType != null, taskType.length > 0 ))) or
+	 Number( intValue > 1 ) from accumulate ( wir : WorkItemReason( type == "PayRec", taskType != null, taskType.length > 0 ), count(wir) ))
+	workItem : WorkItem( type == "PayRec" )
+then
+	workItem.setTaskType("PMP_PAYREC_PROC");
+
+end

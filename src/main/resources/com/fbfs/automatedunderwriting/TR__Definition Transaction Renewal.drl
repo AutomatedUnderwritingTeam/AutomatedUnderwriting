@@ -1,0 +1,18 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_RenewalTransaction;
+
+
+
+rule "TR__Definition Transaction Renewal"
+
+agenda-group "IT_Rules"
+when
+	DM_CurrentTransaction(type == "02")
+then
+	DM_RenewalTransaction rt = new DM_RenewalTransaction();
+	insertLogical(rt);
+
+
+end

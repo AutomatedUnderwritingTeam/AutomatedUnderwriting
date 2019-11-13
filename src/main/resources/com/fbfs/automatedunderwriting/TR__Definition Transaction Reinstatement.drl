@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_ReinstatementTransaction;
+
+rule "TR__Definition Transaction Reinstatement"
+
+agenda-group "IT_Rules"
+when
+	DM_CurrentTransaction(type == "06")
+then
+	DM_ReinstatementTransaction rt = new DM_ReinstatementTransaction();
+	insertLogical(rt);
+
+
+end

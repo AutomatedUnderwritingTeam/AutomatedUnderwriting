@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+import com.fbfs.pc.au.model.declarativemodel.DM_FarmRanchLiabilityCoverage;
+
+
+rule "TR__Definition Farm Ranch Liability Coverage"
+
+agenda-group "IT_Rules"
+when
+(	        
+	 (exists(Coverage ( coverageCode == "BIPDF", deleted != true))) or
+          ( location : Location( locationNumber : locationNumber) and
+		 LocationSupplement( locationUse == "S" || locationUse == "F"  ) from location.supplement and
+		exists(	 UnitAtRisk(deleted != true, lineOfBusiness == "PRPL", locationNumber == locationNumber))) or
+         (not (exists(UnitAtRisk(lineOfBusiness == "PRPL"))) and
+          ((exists (Vehicle(lineOfBusiness == "VEH", type == "ST"  || == "PF" || == "FT" || == "TR"))) or
+          (exists(Vehicle( vehicleUse == 'F'))) ))
+)
+
+then
+	DM_FarmRanchLiabilityCoverage frlc = new DM_FarmRanchLiabilityCoverage();
+	insertLogical(frlc);
+
+end

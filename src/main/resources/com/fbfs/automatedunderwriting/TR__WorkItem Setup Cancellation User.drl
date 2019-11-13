@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.TransactionRecord;
+import com.fbfs.pc.au.model.declarativemodel.DM_ReinstatementTransaction;
+
+
+
+rule "TR__WorkItem Setup Cancellation User"
+
+agenda-group "IT_WorkItem"
+when
+	workItemReason : WorkItemReason( wirType : type, owner != null, owner == "CancellationUser" )
+	workItem : WorkItem( type == wirType)
+	DM_ReinstatementTransaction ()
+	policy : Policy( )
+	cancellationTransaction : TransactionRecord (type == "08" || == "09" || == "10", user : userCreated != null) from policy.transactionList
+then
+	workItem.setOwner(user.getUserId());
+
+
+end

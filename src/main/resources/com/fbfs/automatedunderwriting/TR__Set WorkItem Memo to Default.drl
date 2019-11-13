@@ -1,0 +1,18 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__Set WorkItem Memo to Default"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem(memoDescription == null)
+  
+then
+   
+
+	workItem.setMemoDescription(" ");
+
+
+end

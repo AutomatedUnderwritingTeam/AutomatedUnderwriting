@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_FarmRanchLiabilityCoverage;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+
+
+
+rule "TR__WorkItem Task Type Non Farm PMP_NEW_BUSINESS"
+
+agenda-group "IT_WorkItem"
+when
+	not (exists(DM_FarmRanchLiabilityCoverage()))
+	workItem : WorkItem( type == "Policy")
+       (exists(workItemReason : WorkItemReason( workItemReasonType : type == "Policy", reason != null)))
+	DM_NewBusinessTransaction()
+then
+	workItem.setTaskType("PMP_NEW_BUSINESS");
+	DM_TaskType taskType = new DM_TaskType("PMP_NEW_BUSINESS");
+	insert(taskType);
+
+
+end

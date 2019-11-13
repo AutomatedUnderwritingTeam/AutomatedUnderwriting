@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.membership.Membership;
+
+
+
+rule "TR__WorkItem Setup Membership"
+
+agenda-group "IT_WorkItem"
+when
+	membership : Membership( )
+	workItem : WorkItem( )
+then
+	workItem.setAgentName( membership.getAgentName() );
+	workItem.setAgentNumber( membership.getAgentNumber() );
+	workItem.setAgentPhoneNumber( membership.getAgentPhoneNum() );
+	workItem.setBulkMailCode( membership.getBulkMailCode() );
+
+end

@@ -1,0 +1,16 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.declarativemodel.DM_Ultra;
+import com.fbfs.pc.ecd.model.Policy;
+
+
+rule "TR__Definition Ultra Product"
+
+agenda-group "IT_Rules"
+when
+	Policy(company == "810" && productCode == "ULTRA")
+then
+	DM_Ultra ultra = new DM_Ultra();
+	insert(ultra);
+
+end

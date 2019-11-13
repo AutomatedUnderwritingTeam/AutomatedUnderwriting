@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.control.PolicyFlag;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_ChangeTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_RewriteTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_ReinstatementTransaction;
+
+
+rule "TR__Definition Policy Analyzed"
+
+agenda-group "IT_FinalRules"
+when
+	WorkItemReason(type == "Policy") ||
+	(DM_AutomatedUnderwritingUser() and
+	 (DM_NewBusinessTransaction() || DM_ChangeTransaction() ||
+	  DM_CancellationTransaction() || DM_RewriteTransaction() ||	
+ 	  DM_ReinstatementTransaction()))
+then
+	PolicyFlag policyFlag= new PolicyFlag();
+	policyFlag.setPolicyFlag(true);
+	insert(policyFlag);
+
+
+end

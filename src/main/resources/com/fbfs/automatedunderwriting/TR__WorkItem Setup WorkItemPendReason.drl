@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+
+
+rule "TR__WorkItem Setup WorkItemPendReason"
+
+agenda-group "IT_WorkItem"
+when
+	workItemPendReason : WorkItemPendReason( workItemPendReasonType : type)
+	workItem : WorkItem( type == workItemPendReasonType )
+	DM_CurrentTransaction (effectiveDate : effectiveDate ) 
+	eval(calculateDaysBetween(effectiveDate, new Date()) < 40)
+then
+	workItem.addPendReason(workItemPendReason.getPendReason());
+
+
+end

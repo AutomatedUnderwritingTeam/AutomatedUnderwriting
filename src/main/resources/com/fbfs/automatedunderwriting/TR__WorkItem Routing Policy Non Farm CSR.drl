@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.declarativemodel.DM_FarmRanchLiabilityCoverage;
+
+
+rule "TR__WorkItem Routing Policy Non Farm CSR"
+
+agenda-group "IT_FinalRules"
+when
+	not (exists(DM_FarmRanchLiabilityCoverage()))
+	workItem : WorkItem( type == "Policy" )
+	//WorkItemReason( type == "Policy", queue == "CSR" )
+	not (exists(WorkItemReason( type == "Policy", owner != null )))
+	not (exists(WorkItemReason( type == "Policy", queue == "Asst Undw" )))
+	not (exists(WorkItemReason( type == "Policy", queue == "Asst Undw Farm" )))
+	not (exists(WorkItemReason( type == "Policy", queue == "Undw" )))
+	not (exists(WorkItemReason( type == "Policy", queue == "Undw Farm" )))
+	//not (exists(Policy ( state == 'SD' )))
+then
+	workItem.setQueue("CSR");
+
+end

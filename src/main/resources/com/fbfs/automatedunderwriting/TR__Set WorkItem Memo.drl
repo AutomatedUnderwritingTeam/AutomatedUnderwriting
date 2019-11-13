@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__Set WorkItem Memo"
+
+agenda-group "IT_FinalRules"
+when
+	workItem : WorkItem($wiType : type)
+        $workItemReasons : WorkItemReason( type == $wiType,  $memoDescription : memoDescription != null) 
+	
+ 
+  $i : List () from collect ( String()
+ from $workItemReasons.memoDescription)
+
+
+	$str : String() from $i
+then
+   
+
+	workItem.setMemoDescription(workItem.getMemoDescription() + $str + ".  ");
+
+
+end

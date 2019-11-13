@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+
+
+rule "TR__WorkItem Task Type PMP_T_BCD"
+
+agenda-group "IT_WorkItem"
+when
+	workItem : WorkItem( type == "BCD" )
+then
+	workItem.setTaskType("PMP_T_BCD");
+
+
+end

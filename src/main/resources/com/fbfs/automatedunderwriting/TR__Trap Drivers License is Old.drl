@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.trap.TrapDriversLicense;
+
+
+rule "TR__Trap Drivers License is Old"
+
+agenda-group "IT_Rules"
+when
+	trapDriversLicense: TrapDriversLicense ( oldLicense == false, driversLicense.licenseClass matches ".*ID CARD(.|\n|\r)*" )
+then
+	trapDriversLicense.setOldLicense(true);
+	update(trapDriversLicense);
+
+end

@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+
+
+
+rule "TR__WorkItem Task Type CREATE_FILE New Business"
+
+agenda-group "IT_WorkItem"
+when
+	DM_NewBusinessTransaction()
+	not (exists(workItemReason : WorkItemReason( workItemReasonType : type == "Policy", reason != null)))
+	not (exists(workItemPendReason : WorkItemPendReason (type == "Policy", pendReason !=null)))
+	workItem : WorkItem( type == "Policy" )
+then
+	workItem.setTaskType("CREATE_FILE");
+        DM_TaskType taskType = new DM_TaskType("CREATE_FILE");
+	insert(taskType);
+
+
+
+
+end
