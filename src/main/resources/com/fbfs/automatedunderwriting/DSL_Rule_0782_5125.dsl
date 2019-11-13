@@ -1,0 +1,1 @@
+[when]The driver age > 14 and the state is SD OR age > 16 and the state is IA, MN, NE, AZ, NM, UT OR age > 17 and the state is KS=eval((age > 14 && state.equals("SD")) || (age > 16 && (state.equals("IA") || state.equals("MN") || state.equals("NE") || state.equals("AZ") || state.equals("NM") || state.equals("UT"))) || (age > 17 && state.equals("KS")))

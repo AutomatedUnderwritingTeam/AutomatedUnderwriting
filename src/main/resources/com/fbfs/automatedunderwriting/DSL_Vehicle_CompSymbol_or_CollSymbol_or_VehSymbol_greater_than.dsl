@@ -1,0 +1,1 @@
+[when] The vehicle has a collision symbol, a comp symbol or a symbol and that symbol is greater than {num} = eval((vehicle.getCollSymbol() != null && convertToDouble(vehicle.getCollSymbol()) > {num}) || (vehicle.getCompSymbol() != null && convertToDouble(vehicle.getCompSymbol()) > {num}) || (vehicle.getSymbol() != null && convertToDouble(vehicle.getSymbol()) > {num}))

@@ -1,0 +1,395 @@
+package com.fbfs.automatedunderwriting;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.List;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.trap.model.PropertyClaimPayment;
+import com.fbfs.pc.trap.model.AutoClaimPayment;
+
+
+function boolean areDatesSame(Date d1, Date d2) {
+   if ((isDateFieldSame(Calendar.YEAR, d1,d2)) &&
+	(isDateFieldSame(Calendar.DAY_OF_MONTH, d1,d2))  &&
+	(isDateFieldSame(Calendar.MONTH, d1,d2))){
+	return true;
+   } else {
+	return false;
+   }
+}
+
+function int calculateAge(Date birthDate, Date policyDate) {
+	if (birthDate == null || policyDate == null ) {
+		return 0;
+	}
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	if (birthDate.before(policyDate)) {			
+		String stringBirthDate = formatter.format(birthDate);
+		String stringPolicyDate = formatter.format(policyDate);
+		int birthDateYear = Integer.parseInt(stringBirthDate.substring(0,4));
+		if (birthDateYear == 1 ) {
+		    return 0;
+		}
+
+		int policyDateYear = Integer.parseInt(stringPolicyDate.substring(0,4));
+		int age = policyDateYear - birthDateYear;
+		if (Integer.parseInt(stringPolicyDate.substring(5,7)) < Integer.parseInt(stringBirthDate.substring(5,7))){
+			age = age-1;
+		} else if (Integer.parseInt(stringPolicyDate.substring(5,7)) == Integer.parseInt(stringBirthDate.substring(5,7))){
+			if (Integer.parseInt(stringPolicyDate.substring(8,10)) < Integer.parseInt(stringBirthDate.substring(8,10))){
+				age = age-1;
+			} 
+		}
+		return age;			
+	} else {
+		return 0;	
+	}
+}
+
+function int calculateDaysBetween(Date startDate, Date endDate) {
+	if (startDate == null || endDate == null) {
+		return 0;
+	}
+
+	int daysBetween = 0;
+	if (startDate.compareTo(endDate) < 0) {
+		Calendar calStart = Calendar.getInstance();
+		calStart.setTime(startDate);
+		calStart.set(Calendar.HOUR, 0);
+		calStart.set(Calendar.MINUTE, 0);
+		calStart.set(Calendar.SECOND, 0);
+		calStart.set(Calendar.MILLISECOND, 0);
+		Calendar calEnd = Calendar.getInstance();
+		calEnd.setTime(endDate);
+		calEnd.set(Calendar.HOUR, 0);
+		calEnd.set(Calendar.MINUTE, 0);
+		calEnd.set(Calendar.SECOND, 0);
+		calEnd.set(Calendar.MILLISECOND, 0);
+		while (calStart.before(calEnd)) {       
+			calStart.add(Calendar.DAY_OF_YEAR, 1);       
+			daysBetween++;
+		}
+	}
+	return daysBetween;
+}
+
+function int calculateDwellingAge(Integer yearBuilt, Date policyDate) {
+	if (yearBuilt == null || policyDate == null) {
+		return 0;
+	}
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	String stringPolicyDate = formatter.format(policyDate);
+	int policyDateYear = Integer.parseInt(stringPolicyDate.substring(0,4));
+	int age = policyDateYear - yearBuilt;
+	return age;
+}
+
+function int calculateMonths(Date date1, Date date2) {
+	if (date1 == null || date2 == null) {
+		return 0;
+	}
+  
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	int months = 0;
+	if (date1.before(date2)) {			
+		String stringDate1 = formatter.format(date1);
+		String stringDate2 = formatter.format(date2);
+		int date1Year = Integer.parseInt(stringDate1.substring(0,4));
+		int date2Year = Integer.parseInt(stringDate2.substring(0,4));
+		int yearsBetween = date2Year - date1Year;
+		months = yearsBetween*12;
+			
+		if (Integer.parseInt(stringDate1.substring(5,7)) < Integer.parseInt(stringDate2.substring(5,7))){
+			int difference = Integer.parseInt(stringDate2.substring(5,7)) - Integer.parseInt(stringDate1.substring(5,7));
+			months = months+difference;
+		} else if (Integer.parseInt(stringDate1.substring(5,7)) > Integer.parseInt(stringDate2.substring(5,7))){
+			int difference2 = Integer.parseInt(stringDate1.substring(5,7)) - Integer.parseInt(stringDate2.substring(5,7));
+			months = months-difference2; 
+		}  else if (Integer.parseInt(stringDate1.substring(5,7)) == Integer.parseInt(stringDate2.substring(5,7))){
+			if (Integer.parseInt(stringDate1.substring(8,10)) < Integer.parseInt(stringDate2.substring(8,10)))	{	
+				months++;
+			}
+		}
+	} else if (date2.before(date1)) {			
+		String stringDate1 = formatter.format(date2);
+		String stringDate2 = formatter.format(date1);
+		int date1Year = Integer.parseInt(stringDate1.substring(0,4));
+		int date2Year = Integer.parseInt(stringDate2.substring(0,4));
+		int yearsBetween = date2Year - date1Year;
+		months = yearsBetween*12;
+			
+		if (Integer.parseInt(stringDate1.substring(5,7)) < Integer.parseInt(stringDate2.substring(5,7))){
+			int difference = Integer.parseInt(stringDate2.substring(5,7)) - Integer.parseInt(stringDate1.substring(5,7));
+			months = months+difference;
+		} else if (Integer.parseInt(stringDate1.substring(5,7)) > Integer.parseInt(stringDate2.substring(5,7))){
+			int difference2 = Integer.parseInt(stringDate1.substring(5,7)) - Integer.parseInt(stringDate2.substring(5,7));
+			months = months-difference2; 
+		} else if (Integer.parseInt(stringDate1.substring(5,7)) == Integer.parseInt(stringDate2.substring(5,7))){
+			if (Integer.parseInt(stringDate1.substring(8,10)) < Integer.parseInt(stringDate2.substring(8,10))) {	
+				months++;
+			}
+		}
+		months = months*-1;
+	}
+	return months;
+}
+
+// This will take a String that comes in as yyyy-MM-dd and return a date
+function Date convertToDate(String trapDate) {
+	if (trapDate == null) {
+		return null;
+	}
+
+	Date returnDate = null;
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	returnDate = formatter.parse(trapDate);
+	return returnDate;
+}
+
+function double convertToDouble(String s){
+	try {	
+		return Double.parseDouble(s);
+	} catch (Exception e) {
+		return 0;
+	}
+}
+
+function Calendar getCalendar(Date d) {
+	Calendar c = Calendar.getInstance();
+
+	c.setTimeZone(TimeZone.getTimeZone("GMT"));
+	if (d != null) {
+		c.setTime(d);
+	}
+	c.setLenient(false); //no wild computation of dates here please!
+	return c;
+}
+
+function boolean isDateFieldSame(int field, Date d1, Date d2) {
+	boolean ret = false; //default
+
+	if ((d1 == null) || (d2 == null)) {		// See if at least one is null.
+		if ((d1 == null) && (d2 == null)) {	// See if both are null.
+			ret = true;			// If both are null, return true.
+		} else {
+			ret = false;			// One is null and the other is not, return false.
+		}
+	} else {
+		Calendar cal1 = getCalendar(d1);
+		Calendar cal2 = getCalendar(d2);
+		if (cal1.get(field) == cal2.get(field)) {
+			ret = true;
+		}
+	}
+	
+	return ret;
+}
+
+function boolean isValidDate(Date inDate) {
+	if (inDate == null) {
+		return false;
+	}
+
+	boolean goodDate = true;
+		
+	Date lowDate = new SimpleDateFormat("MM-dd-yyyy").parse("01-02-0001");
+	if (inDate.before(lowDate)) { 
+		goodDate = false; 
+	}
+	return goodDate;
+		
+}
+
+function String replaceString(String targetString, String targetValue, String replacementValue ){
+	try {
+		return targetString.replaceAll(replacementValue, targetValue);
+	} catch (Exception e) {
+	    return "";
+	}
+}
+
+function double totalAutoClaimPayments(List autoClaimPayments) {
+	double totalPayments = 0;
+	
+	if (autoClaimPayments != null) {
+		for (int i = 0; i < autoClaimPayments.size(); i++) {
+			AutoClaimPayment autoClaimPayment = (AutoClaimPayment) autoClaimPayments.get(i);
+			totalPayments += autoClaimPayment.getClaimAmount();
+		}
+	}
+	
+	return totalPayments;
+}
+
+function double totalPropertyClaimPayments(List propertyClaimPayments) {
+	double totalPayments = 0;
+	
+	if (propertyClaimPayments != null) {
+		for (int i = 0; i < propertyClaimPayments.size(); i++) {
+			PropertyClaimPayment propertyClaimPayment = (PropertyClaimPayment) propertyClaimPayments.get(i);
+			totalPayments += propertyClaimPayment.getClaimAmount();
+		}
+	}
+
+	return totalPayments;
+}
+
+function int vehicleUseValue(String s) {
+	
+           if (s == null) {
+                return 0;
+	   }
+
+	//Business Use
+ 	   if (s.equals("B")) {
+		return 4;
+           }
+	// Work vehicles.  Driven to work in excess of 10 miles (WM, WN), and driven to work less than 10 miles (WL, WK)
+ 	   if ((s.equals("WM")) ||(s.equals("WN")) || (s.equals("WL")) || (s.equals("WK"))) {
+		return 3;
+           }
+	 // Driven to work less than 10 miles
+ 	   if (s.equals("F")) {
+		return 1;
+           }
+	// Driven to work less than 10 miles
+ 	   if (s.equals("P")) {
+		return 2;
+           }
+	   return 0;
+}
+
+function boolean isSubstring(String string1, Object string2) {
+	if (string1 == null || string2 == null) {
+		return false;
+	}
+	return string1.indexOf((String) string2) > -1;
+}
+function boolean isSubstringOfString(String string1, String string2) {
+	if (string1 == null || string2 == null) {
+		return false;
+	}
+	return string1.indexOf(string2.trim()) > -1;
+}
+
+
+function int calculateYears(Integer yearBuilt, Date policyDate) {
+	if (yearBuilt == null || policyDate == null) {
+		return 0;
+	}
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	String stringPolicyDate = formatter.format(policyDate);		
+	int policyDateYear = Integer.parseInt(stringPolicyDate.substring(0,4));
+	int age = policyDateYear - yearBuilt;
+	return age;
+}
+
+function int getLossSettlementRank(String lossSettlement) {
+	if (lossSettlement == null) {
+		return 0;
+	}
+	if (lossSettlement.equals("ACV")) {
+		return 3;
+	}
+	if (lossSettlement.equals("GRR")) {
+		return 6;
+	}
+	if (lossSettlement.equals("GRC")) {
+		return 7;
+	}
+	if (lossSettlement.equals("FIX")) {
+		return 2;
+	}
+	if (lossSettlement.equals("FIR")) {
+		return 1;
+	}
+	if (lossSettlement.equals("RPC")) {
+		return 5;
+	}
+	if (lossSettlement.equals("RPR")) {		
+		return 4;
+
+	}
+	return 0;
+}
+
+function boolean isStringNull(String aString) {
+	if (aString == null) {
+		return true;
+	}
+	if (aString.equals("null")) {
+		return true;
+	}
+	if (aString.length() == 0) {
+		return true;
+	}
+
+	return false;
+}
+
+function boolean isVehicleABasicVehicle(String type, String bodyType, Integer grossWeight) {
+         boolean typeIsBasic = false;
+         boolean bodyTypeIsBasic = false;
+         boolean grossWeightIsBasic = false;
+
+          if ((type.equals("PP")) || (type.equals("PT")) || (type.equals("VC")) || (type.equals("PC")) || (type.equals("VA")) || (type.equals("MC")) || (type.equals("PF")) || (type.equals("VM"))) {
+                 typeIsBasic = true;   
+	         bodyTypeIsBasic = true;               
+          }
+
+          if (type.equals("FT")) {
+            if  ((bodyType.indexOf("1 ton") > 0) || (bodyType.indexOf("1 1/2 ton") > 0) || (bodyType.indexOf("2 ton") > 0)  || (bodyType.indexOf("2 1/2 ton") > 0)) {
+                   bodyTypeIsBasic = true;
+           }
+         }
+ 
+        if (grossWeight < 10000) {
+             grossWeightIsBasic = true;
+        }
+ 
+         if (typeIsBasic  && bodyTypeIsBasic  && grossWeightIsBasic) 
+              return true;
+         else
+	     return false;		
+}
+
+function boolean wasVehicleABasicVehicle(String type, String bodyType, String previousBodyType, Integer grossWeight, Integer previousGrossWeight) {
+	
+          String passBodyType;
+          int passGrossWeight;
+ 
+          passBodyType = bodyType;
+          passGrossWeight = grossWeight;
+
+
+          if (previousBodyType != null) {
+              passBodyType = previousBodyType;
+          }
+
+          if (previousGrossWeight != null) { 
+                 passGrossWeight = previousGrossWeight;
+          }
+
+	return isVehicleABasicVehicle(type, passBodyType, passGrossWeight);		
+}
+function String getAUString(String String1, Integer startIndex, Integer endIndex ){
+	try {
+		return String1.substring(startIndex, endIndex);
+	} catch (Exception e) {
+	    return "";
+	}
+}
+function boolean hasCoverage(List coverageList, String coverageCode) {
+	if (coverageList != null) {
+		for ( int i = 0; i < coverageList.size(); i++) {
+			Coverage coverage = (Coverage) coverageList.get(i);
+			if (coverageCode != null && coverageCode.equals(coverage.getCoverageCode())) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+

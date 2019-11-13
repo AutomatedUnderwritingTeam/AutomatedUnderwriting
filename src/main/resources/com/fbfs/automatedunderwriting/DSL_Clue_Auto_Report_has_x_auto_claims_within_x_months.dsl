@@ -1,0 +1,1 @@
+[when]The Clue Auto Report has more than {totalCount} of Auto Claims within {numMonths} months=Number( intValue > {totalCount}) from accumulate ( autoClaim : AutoClaim ( claimDate : date, eval(calculateMonths(claimDate, effectiveDate) <= {numMonths} )) from clueAutoReport.autoClaimList, count(autoClaim))
