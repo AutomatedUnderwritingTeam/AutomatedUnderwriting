@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_RewriteTransaction;
+
+rule "BR__Policy Cancel-Rewrite__PAYREC(Rewrite)~5691~"
+	agenda-group "BR_Rewrite"
+	dialect "mvel"
+	when
+		DM_RewriteTransaction( )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "PayRec" );
+		fact0.setQueue( "PayRec" );
+		fact0.setReason( "5691: Cancel/Rewrite." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PayR" );
+		fact0.setMgmtReportingUnitAtRisk( "PayR" );
+		fact0.setTaskType( "PMP_CANCEL_REWRITE_PAYREC" );
+		insert( fact0 );
+end

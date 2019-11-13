@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Finalize;
+
+rule "BR__Residence age greater than 20 and wiring age less than 16(MN)__UND(New Business)~7300~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>dwelling : Dwelling( $unitAtRiskNumber : unitAtRiskNumber, $wiringYear : wiringYear, $yearBuild : yearBuild)
+		>term : Term( $effectiveDate : effectiveDate)
+		>policy : Policy( state == "MN" )
+		The year build is more than 20 years old
+		The wiring year is less than 16 years old
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "7300: Residence is over 20 years and wiring is less than 16." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		>fact0.setAddAction( "Review Electricians Statement" );
+		>fact0.setAddLink( "Residence link" );
+		>fact0.setAddBookmark( "RS" );
+		>fact0.setAddBookmarkUnit( "$unitAtRiskNumber" );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( "$unitAtRiskNumber" );
+		>insert( fact0 );
+end

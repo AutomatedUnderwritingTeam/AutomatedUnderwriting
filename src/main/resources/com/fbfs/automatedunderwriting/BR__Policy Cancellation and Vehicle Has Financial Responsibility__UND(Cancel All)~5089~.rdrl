@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+
+rule "BR__Policy Cancellation and Vehicle Has Financial Responsibility__UND(Cancel All)~5089~"
+	agenda-group "BR_Cancel_All"
+	dialect "mvel"
+	when
+		DM_CancellationTransaction( )
+		Vehicle( variationCode == "I" , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5089: Policy is cancelled and a vehicle has Financial Responsibility Filing/SR-22." );
+		fact0.setAddAction( "File SR-26" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		fact0.setPriority( "High" );
+		insert( fact0 );
+end

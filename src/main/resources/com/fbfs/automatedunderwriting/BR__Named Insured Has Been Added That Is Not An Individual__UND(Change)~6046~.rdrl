@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Named Insured Has Been Added That Is Not An Individual__UND(Change)~6046~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Policy( clientRelationshipList : clientRelationshipList)
+		Client( $clientReference : clientReference, supplementList : supplementList)
+		(ClientRelationship( clientReference == $clientReference , type == "IN" , added == true ) from clientRelationshipList)
+		(ClientSupplement( clientClass != "IN" ) from supplementList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6046: Named insured has been added that is is not an individual." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( $clientReference );
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( $clientReference );
+		insert( fact0 );
+end

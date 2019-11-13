@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.BusinessLiability;
+import com.fbfs.pc.au.model.count.CntPolicy;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+
+rule "BR__Num Of Rental Dwellings Is Not The num Of Rental Liabilities__ASST(New Business)~7551~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( )
+		CntPolicy( $cntResidencesOwnedRented : cntResidencesOwnedRented, cntRentalLiabilities != $cntResidencesOwnedRented )
+		( Dwelling( occupancyStatus == "OR" ) or BusinessLiability( businessType == "63007"  || == "63008"  || == "63010"  || == "63011"  || == "63012"  || == "63013" ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "7551: Policy has more rental dwelling than rental liabilities." );
+		fact0.setAddAction( "Review for Business Liability" );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Property/Liability Information link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

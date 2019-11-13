@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Outbuilding;
+
+rule "BR__Outbuilding Business Use On The Policy__ASST(Change)~6357~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Outbuilding( isUsedForBusiness == true , unitAtRiskNumber : unitAtRiskNumber, added == true || previousIsUsedForBusiness != null || isUsedForBusiness != true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "6357: Outbuilding with business use" );
+		fact0.setAddAction( "Review Outbuilding Valuation" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Garage outbuilding other structure link" );
+		fact0.setAddBookmark( "OB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Residence approved wiring is no__UND(New Business)~6480~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		dwelling : Dwelling( isWiringApproved == false , unitAtRiskNumber : unitAtRiskNumber)
+		exists (		Coverage( coverageCode == "STRUC" ) from dwelling.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6480: Residence approved wiring is no." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Marshall and Swift" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

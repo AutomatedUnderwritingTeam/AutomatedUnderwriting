@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Outbuilding;
+
+rule "BR__Outbuilding deductible less than $1000(KS)__UND(New Business)~8082~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		Policy( state == "KS" )
+		outbuilding : Outbuilding( unitAtRiskNumber : unitAtRiskNumber)
+		exists (		Coverage( coverageCode == "STRUC" , deductable < 1000 ) from outbuilding.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8082: Outbuilding deductible less than $1000." );
+		fact0.setAddAction( "Increase Deductible" );
+		fact0.setAddLink( "Garage outbuilding other structure link" );
+		fact0.setAddBookmark( "OB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

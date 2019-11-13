@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+
+rule "BR__Out of State Property Location__UND(New Business)~7649~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>location : Location( $locationNumber : locationNumber, locationState : state)
+		The location is a property location
+		>Policy( policyState : state != locationState )
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "7649: Out of state property location." );
+		>fact0.setAddAction( "Review out-of-state Location for Eligibility" );
+		>fact0.setAddLink( "Location link" );
+		>fact0.setAddBookmark( "PropLocation" );
+		>fact0.setAddBookmarkUnit( $locationNumber );
+		>fact0.setMgmtReportingCategory( "LOC" );
+		>fact0.setMgmtReportingUnitAtRisk( $locationNumber );
+		>insertLogical( fact0 );
+end

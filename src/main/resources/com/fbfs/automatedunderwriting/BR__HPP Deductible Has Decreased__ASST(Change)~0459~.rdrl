@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__HPP Deductible Has Decreased__ASST(Change)~0459~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber)
+		exists (		Coverage( coverageCode == "HPP" , previousDeductable != null , eval( deductable  < previousDeductable )) from dwelling.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0459: HPP deductible has decreased." );
+		fact0.setAddAction( "Review for Claims" );
+		fact0.setAddLink( "Household personal property link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

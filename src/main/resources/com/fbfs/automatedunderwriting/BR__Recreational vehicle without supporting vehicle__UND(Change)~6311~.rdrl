@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Recreational vehicle without supporting vehicle__UND(Change)~6311~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Vehicle( type == "PC"  || == "VC"  || == "VA"  || == "SN"  || == "TT"  || == "SG"  || == "M3"  || == "M4"  || == "M5"  || == "MD"  || == "MP"  || == "MC"  || == "WO"  || == "WI"  || == "WB"  || == "WJ"  || == "VM" , $unitAtRiskNumber : unitAtRiskNumber, deleted != true )
+		not (Vehicle( type == "PP"  || == "PC"  || == "PF"  || == "PN"  || == "PT" , deleted != true , unitAtRiskNumber != $unitAtRiskNumber )) 
+		( Vehicle( added == true , unitAtRiskNumber == $unitAtRiskNumber ) or Vehicle( deleted == true , type == "PP"  || == "PC"  || == "PF"  || == "PN"  || == "PT" , unitAtRiskNumber != $unitAtRiskNumber ) or Dwelling( deleted == true ) or Coverage( deleted == true , coverageCode == "STRUC"  || == "BIPDF"  || == "HPP" ) or Dwelling( previousOccupancyStatus != null ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6311: Recreational vehicle without supporting insurance." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review for Supporting Insurance" );
+		fact0.setAddAction( "Remove Vehicle" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

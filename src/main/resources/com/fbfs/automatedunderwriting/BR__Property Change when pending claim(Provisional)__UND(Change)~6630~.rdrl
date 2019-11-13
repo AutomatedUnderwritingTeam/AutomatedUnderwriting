@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+
+rule "BR__Property Change when pending claim(Provisional)__UND(Change)~6630~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		DM_CurrentTransaction( effectiveDate : effectiveDate)
+		$lossOccurenceSummary : LossOccurrenceSummary( dateOccurred : dateOccurred after ( effectiveDate ) )
+		(claimSummary : ClaimSummary( lineOfBusiness == "PRPL" ) from $lossOccurenceSummary.claimSummaryList)
+		UnitAtRisk( unitAtRiskNumber : unitAtRiskNumber, eval( unitAtRiskNumber.equals(claimSummary.getUnitAtRiskNum()) ), currentState != null , deleted != true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6630: Property change with pending claim(Provisional)." );
+		fact0.setAddAction( "Review for Claims" );
+		fact0.setAddLink( "Property link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insert( fact0 );
+		AutoAcceptor fact1 = new AutoAcceptor();
+		fact1.setAutoAcceptable( false );
+		insertLogical( fact1 );
+end

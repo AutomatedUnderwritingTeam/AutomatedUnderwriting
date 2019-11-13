@@ -1,0 +1,34 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.PriorLoss;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.trap.model.AutoClaim;
+
+rule "BR__Physical Damage Deductible Has Decreased__UND(Change)~4887~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>vehicle : Vehicle( unitAtRiskNumber : unitAtRiskNumber)
+		>(Coverage( coverageCode == "PHYDM" , eval( deductable < previousDeductable )) from vehicle.coverageList)
+		>Term( effectiveDate : effectiveDate)
+		There is a Loss Occurrence Summary or Prior Loss within 48 months of type PHY or a Trap Auto Claim within 48 months of type PHYSICAL
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "4887: Physical damage deductible has decreased." );
+		>fact0.setAddAction( "Review Photo" );
+		>fact0.setAddAction( "Review Claims" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

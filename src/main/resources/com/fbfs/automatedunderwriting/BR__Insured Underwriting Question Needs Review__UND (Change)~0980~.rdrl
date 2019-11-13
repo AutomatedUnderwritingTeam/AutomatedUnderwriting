@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.UnderwritingQuestion;
+
+rule "BR__Insured Underwriting Question Needs Review__UND (Change)~0980~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Policy( underwritingQuestionList : underwritingQuestionList)
+		(UnderwritingQuestion( answer == true , questionNum != "1" , deleteTransaction == null , added == true || previousAnswer != null , lineOfBusiness != "VEH" && lineOfBusiness != "PRPL" && lineOfBusiness != "UMB" ) from underwritingQuestionList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0980: Insured underwriting question needs review (Change)." );
+		fact0.setAddAction( "Review Question" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Underwriting questions link" );
+		fact0.setAddBookmark( "UnderwritingQuestions" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( "0" );
+		insert( fact0 );
+end

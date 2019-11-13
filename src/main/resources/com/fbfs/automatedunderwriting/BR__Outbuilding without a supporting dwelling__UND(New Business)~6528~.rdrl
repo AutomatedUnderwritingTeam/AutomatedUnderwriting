@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Outbuilding;
+
+rule "BR__Outbuilding without a supporting dwelling__UND(New Business)~6528~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		outbuilding : Outbuilding( unitAtRiskNumber : unitAtRiskNumber)
+		not (Dwelling( )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6528: Outbuilding without a supporting dwelling." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Garage outbuilding other structure link" );
+		fact0.setAddBookmark( "OB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

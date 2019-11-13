@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+
+rule "BR__Policy Cancellation and Driver Has Financial Responsibility__UND(Cancel All)~5780~"
+	agenda-group "BR_Cancel_All"
+	dialect "mvel"
+	when
+		DM_CancellationTransaction( )
+		Driver( sr22FilingDate : sr22FilingDate, unitAtRiskNumber : unitAtRiskNumber, eval( isValidDate(sr22FilingDate) ), driverReference : driverReference)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5780: Policy is cancelled and a driver has an Financial Responsibility Filing/SR-22." );
+		fact0.setAddAction( "File SR-26" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		fact0.setPriority( "High" );
+		insert( fact0 );
+end

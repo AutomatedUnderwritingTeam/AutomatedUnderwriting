@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+
+
+rule "BR__Property LOB does not have liability coverage__UND(New Business)~6515~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( )
+		not (Coverage( coverageCode == "BIPDF"  || == "BIPDP" )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6515: Prop LOB without liability coverage." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Property/Liability Information link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Outbuilding;
+
+
+rule "BR__Outbuilding Type 2-31 Has Been Added Over $30,000__ASST(Change)~2935~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		outbuilding : Outbuilding( added == true , buildingType != "1" , unitAtRiskNumber : unitAtRiskNumber)
+		Coverage( limit1 > 30000 ) from outbuilding.coverageList
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "2935: Garage, outbuilding, or other structure type 2-31 over $30,000 has been added." );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddAction( "Review Outbuilding Valuation" );
+		fact0.setAddLink( "Garage outbuilding other structure link" );
+		fact0.setAddBookmark( "OB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

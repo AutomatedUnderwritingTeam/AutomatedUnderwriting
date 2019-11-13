@@ -1,0 +1,36 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+
+rule "BR__Household Without An Auto CLUE Report__ASST(New Business)~5778~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Client( $trapId : trapId, clientClientReference : clientReference, supplementList : supplementList)
+		>(ClientSupplement( clientClass == "IN" ) from supplementList)
+		>Household( headOfHousehold.clientReference == ( clientClientReference ) )
+		>not (TrapClueAutoReport( trapId == $trapId , clueAutoReport != null )) 
+		R5778 Effective 06/20/2012 for states AZ, IA, NE, SD must always have a Auto Clue on every policy
+		R5778 Before 06/20/2012 for states AZ, IA, NE, SD must have Vehicle LOB
+		R5778 Before 09/27/2012 for states KS, MN, NM, UT must have Vehicle LOB
+		R5778 After 09/26/2012 for states KS, MN, NM, UT must always have Auto Clue for every policy
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "5778: Household without an Auto CLUE report." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Household link" );
+		>fact0.setAddBookmark( "Household" );
+		>fact0.setAddBookmarkUnit( clientClientReference );
+		>fact0.setMgmtReportingCategory( "ILOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "ILOB" );
+		>insert( fact0 );
+end

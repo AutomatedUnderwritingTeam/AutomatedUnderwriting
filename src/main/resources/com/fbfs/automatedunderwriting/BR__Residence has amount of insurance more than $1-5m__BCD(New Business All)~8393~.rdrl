@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Residence has amount of insurance more than $1-5m__BCD(New Business All)~8393~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness_All"
+	when
+		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, yearBuild : yearBuild)
+		exists (		Coverage( coverageCode == "STRUC" , limit1 > 1500000 ) from dwelling.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "BCD" );
+		fact0.setQueue( "BCD" );
+		fact0.setReason( "8393: Residence amount of insurance is more than $1.5m." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "Check for BCD High Value Review Task Approval" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setMemoDescription( "\"R8393:  Review valuation and photos of high value residence \" + yearBuild + \" Dwelling\"" );
+		insertLogical( fact0 );
+end

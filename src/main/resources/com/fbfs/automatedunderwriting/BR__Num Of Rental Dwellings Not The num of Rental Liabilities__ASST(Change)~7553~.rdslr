@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.BusinessLiability;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+
+rule "BR__Num Of Rental Dwellings Not The num of Rental Liabilities__ASST(Change)~7553~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>PropertyLineOfBusiness( )
+		>CntPolicy( cntRentalLiabilities : cntRentalLiabilities, cntResidencesOwnedRented != cntRentalLiabilities )
+		R7553 Rental liability or residence has been added or deleted or occupancy status has changed
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "7553: Policy number of rental dwellings is not the number of rental liabilities." );
+		>fact0.setAddAction( "Review for Business Liability" );
+		>fact0.setAddLink( "Property/Liability Information link" );
+		>fact0.setAddBookmark( "PropertyLiability" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "PLOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		>fact0.setAddAction( "Review Umbrella Coverage" );
+		>insert( fact0 );
+end

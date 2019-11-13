@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Policy has a residence owner or tenant count that doesnt match the liability counts__ASST(New Business - Change)~6516~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>liability : Liability( deleted != true , residencesOwner : residencesWhereInsuredIsOwner, residencesTenant : residencesWhereInsuredIsTenant, $unitAtRiskNumber : unitAtRiskNumber)
+		>(Coverage( deleted != true , coverageCode == "BIPDF"  || == "BIPDP" ) from liability.coverageList)
+		R6516 -- The policy residence count does not match the liability residence count
+		>( Liability( added == true , $unitAtRiskNumber == unitAtRiskNumber ) or Dwelling( added == true , occupancyStatus != "OR" ) or Dwelling( previousOccupancyStatus != null  , $previousOccupancyStatus : previousOccupancyStatus != null  , $occupancyStatus : occupancyStatus, eval( $occupancyStatus != $previousOccupancyStatus   ), eval( $occupancyStatus == "OR"   ||  $previousOccupancyStatus == "OR" )) or Liability( previousResidencesWhereInsuredIsOwner != null  , $unitAtRiskNumber == unitAtRiskNumber ) or Dwelling( deleted == true , occupancyStatus != "OR" ) )
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "6516: Policy has a residence owner/tenant count that doesn't match the liability counts." );
+		>fact0.setAddAction( "General Review" );
+		>fact0.setAddLink( "Liability link" );
+		>fact0.setAddBookmark( "LB" );
+		>fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

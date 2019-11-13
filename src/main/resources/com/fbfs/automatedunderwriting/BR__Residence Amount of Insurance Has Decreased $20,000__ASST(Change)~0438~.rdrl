@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Residence Amount of Insurance Has Decreased $20,000__ASST(Change)~0438~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, dwellingType != "MH" )
+		exists (		Coverage( coverageCode == "STRUC" , previousLimit1 != null , limit1 < ( previousLimit1- 20000 ) ) from dwelling.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0438: Residence amount of insurance has decreased more than $20,000." );
+		fact0.setAddAction( "Review Marshall and Swift" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

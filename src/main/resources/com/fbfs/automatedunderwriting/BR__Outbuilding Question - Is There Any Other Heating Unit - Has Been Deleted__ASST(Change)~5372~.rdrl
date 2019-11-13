@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Outbuilding;
+
+rule "BR__Outbuilding Question - Is There Any Other Heating Unit - Has Been Deleted__ASST(Change)~5372~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Outbuilding( previousHasHeatUnitInGarage != null  , hasHeatUnitInGarage == false , hasHeatUnitInGarage != ( previousHasHeatUnitInGarage ) , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "5372: BR--Outbuilding Question--'Is There Any Other Heating Unit' has been deleted." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Garage outbuilding other structure link" );
+		fact0.setAddBookmark( "OB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

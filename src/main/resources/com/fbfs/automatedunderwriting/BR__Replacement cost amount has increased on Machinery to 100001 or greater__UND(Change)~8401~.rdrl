@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.FarmMachinery;
+
+rule "BR__Replacement cost amount has increased on Machinery to 100001 or greater__UND(Change)~8401~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		FarmMachinery( $unitAtRiskCode : unitAtRiskCode, $unitAtRiskNumber : unitAtRiskNumber, previousReplacementCost != null  && <= 100000 , replacementCost > 100000 , leasedUnit != null || hasReplacementCost == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw Farm" );
+		fact0.setReason( "8401: Replacement cost amount has increased on Machinery to $100,001 or greater" );
+		fact0.setAddAction( "Machinery Valuation Worksheet" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review FPP Item(s)" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( $unitAtRiskCode+$unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

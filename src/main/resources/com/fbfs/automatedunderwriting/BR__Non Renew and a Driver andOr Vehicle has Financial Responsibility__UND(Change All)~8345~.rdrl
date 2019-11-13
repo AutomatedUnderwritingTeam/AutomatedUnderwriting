@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Non Renew and a Driver andOr Vehicle has Financial Responsibility__UND(Change All)~8345~"
+	agenda-group "BR_Change_All"
+	dialect "mvel"
+	when
+		Term( renewalIndicator == "Z" , previousRenewalIndicator != "Z" )
+		( Driver( sr22FilingDate1 : sr22FilingDate, eval( isValidDate(sr22FilingDate1) )) or Vehicle( variationCode == "I" ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8345:  Non renewal and the driver/vehicle has Financial Responsibility/SR22." );
+		fact0.setAddAction( "File SR-26" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "VLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Motorcycle;
+
+rule "BR__Motorcycle added with High Performance Indicator Yes__ASST(Change)~8330~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Motorcycle( unitAtRiskNumber : unitAtRiskNumber, added == true , isHighPerformance == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8330:  Motorcycle added with high performance indicator of yes." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

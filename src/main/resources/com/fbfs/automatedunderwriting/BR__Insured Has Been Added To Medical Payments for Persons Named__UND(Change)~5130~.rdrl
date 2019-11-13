@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Insured Has Been Added To Medical Payments for Persons Named__UND(Change)~5130~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber)
+		coverage : Coverage( $coverageNumber : coverageNumber)
+		exists (		Coverage( coverageCode == "MPPN" , added != true , coverageNumber == $coverageNumber ) from liability.coverageList
+) 
+		exists (		ClientRelationship( added == true ) from coverage.clientRelationshipList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5130: Insured has been added to Medical Payments for Persons Named." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Person For Any Pre-existing Conditions" );
+		fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		fact0.setAddLink( "Farm/ranch liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

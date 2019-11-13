@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.au.model.trap.TrapCluePropertyReport;
+
+rule "BR__Household Without A Property CLUE Report__ASST(New Business)~5779~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( )
+		householdMember : HouseholdMember( clientReference : clientReference)
+		Household( headOfHousehold != null , headOfHousehold == householdMember )
+		Client( clientReference == clientReference , trapId : trapId, supplementList : supplementList)
+		(ClientSupplement( clientClass == "IN" ) from supplementList)
+		not (TrapCluePropertyReport( trapId == trapId )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "5779: Household without a Property CLUE report." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( clientReference );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

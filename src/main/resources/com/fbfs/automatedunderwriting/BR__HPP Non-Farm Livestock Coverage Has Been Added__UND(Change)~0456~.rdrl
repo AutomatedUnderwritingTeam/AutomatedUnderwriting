@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__HPP Non-Farm Livestock Coverage Has Been Added__UND(Change)~0456~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		dwelling : Dwelling( added != true , unitAtRiskNumber : unitAtRiskNumber)
+		exists (		Coverage( added == true , coverageCode == "LVSTK" ) from dwelling.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0456: HPP Non-Farm Livestock coverage has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review for Farm Income" );
+		fact0.setAddLink( "Household personal property link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

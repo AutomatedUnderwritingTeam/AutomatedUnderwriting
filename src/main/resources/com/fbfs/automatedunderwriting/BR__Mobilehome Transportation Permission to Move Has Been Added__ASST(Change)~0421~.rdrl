@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Mobilehome Transportation Permission to Move Has Been Added__ASST(Change)~0421~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		dwelling : Dwelling( dwellingType == "MH" , unitAtRiskNumber : unitAtRiskNumber)
+		exists (		Coverage( added == true , coverageCode == "TRANP" ) from dwelling.coverageList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0421: Mobilehome Transportation Persmission to Move has been added." );
+		fact0.setAddAction( "FB Memo for Professional Mover" );
+		fact0.setAddAction( "FB Memo for Move Dates" );
+		fact0.setAddLink( "Mobilehome link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Related policy add-change-delete and umbrella counts appear incorrect__CSR(New Business - Change)~8055~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber)
+		>CntPolicy( $cntPolicyUmbrellaCounts : cntPolicyUmbrellaCounts, $cntTotalUmbrellaCounts : cntTotalUmbrellaCounts)
+		R8055 Condition 1 - Umbrella Coverage has been added with related policies
+		R8055 Condition 2 -  OR  Umbrella Coverage has a related policies that has been add or changed
+		R8055 Condition 3 -  OR  Umbrella Coverage has a related policies that has been deleted and counts seem incorrect
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "CSR" );
+		>fact0.setReason( "8055: Umbrella counts maybe incorrect due to a related policy add/change/delete." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review Umbrella Coverage" );
+		>fact0.setAddLink( "Umbrella link" );
+		>fact0.setAddBookmark( "Umbrella" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setAddLink( "Vehicle folder link" );
+		>fact0.setAddBookmark( "VehicleFolder" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		>insertLogical( fact0 );
+end

@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.FormHeader;
+
+rule "BR__Personal liability has the certificate of insurance endorsement__UND(New Business)~6511~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber)
+		exists (FormHeader( formNumber matches ".*NF002(.|\n|\r)*" , unitAtRiskNumber == $unitAtRiskNumber )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6511: Personal liability has the certificate of insurance endorsement." );
+		fact0.setAddAction( "Review Endorsement" );
+		fact0.setAddAction( "Review Comments" );
+		fact0.setAddLink( "Liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

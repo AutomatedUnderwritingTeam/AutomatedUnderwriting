@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Owned rented to others residence added without an owner occupied residence__ASST(Change)~6655~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Dwelling( added == true , occupancyStatus == "OR" , unitAtRiskNumber : unitAtRiskNumber)
+		not (Dwelling( occupancyStatus == "OO"  || == "TN" , deleted != true )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "6655: Owned rented to others residence added without an owner occupied residence." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review for Owner Occupied Dwelling" );
+		fact0.setAddLink( "Property/Liability Information link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "none" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+
+
+
+rule "BR__Policy Has Blanket Farm Ranch Personal Property__UND(New Business)~4954~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Coverage( coverageCode == "FPPB" , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4954: Policy has blanket farm/ranch personal property." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "FarmBlanket" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

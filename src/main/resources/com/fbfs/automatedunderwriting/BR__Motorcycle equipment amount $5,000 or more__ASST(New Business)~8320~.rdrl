@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Motorcycle;
+
+rule "BR__Motorcycle equipment amount $5,000 or more__ASST(New Business)~8320~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		vehicle : Motorcycle( unitAtRiskNumber : unitAtRiskNumber, equipmentAmount >= 5000 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8320:  Motorcycle equipment amount $5,000 or more." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

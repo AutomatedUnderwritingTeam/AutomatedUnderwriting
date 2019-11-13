@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__Replacement Vehicle with lower Collision Deductible(MN)__UND(Change)~6618~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>vehicle1 : Vehicle( added == true , unitAtRiskNumber : unitAtRiskNumber, type1 : type)
+		>(coverage1 : Coverage( coverageCode == "COLL" ) from vehicle1.coverageList)
+		>Policy( state == "MN" )
+		R6618 - All other vehicles have higher Coll Deductible
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "6618: Replacement vehicle added with lower collision deductible." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review Coverage" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Location has an additional insured__UND(New Business)~6476~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		location : Location( locationNumber : locationNumber)
+		exists (		ClientRelationship( type == "B1"  || == "B2"  || == "B3"  || == "B4"  || == "B5"  || == "B6"  || == "B7"  || == "B8"  || == "B9"  || == "4I" ) from location.clientRelationshipList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6476: Location has an additional insured." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Location link" );
+		fact0.setAddBookmark( "PropLocation" );
+		fact0.setAddBookmarkUnit( locationNumber );
+		fact0.setMgmtReportingCategory( "LOC" );
+		fact0.setMgmtReportingUnitAtRisk( locationNumber );
+		insertLogical( fact0 );
+end

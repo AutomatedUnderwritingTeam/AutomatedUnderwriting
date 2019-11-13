@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Outbuilding;
+
+rule "BR__Outbuilding Amount Of Insurance Has Decreased__ASST(Change)~5337~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		outbuilding : Outbuilding( unitAtRiskNumber : unitAtRiskNumber, previousReplacementCost != null || previousActualCashValue != null )
+		(Coverage( coverageCode == "STRUC" , previousLimit1 != null , limit1 < ( previousLimit1 ) ) from outbuilding.coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "5337: The amount of coverage on a structure has decreased and the ACV or RC has also changed." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Garage outbuilding other structure link" );
+		fact0.setAddBookmark( "OB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

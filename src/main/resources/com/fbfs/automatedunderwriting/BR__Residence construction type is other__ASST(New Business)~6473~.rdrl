@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Residence construction type is other__ASST(New Business)~6473~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		dwelling : Dwelling( constructionType == "O" , unitAtRiskNumber : unitAtRiskNumber, dwellingType != "H1"  || == "H2"  || == "H3"  || == "H4" )
+		Term( effectiveDate < "23-Oct-2017" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "6473: Residence construction type is other." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

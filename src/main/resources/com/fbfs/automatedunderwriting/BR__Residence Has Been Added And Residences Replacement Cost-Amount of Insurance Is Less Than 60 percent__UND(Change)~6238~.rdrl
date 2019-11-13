@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Residence Has Been Added And Residences Replacement Cost-Amount of Insurance Is Less Than 60 percent__UND(Change)~6238~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		dwelling : Dwelling( added == true , $replacementCost : replacementCost, $unitAtRiskNumber : unitAtRiskNumber)
+		(Coverage( coverageCode == "STRUC" , $limit1 : limit1, eval( $limit1 > ($replacementCost *1.6)  )) from dwelling.coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6238: Residence has been added and the residence's replacement cost/amount of insurance is less than 60%." );
+		fact0.setAddAction( "Review Dwelling Class" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Premium Amount" );
+		fact0.setAddAction( "Review Marshall and Swift" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

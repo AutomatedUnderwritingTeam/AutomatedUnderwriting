@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.au.model.count.CntHousehold;
+import java.lang.Number;
+
+rule "BR__Policy has more than 1 owner occuppied residence__UND(Change)~7642~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		ownerOccupiedCount : Number( ) from accumulate ( Dwelling( occupancyStatus : occupancyStatus == "OO" , isUsedSeasonally == false , deleted != true ),
+			count(occupancyStatus)) 
+		householdCount : Number( ) from accumulate ( cntHousehold : CntHousehold( cntHouseholdInsuredIndividualMembers > 0 ),
+			count(cntHousehold)) 
+		eval( ownerOccupiedCount > householdCount )
+		( Dwelling( added == true , isUsedSeasonally == false , occupancyStatus == "OO" ) or Dwelling( previousIsUsedSeasonally != null , isUsedSeasonally == false , isUsedSeasonally != ( previousIsUsedSeasonally ) ) or Dwelling( previousOccupancyStatus != null , occupancyStatus != ( previousOccupancyStatus ) ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "7642: More non seasonal owner occupied residences than households." );
+		fact0.setAddAction( "Review Status of Dwelling" );
+		fact0.setAddAction( "Cancel Property LOB" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "none" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insertLogical( fact0 );
+end

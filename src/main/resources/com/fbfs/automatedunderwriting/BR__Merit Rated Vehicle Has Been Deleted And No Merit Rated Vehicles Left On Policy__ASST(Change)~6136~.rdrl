@@ -1,0 +1,35 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusinessSupplement;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+
+rule "BR__Merit Rated Vehicle Has Been Deleted And No Merit Rated Vehicles Left On Policy__ASST(Change)~6136~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		VehicleLineOfBusiness( deleted != true )
+		Vehicle( deleted == true , type == "PP"  || == "PC"  || == "PF"  || == "PN"  || == "PT" )
+		not (Vehicle( deleted != true , type == "PP"  || == "PC"  || == "PF"  || == "PN"  || == "PT" )) 
+		((PropertyLineOfBusiness( deleted != true, supplementList : supplementList != null ) and
+		(PropertyLineOfBusinessSupplement( areAllMeritRatedVehiclesFBInsured == true) from supplementList)) or
+		(UmbrellaCoverage( deleted != true)))		
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "6136: Merit rated vehicle has been deleted and no merit rated vehicles left on policy" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Recreational Vehicle" );
+		fact0.setAddAction( "Review the Vehicle Use" );
+		fact0.setAddAction( "Review for YouthFul Operator" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "VLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		insert( fact0 );
+end

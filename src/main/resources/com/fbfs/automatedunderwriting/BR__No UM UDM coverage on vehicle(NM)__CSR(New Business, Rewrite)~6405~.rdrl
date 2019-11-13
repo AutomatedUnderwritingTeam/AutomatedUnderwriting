@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Policy; 
+
+rule "BR__No UM UDM coverage on vehicle(NM)__CSR(New Business, Rewrite)~6405~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness_Rewrite"
+	when
+		vehicle : Vehicle( type != "WI", type != "WB", type != "WJ", type != "WO", type != "WA", type != "WS"  , unitAtRiskNumber : unitAtRiskNumber, deleted != true )
+		exists (		Coverage( coverageCode == "BI" , deleted != true ) from vehicle.coverageList
+) 
+		not (		Coverage( coverageCode == "UDRBI", coverageCode != "UIBI", coverageCode != "UDCSL", coverageCode != "UMCSL") from vehicle.coverageList
+) 
+		Policy( state == "NM" )
+		Term( effectiveDate < "30-Sep-2019")
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "6405: Vehicle with no UM/UDM coverage" );
+		fact0.setAddAction( "Check For UM/UDM Stacking Rejection/selection Form" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

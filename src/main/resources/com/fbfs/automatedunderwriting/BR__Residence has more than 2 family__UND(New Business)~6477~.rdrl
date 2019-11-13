@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Residence has more than 2 family__UND(New Business)~6477~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, numberOfFamilies > 2 , dwellingType != "H1", dwellingType != "H2", dwellingType != "H3", dwellingType != "H4", dwellingType != "M1", dwellingType != "M2", dwellingType != "M3" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6477: Residence has more than 2 family." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

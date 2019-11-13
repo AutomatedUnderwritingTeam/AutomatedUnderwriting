@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+
+
+rule "BR__Policy Includes a Personal Umbrella Over 2,000,000__UND(New Business)~6342~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( policyType == "P" , limit1 > 2000000 , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "6342: Policy includes a personal umbrella over 2,000,000." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

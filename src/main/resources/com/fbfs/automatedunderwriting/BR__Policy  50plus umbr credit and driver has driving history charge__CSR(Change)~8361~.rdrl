@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+
+
+
+rule "BR__Policy  50plus umbr credit and driver has driving history charge__CSR(Change)~8361~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Driver( hasHistoryCharge == true , driverReference : driverReference)
+		umbrellaCoverage : UmbrellaCoverage( has50PlusCredit == true , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "8361: Policy w/50+ umbrella credit and driver has driving history charge" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

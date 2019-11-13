@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Outbuilding;
+
+rule "BR__Outbuilding Amount Of Insurance Has Changed Over $50,000__ASST(Change)~0488~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		outbuilding : Outbuilding( unitAtRiskNumber : unitAtRiskNumber)
+		(Coverage( coverageCode == "STRUC" , previousLimit1 != null , limit1 > ( previousLimit1 + 50000 ) ) from outbuilding.coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0488: Garage, outbuilding, or other structure amount of insurance has increased over $50,000." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Garage outbuilding other structure link" );
+		fact0.setAddBookmark( "OB" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

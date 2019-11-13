@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.ConfinedLivestock;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.AggregateFarm;
+
+rule "BR__Policy Has Livestock in Confinement__UND(New Business)~5343~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		UnitAtRisk( unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber)
+		( ConfinedLivestock( unitAtRiskNumber == unitAtRiskNumber ) or AggregateFarm( unitAtRiskNumber == unitAtRiskNumber , inventoryClass == "06" ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5343: Policy has Livestock in Confinement." );
+		fact0.setAddAction( "Review for Multiple Livestock in Confinement" );
+		fact0.setAddAction( "Change Multiple Livestock In Confinement From Blanket To Scheduled" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode + unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

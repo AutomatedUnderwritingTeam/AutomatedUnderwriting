@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Irrigation;
+
+rule "BR__Irrigation has been added__UND(Change)~8352~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Irrigation( unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber, added == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8352:  Irrigation has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Irrigation Equipment Worksheet Needed" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode+unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

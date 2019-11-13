@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.FormHeader;
+
+rule "BR__Personal liability has been added and has a dog restriction__ASST(Change)~6659~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber, added == true )
+		FormHeader( unitAtRiskNumber == $unitAtRiskNumber , formNumber matches ".*EX001(.|\n|\r)*" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "6659: Personal liability has a dog restriction endorsement." );
+		fact0.setAddAction( "Review Endorsement" );
+		fact0.setAddAction( "Review Comments" );
+		fact0.setAddLink( "Liability link" );
+		fact0.setAddBookmark( "LB" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

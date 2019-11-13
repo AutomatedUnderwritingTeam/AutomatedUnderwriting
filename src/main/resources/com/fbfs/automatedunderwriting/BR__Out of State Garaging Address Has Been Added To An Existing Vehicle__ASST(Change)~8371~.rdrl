@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Out of State Garaging Address Has Been Added To An Existing Vehicle__ASST(Change)~8371~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Vehicle( added != true , vehicleLocationNumber : locationNumber, unitAtRiskNumber : unitAtRiskNumber)
+		Location( locationNumber == vehicleLocationNumber , locationState : state, previousState : previousState, added == true || ( previousState != null && state != previousState ))
+		Policy( state != locationState )
+		(Term( effectiveDate >= "30-Sep-2016" ) and Policy( state == "KS"  || == "MN" || == "NM" || == "UT") or
+					 Term( effectiveDate >= "23-Jun-2017" ) and Policy( state == "AZ"  || == "IA" || == "NE" || == "SD"))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8371: Out of state garaging address added to an existing vehicle." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Garaging" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

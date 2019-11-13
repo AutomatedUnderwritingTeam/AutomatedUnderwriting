@@ -1,0 +1,40 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+
+
+
+rule "BR__Named Insured Has Been Added To An Existing Household__UND(Change)~3086~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>ClientRelationship( type == "IN" , crClientReference : clientReference, added == true )
+		>Client( clientReference == crClientReference , supplementList : supplementList)
+		>ClientSupplement( clientClass == "IN" ) from supplementList
+		>household : Household( added != true )
+		R3086 Condition 1 - Household has the client as head of household
+		R3086 Condition 2 - OR  Household has the client as member of the household
+		R3086 Condition 3 - AND  Client was not in the household previously
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "3086: Named insured has been added to an existing household." );
+		>fact0.setAddAction( "Review Named Insured" );
+		>fact0.setAddAction( "Review Client Relationship" );
+		>fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( crClientReference );
+		>fact0.setAddLink( "Policy Level Information link" );
+		>fact0.setAddBookmark( "PolicyLevelInformation" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "INSD" );
+		>fact0.setMgmtReportingUnitAtRisk( crClientReference );
+		>insert( fact0 );
+end

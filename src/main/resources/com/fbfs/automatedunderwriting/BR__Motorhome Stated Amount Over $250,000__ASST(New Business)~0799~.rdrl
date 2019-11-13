@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Motorhome Stated Amount Over $250,000__ASST(New Business)~0799~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( statedAmount > 250000 , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0799: Policy includes a motorhome with stated amount over $250,000." );
+		fact0.setAddAction( "Remove Vehicle" );
+		fact0.setAddAction( "Remove Coverage" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end

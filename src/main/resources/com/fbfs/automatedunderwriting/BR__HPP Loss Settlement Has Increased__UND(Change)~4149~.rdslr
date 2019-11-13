@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.PriorLoss;
+import com.fbfs.pc.au.model.trap.TrapCluePropertyReport;
+import com.fbfs.pc.trap.model.PropertyClaim;
+
+
+rule "BR__HPP Loss Settlement Has Increased__UND(Change)~4149~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+	    >Term( expirationDate : expirationDate)
+		>dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, (lossSettlement == null || lossSettlement != householdPersonalPropertyLossSettlement), eval( isStringNull(previousHouseholdPersonalPropertyLossSettlement)==false ), eval( getLossSettlementRank(householdPersonalPropertyLossSettlement) > getLossSettlementRank(previousHouseholdPersonalPropertyLossSettlement) ))
+	   R4149 There are property losses within last 2 years excluding storm/wind/hail
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "4149: HPP loss settlement has increased." );
+		>fact0.setAddAction( "Review for Claims" );
+		>fact0.setAddLink( "Household personal property link" );
+		>fact0.setAddBookmark( "RS" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

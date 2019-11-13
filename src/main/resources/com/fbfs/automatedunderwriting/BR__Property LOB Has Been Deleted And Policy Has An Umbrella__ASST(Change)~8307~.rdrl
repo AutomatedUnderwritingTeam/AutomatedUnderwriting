@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+
+
+rule "BR__Property LOB Has Been Deleted And Policy Has An Umbrella__ASST(Change)~8307~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( deleted == true )
+		UmbrellaCoverage( deleted != true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8307: Property line of business has been deleted and policy has an umbrella." );
+		fact0.setAddAction( "Review for Supporting Coverages" );
+		fact0.setAddAction( "Review Umbrella Question" );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Property/Liability Information link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		insert( fact0 );
+end

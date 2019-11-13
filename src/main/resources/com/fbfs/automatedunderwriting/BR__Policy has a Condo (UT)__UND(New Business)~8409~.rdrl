@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__Policy has a Condo (UT)__UND(New Business)~8409~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		policy : Policy( state == "UT" )
+		dwelling : Dwelling( dwellingType == "C1"  || == "C2" , unitAtRiskNumber : unitAtRiskNumber)
+		exists (Coverage( coverageCode == "CONDO" ) from dwelling.coverageList) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8409: Policy has a condo (UT)." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Ownership" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

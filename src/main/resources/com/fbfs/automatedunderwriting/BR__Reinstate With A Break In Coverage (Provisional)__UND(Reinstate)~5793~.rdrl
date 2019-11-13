@@ -1,0 +1,35 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.TransactionRecord;
+import com.fbfs.pc.au.model.declarativemodel.DM_ReinstatementTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Reinstate With A Break In Coverage (Provisional)__UND(Reinstate)~5793~"
+	agenda-group "BR_Reinstate"
+	dialect "mvel"
+	when
+		DM_ReinstatementTransaction( )
+		DM_AutomatedUnderwritingUser( )
+		DM_CurrentTransaction( reinstateEffectiveDate : effectiveDate)
+		Policy( transactionList : transactionList)
+		(TransactionRecord( type == "09"  || == "10" , effectiveDate after reinstateEffectiveDate || effectiveDate before reinstateEffectiveDate ) from transactionList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5793: Reinstate with a break in coverage (Provisional)." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		insert( fact0 );
+		AutoAcceptor fact1 = new AutoAcceptor();
+		fact1.setAutoAcceptable( false );
+		insert( fact1 );
+end

@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+
+rule "BR__Prop LOB Added and TRAP and Prior Losses not equal(36 Months)__ASST(Change)~5789~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( added == true )
+		CntPolicy( $countTrapPRPLLosses : countTrapPRPLLosses, countCogenPRPLLosses < $countTrapPRPLLosses )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "5789: Property/Liability line of business has been added and the UW Rpt/Policy property and liability losses do not match - all households (36 months all states)." );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

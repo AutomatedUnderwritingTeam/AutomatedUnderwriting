@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Policy TRAP Property and Liability Prior Losses Do Not Match-All Households (36 Months)__UND(New Business)~5769~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( )
+		CntPolicy( countTrapPRPLLosses : countTrapPRPLLosses, countCogenPRPLLosses < countTrapPRPLLosses )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5769: UW Rpt/Policy property and liability losses do not match - all households (36 months all states)." );
+		fact0.setAddAction( "Review Underwriting Reports" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
+		insert( fact0 );
+end

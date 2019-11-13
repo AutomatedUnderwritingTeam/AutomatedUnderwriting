@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+
+rule "BR__Policy has Umbrella and a Vehicle added with Financial Responsibility__UND(Change All)~8349~"
+	agenda-group "BR_Change_All"
+	dialect "mvel"
+	when
+		Vehicle( variationCode : variationCode == "I" , unitAtRiskNumber : unitAtRiskNumber, added == true )
+		LineOfBusiness( lineOfBusiness == "UMB" , deleted != true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8349:  Policy has umbrella and a vehicle added with Financial Responsibility Filing/SR-22." );
+		fact0.setAddAction( "Review for Reinsurance - SR-22/MN Insurance Certification" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( "unitAtRiskNumber" );
+		fact0.setPriority( "High" );
+		insertLogical( fact0 );
+end

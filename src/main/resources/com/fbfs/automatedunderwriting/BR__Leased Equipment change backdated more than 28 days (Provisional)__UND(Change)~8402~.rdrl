@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.FarmMachinery;
+
+rule "BR__Leased Equipment change backdated more than 28 days (Provisional)__UND(Change)~8402~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		FarmMachinery( $unitAtRiskCode : unitAtRiskCode, $unitAtRiskNumber : unitAtRiskNumber, leasedUnit != null , leasedUnit.startDate != null  && != "01-Jan-0001" , leasedUnit.added == true || leasedUnit.previousStartDate != null, eval( calculateDaysBetween(leasedUnit.startDate, new Date()) > 28 ))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw Farm" );
+		fact0.setReason( "8402: Leased Equipment change backdated more than 28 days (Provisional)." );
+		fact0.setAddAction( "Review Leased Equipment" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( $unitAtRiskCode + $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insert( fact0 );
+		AutoAcceptor fact1 = new AutoAcceptor();
+		fact1.setAutoAcceptable( false );
+		insert( fact1 );
+end

@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import java.lang.Number;
+
+rule "BR__Policy Has Scheduled Farm Ranch Personal Property over 100000__UND(New Business)~2927~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		getFPPSwithMaxLimit : Coverage( coverageCode == "FPPS" , limit1 > 100000 , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "2927: Policy has scheduled farm/ranch personal property over $100,000." );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "FarmScheduled" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end
