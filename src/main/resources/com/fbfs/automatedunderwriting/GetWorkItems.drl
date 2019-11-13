@@ -1,0 +1,7 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItem;
+
+query "GetWorkItems"
+	workItem : WorkItem()
+end
+

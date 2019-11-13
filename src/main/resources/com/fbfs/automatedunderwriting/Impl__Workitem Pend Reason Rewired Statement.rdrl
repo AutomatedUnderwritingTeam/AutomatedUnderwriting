@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
+import com.fbfs.pc.ecd.model.Finalize;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "Impl__Workitem Pend Reason Rewired Statement"
+	agenda-group "IT_WorkItem"
+	dialect "mvel"
+	when
+		policy : Policy( )
+		(finalize : Finalize( electriciansStatement == true ) from policy.finalization)
+		DM_AutomatedUnderwritingUser( )
+	then
+		WorkItemPendReason fact0 = new WorkItemPendReason();
+		fact0.setType( "Policy" );
+		fact0.setPendReason( "PMP_ELEC_STATEMENT" );
+		insertLogical( fact0 );
+end

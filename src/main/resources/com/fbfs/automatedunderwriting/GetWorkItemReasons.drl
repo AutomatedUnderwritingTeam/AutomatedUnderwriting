@@ -1,0 +1,6 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+
+query "GetWorkItemReasons"
+	workItemReason : WorkItemReason()
+end

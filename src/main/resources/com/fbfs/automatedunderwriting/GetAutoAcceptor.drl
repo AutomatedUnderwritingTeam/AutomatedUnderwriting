@@ -1,0 +1,6 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+query "GetAutoAcceptor"
+	autoAcceptor : AutoAcceptor()
+end

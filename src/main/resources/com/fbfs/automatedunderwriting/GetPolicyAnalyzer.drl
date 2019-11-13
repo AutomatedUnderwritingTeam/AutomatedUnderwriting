@@ -1,0 +1,7 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.control.PolicyFlag;
+
+query "GetPolicyAnalyzer"
+	policyFlag: PolicyFlag()
+end

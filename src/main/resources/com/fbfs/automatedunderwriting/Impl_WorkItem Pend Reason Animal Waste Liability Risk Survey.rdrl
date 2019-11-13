@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Finalize;
+import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
+
+rule "Impl_WorkItem Pend Reason Animal Waste Liability Risk Survey"
+	agenda-group "IT_WorkItem"
+	dialect "mvel"
+	when
+		policy : Policy( )
+		(finalize : Finalize( animalWasteLiabilityRiskSurvey == true ) from policy.finalization)
+		DM_AutomatedUnderwritingUser( )
+	then
+		WorkItemPendReason fact0 = new WorkItemPendReason();
+		fact0.setType( "Policy" );
+		fact0.setPendReason( "PMP_D_AN_WASTE" );
+		insertLogical( fact0 );
+end

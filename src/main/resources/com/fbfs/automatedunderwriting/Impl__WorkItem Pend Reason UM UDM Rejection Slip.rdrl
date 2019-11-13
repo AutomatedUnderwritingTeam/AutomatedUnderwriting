@@ -1,0 +1,21 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
+import com.fbfs.pc.ecd.model.Finalize;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+
+rule "Impl__WorkItem Pend Reason UM UDM Rejection Slip"
+	agenda-group "IT_WorkItem"
+	dialect "mvel"
+	when
+		$policy : Policy ( )
+		not(Policy (state == "NM") and Term (effectiveDate >= "30-Sep-2019"))
+		finalize : Finalize( umUdmRejectionSlip == true ) from $policy.finalization
+		DM_AutomatedUnderwritingUser( )
+	then
+		WorkItemPendReason fact0 = new WorkItemPendReason();
+		fact0.setType( "Policy" );
+		fact0.setPendReason( "PMP_UM_UDM_REJECTION" );
+		insertLogical( fact0 );
+end

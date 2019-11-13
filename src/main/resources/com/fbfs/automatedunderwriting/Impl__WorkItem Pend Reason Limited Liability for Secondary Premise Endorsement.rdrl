@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
+import com.fbfs.pc.ecd.model.Finalize;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "Impl__WorkItem Pend Reason Limited Liability for Secondary Premise Endorsement"
+	agenda-group "IT_WorkItem"
+	dialect "mvel"
+	when
+		policy : Policy( )
+		(finalize : Finalize( limitedLiabilityEndorsement == true ) from policy.finalization)
+		DM_AutomatedUnderwritingUser( )
+	then
+		WorkItemPendReason fact0 = new WorkItemPendReason();
+		fact0.setType( "Policy" );
+		fact0.setPendReason( "PMP_D_LIMITED_LIAB_SEC" );
+		insertLogical( fact0 );
+end

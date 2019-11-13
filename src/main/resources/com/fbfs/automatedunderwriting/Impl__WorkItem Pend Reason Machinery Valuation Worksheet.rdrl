@@ -1,0 +1,20 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Finalize;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+
+rule "Impl__WorkItem Pend Reason Machinery Valuation Worksheet"
+	agenda-group "IT_WorkItem"
+	dialect "mvel"
+	when
+		policy : Policy( )
+		finalize : Finalize( machineryValuationWorksheet == true ) from policy.finalization
+		DM_AutomatedUnderwritingUser( )
+	then
+		WorkItemPendReason fact0 = new WorkItemPendReason();
+		fact0.setType( "Policy" );
+		fact0.setPendReason( "PMP_D_MACH_VAL" );
+		insertLogical( fact0 );
+end

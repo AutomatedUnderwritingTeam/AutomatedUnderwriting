@@ -1,0 +1,19 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
+import com.fbfs.pc.ecd.model.Finalize;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "Impl__WorkItem Pend Reason Waiver of Work Loss MN"
+	agenda-group "IT_WorkItem"
+	dialect "mvel"
+	when
+		policy : Policy( state == "MN" )
+		(finalize : Finalize( waiverOfWorkLoss == true ) from policy.finalization)
+		DM_AutomatedUnderwritingUser( )
+	then
+		WorkItemPendReason fact0 = new WorkItemPendReason();
+		fact0.setType( "Policy" );
+		fact0.setPendReason( "PMP_SR_WAGE_LOSS" );
+		insertLogical( fact0 );
+end
