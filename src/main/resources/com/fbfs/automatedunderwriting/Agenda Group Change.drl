@@ -1,0 +1,16 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_ChangeTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+
+
+rule "Agenda Group Change"
+
+    agenda-group "control"
+    salience 1001
+	when
+	    DM_ChangeTransaction( ) and
+            DM_AutomatedUnderwritingUser()
+	then
+	    drools.setFocus("BR_Change");
+
+end

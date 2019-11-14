@@ -1,0 +1,14 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+
+
+rule "Agenda Group Cancel_All"
+
+    agenda-group "control"
+    salience 1009
+	when
+	    DM_CancellationTransaction() 
+	then
+	    drools.setFocus("BR_Cancel_All");
+
+end

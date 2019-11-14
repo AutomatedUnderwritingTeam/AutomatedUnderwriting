@@ -1,0 +1,16 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+
+
+
+rule "Agenda Group NewBusiness All"
+
+    agenda-group "control"
+    salience 1000
+	when
+	    DM_NewBusinessTransaction() 
+	then
+	    drools.setFocus("BR_NewBusiness_All");
+
+
+end

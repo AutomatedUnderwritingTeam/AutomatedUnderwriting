@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_RewriteTransaction;
+
+
+rule "Agenda Group Rewrite All"
+
+    agenda-group "control"
+    salience 1006
+	when
+	    DM_RewriteTransaction() 
+	then
+	    drools.setFocus("BR_Rewrite_All");
+
+
+end

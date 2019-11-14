@@ -1,0 +1,15 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.declarativemodel.DM_RenewalTransaction;
+
+rule "Agenda Group Renewal"
+
+    agenda-group "control"
+    salience 1005
+	when
+	    DM_RenewalTransaction() 	   
+	then
+	    drools.setFocus("BR_Renewal");
+
+
+end

@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_Ultra;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+import com.fbfs.pc.au.model.declarativemodel.DM_NonUnderwritingAgent;
+import com.fbfs.pc.au.model.declarativemodel.DM_TenantOnlyPolicy;
+
+
+rule "Agenda Group NewBusiness"
+
+    agenda-group "control"
+    salience 1000
+	when
+	    ((DM_NewBusinessTransaction() and
+	    not DM_Ultra() and
+ 	    DM_AutomatedUnderwritingUser()) or
+
+          (DM_NewBusinessTransaction() and
+	    exists(DM_TenantOnlyPolicy()))) or
+
+	  (DM_NewBusinessTransaction() and
+	    DM_NonUnderwritingAgent() )
+ 	   
+	then
+	    drools.setFocus("BR_NewBusiness");
+
+
+end

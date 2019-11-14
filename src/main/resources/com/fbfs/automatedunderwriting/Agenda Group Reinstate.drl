@@ -1,0 +1,18 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.declarativemodel.DM_ReinstatementTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+
+
+
+rule "Agenda Group Reinstate"
+
+    agenda-group "control"
+    salience 1003
+	when
+	    DM_ReinstatementTransaction() and
+	    DM_AutomatedUnderwritingUser()
+	then
+	    drools.setFocus("BR_Reinstate");
+
+
+end
