@@ -1,0 +1,31 @@
+group = project.buildGroup
+version = project.buildVersion
+if (System.env.BUILD_NUMBER) {
+   version += ".${System.env.BUILD_NUMBER}"
+}
+
+apply plugin: 'java'
+
+configurations {
+	zips
+}
+  
+task zipIt(type: Zip) {
+	from 'Source/Deployment'
+	baseName = 'AURules'
+	include '*.drl'
+    include 'automatedunderwriting/*/*'	
+}
+
+artifacts {
+	zips zipIt
+}
+
+uploadZips {
+	repositories {
+		 ivy {
+			 url gradle.localIvy
+			 layout 'maven'
+		 }
+	 }
+ }
