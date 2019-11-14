@@ -1,0 +1,192 @@
+package PolicyDefinitionRules
+
+import com.fbfs.pc.ecd.model.*;
+
+/*
+ * This Drools Rule Language (DRL) file was not created from Guvnor
+ * and should be manually edited.
+ */
+
+rule "policyDefinition.Term"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$t : Term() from $p.term
+	then
+		insert($t);
+end
+
+rule "policyDefinition.LossOccurrenceSummary"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$los : LossOccurrenceSummary() from $p.lossOccurrenceSummaryList
+	then
+		insert($los);
+end
+
+rule "policyDefinition.Form"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$f : FormHeader() from $p.formList
+	then
+	   	if($f.getCurrentState() == null) {
+	        $f.setCurrentState("");
+	    	}
+	      insert($f);
+end
+
+rule "policyDefinition.publicProtection"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$pp : PublicProtection() from $p.publicProtectionList
+	then
+        	insert($pp);
+end
+
+rule "policyDefinition.Location"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$l : Location() from $p.locationList
+	then
+		if (!$l.getStatus().equalsIgnoreCase("D") || $l.isDeleted()) {
+		    insert($l);
+	      }
+end
+
+rule "policyDefinition.LineOfBusiness"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$lob : LineOfBusiness() from $p.lineOfBusinessList
+	then
+		insert($lob);
+
+end
+
+rule "policyDefinition.LineOfBusinessUnitAtRisk"
+agenda-group "policyDefinition"
+	when
+		$lob : LineOfBusiness()
+		$uar : UnitAtRisk() from $lob.unitAtRiskList
+	then
+		$uar.setCurrentState("");
+	      if (!$uar.getStatus().equalsIgnoreCase("D") || $uar.isDeleted()) {
+			insert($uar);
+	      }
+end
+
+rule "policyDefinition.LineOfBusinessCoverage"
+agenda-group "policyDefinition"
+	when
+		$lob : LineOfBusiness()
+		$cov : Coverage() from $lob.coverageList
+	then
+		insert($cov);
+end
+
+rule "policyDefinition.UnitAtRiskCoverage"
+agenda-group "policyDefinition"
+	when
+		$uar : UnitAtRisk()
+		$cov : Coverage() from $uar.coverageList
+	then
+		insert($cov);
+end
+
+rule "policyDefinition.CoverageUnitAtRisk"
+agenda-group "policyDefinition"
+	when
+		$cov : Coverage()
+		$uar : UnitAtRisk() from $cov.unitAtRiskList
+	then
+	      $uar.getCoverageList().add($cov);
+	      insert($uar);
+end
+
+rule "policyDefinition.PolicyClientRelationship"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$cr : ClientRelationship() from $p.clientRelationshipList
+	then
+		insert($cr);
+end
+
+rule "policyDefinition.LocationClientRelationship"
+agenda-group "policyDefinition"
+	when
+		$l : Location()
+		$cr : ClientRelationship() from $l.clientRelationshipList
+	then
+		insert($cr);
+end
+
+rule "policyDefinition.LineOfBusinessClientRelationship"
+agenda-group "policyDefinition"
+	when
+		$lob : LineOfBusiness()
+		$cr : ClientRelationship() from $lob.clientRelationshipList
+	then
+		insert($cr);
+end
+
+rule "policyDefinition.UnitAtRiskClientRelationship"
+agenda-group "policyDefinition"
+	when
+		$uar : UnitAtRisk()
+		$cr : ClientRelationship() from $uar.clientRelationshipList
+	then
+		insert($cr);
+end
+
+rule "policyDefinition.CoverageClientRelationship"
+agenda-group "policyDefinition"
+	when
+		$cov : Coverage()
+		$cr : ClientRelationship() from $cov.clientRelationshipList
+	then
+		insert($cr);
+end
+
+rule "policyDefinition.Client"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$c : Client() from $p.clientList
+	then
+		insert($c);
+end
+
+rule "policyDefinition.Households"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$hh : Household( $headOfHousehold : headOfHousehold ) from $p.householdList
+	then
+		insert($hh);
+		insert($headOfHousehold);
+end
+
+rule "policyDefinition.HouseholdMembers"
+agenda-group "policyDefinition"
+	when
+		$hh : Household()
+		$hm : HouseholdMember() from $hh.householdMemberList
+	then
+		insert($hm);
+end 
+
+rule "policyDefinition.PriorLoss"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$pl : PriorLoss() from $p.priorLossList
+	then
+		insert($pl);
+end
+
+
