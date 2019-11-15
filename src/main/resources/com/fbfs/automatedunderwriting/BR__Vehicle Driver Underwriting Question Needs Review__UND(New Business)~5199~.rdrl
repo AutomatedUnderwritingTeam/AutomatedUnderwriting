@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.UnderwritingQuestion;
+
+rule "BR__Vehicle Driver Underwriting Question Needs Review__UND(New Business)~5199~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		VehicleLineOfBusiness( )
+		Policy( underwritingQuestionList : underwritingQuestionList)
+		(UnderwritingQuestion( lineOfBusiness == "VEH" , answer == true , questionNum != "1" , deleteTransaction == null ) from underwritingQuestionList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5199: Vehicle/driver underwriting question needs review (New Business)." );
+		fact0.setAddAction( "Review Question" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Underwriting questions link" );
+		fact0.setAddBookmark( "UnderwritingQuestions" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "VLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		insert( fact0 );
+end

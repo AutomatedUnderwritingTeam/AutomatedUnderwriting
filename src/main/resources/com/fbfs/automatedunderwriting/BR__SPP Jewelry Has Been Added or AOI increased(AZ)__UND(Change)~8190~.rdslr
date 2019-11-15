@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+
+
+rule "BR__SPP Jewelry Has Been Added or AOI increased(AZ)__UND(Change)~8190~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Coverage( coverageCode : coverageCode == "JWLSP" , added == true || previousLimit1 != null   && < ( limit1 ) , coverageNumber : coverageNumber)
+		There is a Schedule Personal Property unit at risk that contains the coverage
+		>Policy( state == "AZ" )
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8190: Scheduled personal property - Jewelry - Added or AOI increased." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review Appraisal" );
+		>fact0.setAddLink( "Scheduled personal property class link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( coverageCode + coverageNumber );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageCode );
+		>insertLogical( fact0 );
+end

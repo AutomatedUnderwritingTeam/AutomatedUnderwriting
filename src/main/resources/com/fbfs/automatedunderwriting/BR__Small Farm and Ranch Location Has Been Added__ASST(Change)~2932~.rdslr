@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+import com.fbfs.pc.ecd.model.Sublocation;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+
+rule "BR__Small Farm and Ranch Location Has Been Added__ASST(Change)~2932~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>location : Location( $locationNumber : locationNumber)
+		>(LocationSupplement( locationUse == "S" ) from location.supplement)
+		The location is a property location
+		The location is a new property location
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "2932: Small farm/ranch location has been added." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Location link" );
+		>fact0.setAddBookmark( "PropLocation" );
+		>fact0.setAddBookmarkUnit( $locationNumber );
+		>fact0.setMgmtReportingCategory( "LOC" );
+		>fact0.setMgmtReportingUnitAtRisk( $locationNumber );
+		>insertLogical( fact0 );
+end

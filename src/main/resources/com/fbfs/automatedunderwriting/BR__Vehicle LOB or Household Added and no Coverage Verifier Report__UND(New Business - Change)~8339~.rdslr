@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.au.model.trap.TrapCoverageVerifierReport;
+
+rule "BR__Vehicle LOB or Household Added and no Coverage Verifier Report__UND(New Business - Change)~8339~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>Term( termEffectiveDate : effectiveDate)
+		>Policy( CIF : continuedInForceDate, continuedInForceDate != termEffectiveDate )
+		>LineOfBusiness( lineOfBusiness == "VEH" )
+		>not (LineOfBusiness( lineOfBusiness == "PRPL" )) 
+		>( Household( added == true ) or LineOfBusiness( lineOfBusiness == "VEH" , added == true ) or Household( headOfHousehold.added == true ) )
+		R8339 Does not have Coverage Verifier
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8339: Vehicle LOB or Household Added and no Coverage Verifier Report." );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddAction( "Remove Discount" );
+		>fact0.setAddLink( "Vehicle folder link" );
+		>fact0.setAddBookmark( "VehicleFolder" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "VLOB" );
+		>fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		>insertLogical( fact0 );
+end

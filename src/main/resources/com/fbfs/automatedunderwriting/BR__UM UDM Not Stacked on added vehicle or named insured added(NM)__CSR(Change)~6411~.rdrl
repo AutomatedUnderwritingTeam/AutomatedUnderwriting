@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__UM UDM Not Stacked on added vehicle or named insured added(NM)__CSR(Change)~6411~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, deleted != true )
+		Coverage( coverageCode == "UIBI"  || == "UDRBI"  || == "UDCSL"  || == "UMCSL" , $coverageNumber : coverageNumber, vehicleSupplement != null , vehicleSupplement.stackable != null , vehicleSupplement.stackable == false )
+		(Coverage( coverageNumber == $coverageNumber ) from vehicle.coverageList)
+		Policy( state == "NM" )
+		Term( effectiveDate < "30-Sep-2019")
+		( Vehicle( unitAtRiskNumber == $unitAtRiskNumber , added == true ) or ClientRelationship( added == true , type == "IN" ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "6411: Vehicle added or named insured added and vehicle does not have um/udm stacking." );
+		fact0.setAddAction( "Check For UM/UDM Stacking Rejection/selection Form" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

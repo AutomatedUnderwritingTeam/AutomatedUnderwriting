@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Vehicle Use Has Decreased__ASST(Change)~6005~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>vehicle : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, deleted != true , added != true , firstVehiclesVehicleUse : vehicleUse, firstVehiclesPreviousVehicleUse : previousVehicleUse != null , vehicleUse : vehicleUse, previousVehicleUse : previousVehicleUse)
+		The vehicle has a vehicle use that has decreased
+		>not (anotherVehicle : Vehicle( added == true , unitAtRiskNumber != $unitAtRiskNumber , vehicleUse == firstVehiclesPreviousVehicleUse )) 
+		>not (anotherVehicle2 : Vehicle( unitAtRiskNumber != $unitAtRiskNumber , added != true , deleted != true , vehicleUse == firstVehiclesPreviousVehicleUse , previousVehicleUse != null )) 
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "6005: Vehicle use has decreased." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

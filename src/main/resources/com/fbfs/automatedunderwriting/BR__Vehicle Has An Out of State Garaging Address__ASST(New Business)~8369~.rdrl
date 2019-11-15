@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Vehicle Has An Out of State Garaging Address__ASST(New Business)~8369~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		Policy( $state : state)
+		Vehicle( $locationNumber : locationNumber, $unitAtRiskNumber : unitAtRiskNumber)
+		Location( locationState : state, locationNumber == $locationNumber )
+		Policy( state != locationState )
+		( Term( effectiveDate >= "30-Sep-2016" , eval( $state == "KS" || $state == "MN" || $state == "NM" || $state == "UT" )) or Term( effectiveDate >= "23-Jun-2017" , eval( $state == "AZ" || $state == "IA" || $state == "NE" || $state == "SD" )) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8369: Vehicle has an out of state garaging address" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		fact0.setAddAction( "Review Garaging" );
+		insertLogical( fact0 );
+end

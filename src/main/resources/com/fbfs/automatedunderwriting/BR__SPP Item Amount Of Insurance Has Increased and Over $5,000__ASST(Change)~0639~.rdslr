@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+
+rule "BR__SPP Item Amount Of Insurance Has Increased and Over $5,000__ASST(Change)~0639~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>scheduledPersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber, amountInsured > 5000 , previousAmountInsured != null , amountInsured > ( previousAmountInsured ) )
+		>Coverage( $coverageNumber : coverageNumber, coverageCode : coverageCode)
+		The coverage is a schedule personal property
+		>(Coverage( coverageNumber == $coverageNumber ) from scheduledPersonalProperty.coverageList)
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "0639: Scheduled personal property item's amount of insurance has increased and over $5,000." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review Appraisal" );
+		>fact0.setAddLink( "Scheduled personal property class link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( coverageCode + $coverageNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

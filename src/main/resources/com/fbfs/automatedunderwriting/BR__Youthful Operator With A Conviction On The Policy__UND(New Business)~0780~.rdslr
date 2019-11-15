@@ -1,0 +1,34 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.au.model.count.CntDriver;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Youthful Operator With A Conviction On The Policy__UND(New Business)~0780~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Vehicle( assignedDriver : assignedDriver, vehUnitAtRiskNumber : unitAtRiskNumber, ( primaryClassification matches "3" && ageClassification matches "[12]" )|| ( primaryClassification matches "2" && ageClassification matches "[12F]" )|| ( primaryClassification matches "5" && ageClassification matches "[123567]" )|| ( primaryClassification matches "7" && ageClassification matches "[12]" )|| ( primaryClassification matches "6" && ageClassification matches "[125]" ))
+		>Policy( $state : state)
+		>( Term( effectiveDate < "30-Sep-2016" , eval( $state == "KS"  || $state == "MN" || $state == "NM" || $state == "UT" )) or Term( effectiveDate < "23-Jun-2017" , eval( $state == "AZ"  || $state == "IA" || $state == "NE" || $state == "SD" )) )
+		>Driver( drvUnitAtRiskNumber : unitAtRiskNumber, licenseList : licenseList, age < 25 , frequentVehicle == vehUnitAtRiskNumber || unitAtRiskNumber == assignedDriver , driverReference : driverReference)
+		>CntDriver( unitAtRiskNumber == drvUnitAtRiskNumber , cntCogenGroup1ConvictionsWithin60 > 0 || cntCogenGroup2ConvictionsWithin60 > 0 || cntCogenGroup3ConvictionsWithin48 > 1 )
+		There are more than 0 accidents and convictions on the driver license list
+		CntDriver total Cogen grp 1, 2 and 3 convictions within 60 months more than 0
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "0780: Youthful operator (under 25) with a conviction on the policy." );
+		>fact0.setAddAction( "Review Driver Assignment" );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( driverReference );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( drvUnitAtRiskNumber );
+		>insertLogical( fact0 );
+end

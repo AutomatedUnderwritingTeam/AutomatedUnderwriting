@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.UnderwritingQuestion;
+
+
+rule "BR__Umbrella Underwriting Question Needs Review (Change)__UND~5167~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		LineOfBusiness( lineOfBusiness == "UMB" , deleted != true )
+		Policy( underwritingQuestionList : underwritingQuestionList)
+		UnderwritingQuestion( lineOfBusiness == "UMB" , answer == true , questionNum != "1" , added == true || previousAnswer == false || ( previousAnswerDetail != null  && answerDetail != ( previousAnswerDetail ) )) from underwritingQuestionList
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5167: Umbrella underwriting question needs review (Change)." );
+		fact0.setAddAction( "Review Question" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Underwriting questions link" );
+		fact0.setAddBookmark( "UnderwritingQuestions" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "ULOB" );
+		fact0.setMgmtReportingUnitAtRisk( "ULOB" );
+		insert( fact0 );
+end

@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+
+
+rule "BR__Umbrella All FB Coverage Question answered No__ASST(Change)~7821~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( isAllFarmBureauCoverage != true , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw Farm" );
+		fact0.setReason( "7821: Umbrella 'All Underlying Coverage with us' question has been answered 'no'." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

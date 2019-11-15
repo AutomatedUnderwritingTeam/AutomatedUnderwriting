@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+
+rule "BR__SR22 Filing Date Has Been Added To A Driver__UND(Change)~0791~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Driver( sr22FilingDate : sr22FilingDate, previousSr22FilingDate : previousSr22FilingDate != null , eval( isValidDate(sr22FilingDate) ), eval( !isValidDate(previousSr22FilingDate) ), driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0791: SR-22 filing date has been added to a driver." );
+		fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		fact0.setAddAction( "Remove Driver" );
+		fact0.setAddAction( "Remove Vehicle" );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setPriority( "High" );
+		insert( fact0 );
+end

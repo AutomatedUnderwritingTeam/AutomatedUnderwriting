@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+
+rule "BR__SPP is listed on the policy with a value over 5,000__ASST(New Business)~6504~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>scheduledPersonalProperty : ScheduledPersonalProperty( amountInsured > 5000 , unitAtRiskNumber : unitAtRiskNumber)
+		>Coverage( coverageCode : coverageCode, $coverageNumber : coverageNumber)
+		The coverage is a schedule personal property
+		>(Coverage( coverageNumber == $coverageNumber ) from scheduledPersonalProperty.coverageList)
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "6504: Scheduled personal property over 5,000." );
+		>fact0.setAddAction( "Review Scheduled Personal Property" );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Scheduled personal property class link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( coverageCode + $coverageNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

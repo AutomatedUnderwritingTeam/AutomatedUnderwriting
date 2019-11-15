@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Umbrella Num of Farm Ranch Acres Does Not Equal Policy Acres__CSR(New Business - Change)~2956~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, $totalFarmAcres : propertyPremium.totalFarmAcres)
+		>CntPolicy( cntTotalAcres : cntTotalAcres, eval( cntTotalAcres != $totalFarmAcres ))
+		R2956 If acres changed or location added or deleted or umbrella added or umbrella count changed
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "CSR" );
+		>fact0.setReason( "2956: Number of farm/ranch acres on the policy does not match the umbrella." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Umbrella link" );
+		>fact0.setAddBookmark( "Umbrella" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setAddLink( "Property/Liability Information link" );
+		>fact0.setAddBookmark( "PropertyLiability" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		>insertLogical( fact0 );
+end

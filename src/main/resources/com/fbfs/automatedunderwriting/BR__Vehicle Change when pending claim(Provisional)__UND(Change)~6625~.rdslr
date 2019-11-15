@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Vehicle Change when pending claim(Provisional)__UND(Change)~6625~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>DM_CurrentTransaction( $effectiveDate : effectiveDate, $transactionNumber : transactionNumber)
+		>lossOccurrenceSummary : LossOccurrenceSummary( dateOccurred : dateOccurred after $effectiveDate)
+		>(claimSummary : ClaimSummary( lineOfBusiness == "VEH" , unitAtRiskNum : unitAtRiskNum != null ) from lossOccurrenceSummary.claimSummaryList)
+		The UAR on the Claim has changed
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "6625: Vehicle change with pending claim(Provisional)." );
+		>fact0.setAddAction( "Review for Claims" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNum );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNum );
+		>insert( fact0 );
+		>AutoAcceptor fact1 = new AutoAcceptor();
+		>fact1.setAutoAcceptable( false );
+		>insertLogical( fact1 );
+end

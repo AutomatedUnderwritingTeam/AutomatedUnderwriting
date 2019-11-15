@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Hay;
+import java.lang.Number;
+
+rule "BR__Scheduled Hay Added with Total Unit Value amount $200,000 or more__UND(Change)~8356~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		totalSchedHay : Number( ) from accumulate ( Hay( unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber, totalUnitValue : totalUnitValue, added == true , eval( hasCoverage(coverageList, "FPPS") )),
+			sum(totalUnitValue)) 
+		eval( totalSchedHay >= 200000 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8356: Scheduled hay added with total unit value amount $200,000 or more." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Stack Limit" );
+		fact0.setAddAction( "Review Hay Supplement Survey" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "FarmScheduled" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( "FPPS" );
+		insertLogical( fact0 );
+end

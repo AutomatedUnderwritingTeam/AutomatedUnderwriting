@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Umbrella Num of Medium and Heavy Farm Trucks Does not Equal Policy Count__CSR(New Business_Change)~2952~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, umbNumTrucks : vehiclePremium.numberOfFarmTrucks)
+		CntPolicy( policyNumTrucks : cntMediumHeavyFarmTrucks)
+		eval( umbNumTrucks != policyNumTrucks )
+		( Vehicle( type == "FT" , bodyType : bodyType == null , prevBodyType : previousBodyType != null , previousBodyType == "3 T TRK"  || == "3.5-5TON"  || == "5-10 TON"  || == "10-15TON"  || == "15-20TON"  || == "20-25TON"  || == "OVR25TON" , eval( bodyType != prevBodyType )) or Vehicle( type == "FT" , bodyType : bodyType == "3 T TRK"  || == "3.5-5TON"  || == "5-10 TON"  || == "10-15TON"  || == "15-20TON"  || == "20-25TON"  || == "OVR25TON" , prevBodyType : previousBodyType != null , eval( bodyType != prevBodyType )) or Vehicle( added == true , type == "FT" , bodyType == "3 T TRK"  || == "3.5-5TON"  || == "5-10 TON"  || == "10-15TON"  || == "15-20TON"  || == "20-25TON"  || == "OVR25TON" ) or Vehicle( deleted == true , type == "FT" , bodyType == "3 T TRK"  || == "3.5-5TON"  || == "5-10 TON"  || == "10-15TON"  || == "15-20TON"  || == "20-25TON"  || == "OVR25TON" ) or UmbrellaCoverage( added == true ) or UmbrellaCoverage( numTrucks : vehiclePremium.numberOfFarmTrucks, prevNumTrucks : vehiclePremium.previousNumberOfFarmTrucks != null , eval( numTrucks != prevNumTrucks )) or Vehicle( type == "FT" , grossWeight > 10000 , added == true ) or Vehicle( type == "FT" , deleted == true , grossWeight > 10000 ) or Vehicle( type == "FT" , grossWeight > 10000 , previousGrossWeight != null , previousGrossWeight <= 10000 ) or Vehicle( type == "FT" , grossWeight <= 10000 , previousGrossWeight != null , previousGrossWeight > 10000 ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "2952: Number of medium/heavy farm trucks (Over 2.5 Tons--1997 & Older for IA, MN, SD, UT or Over 10,000 lbs--AZ, KS, NE, 1998 & Newer for IA, MN, SD, UT) on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Medium/Heavy Farm Trucks" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

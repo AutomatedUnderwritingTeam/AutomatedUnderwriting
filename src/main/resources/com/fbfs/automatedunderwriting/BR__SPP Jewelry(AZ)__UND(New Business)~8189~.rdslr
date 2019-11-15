@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__SPP Jewelry(AZ)__UND(New Business)~8189~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		>Policy( state == "AZ" )
+		>$schedulePersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber)
+		>(Coverage( coverageCode : coverageCode, coverageNumber : coverageNumber) from $schedulePersonalProperty.coverageList)
+		The coverage is a schedule personal property
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8189: Scheduled personal property - Jewelry." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review Appraisal" );
+		>fact0.setAddLink( "Scheduled personal property class link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( coverageCode + coverageNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

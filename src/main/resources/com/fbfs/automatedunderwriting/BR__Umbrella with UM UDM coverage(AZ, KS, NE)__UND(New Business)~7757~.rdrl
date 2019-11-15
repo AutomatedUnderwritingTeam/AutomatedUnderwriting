@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.UmbrellaVehiclePremium;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__Umbrella with UM UDM coverage(AZ, KS, NE)__UND(New Business)~7757~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		umbrellaCoverage : UmbrellaCoverage( coverageNumber : coverageNumber)
+		(UmbrellaVehiclePremium( udmUmbrellaCoverageInd == true ) from umbrellaCoverage.vehiclePremium)
+		Policy( state == "AZ"  || == "KS"  || == "NE" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "7757: Umbrella with um/udm coverage." );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusinessSupplement;
+
+rule "BR__Vehicle LOB Has Been Deleted and Are All Merit Rated Vehicles Insured With FB Question Is Yes__ASST(Change)~6003~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		VehicleLineOfBusiness( deleted == true )
+		PropertyLineOfBusiness( supplementList : supplementList != null )
+		(PropertyLineOfBusinessSupplement( areAllMeritRatedVehiclesFBInsured == true ) from supplementList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "6003: Vehicle line of business has been deleted and 'Are all merit rated vehicles insured with FB?' question is yes." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Umbrella Question" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		insert( fact0 );
+end

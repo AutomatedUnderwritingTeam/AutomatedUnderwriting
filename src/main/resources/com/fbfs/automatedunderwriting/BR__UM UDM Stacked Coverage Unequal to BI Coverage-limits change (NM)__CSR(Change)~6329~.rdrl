@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__UM UDM Stacked Coverage Unequal to BI Coverage-limits change (NM)__CSR(Change)~6329~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, deleted != true )
+		coverage : Coverage( coverageCode == "UIBI"  || == "UDRBI"  || == "UDCSL"  || == "UMCSL" , $coverageNumber : coverageNumber, umLimit : limit1, vehicleSupplement != null , vehicleSupplement.stackable != null , vehicleSupplement.stackable == true , deleted != true )
+		(Coverage( coverageNumber == $coverageNumber ) from vehicle.coverageList)
+		(Coverage( coverageCode == "BI"  || == "BIPD" , limit1 != umLimit , deleted != true ) from vehicle.coverageList)
+		Policy( state == "NM" )
+		Term( effectiveDate < "30-Sep-2019")
+		( Coverage( coverageNumber == $coverageNumber , added == true || previousLimit1 != null , vehicleSupplement != null , vehicleSupplement.previousStackable == null ) or ClientRelationship( added == true , type == "IN" ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "6329: Coverage added or limits changed and UM/UDM limits not equal to the Bodily Injury limits" );
+		fact0.setAddAction( "Check For UM/UDM Stacking Rejection/selection Form" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

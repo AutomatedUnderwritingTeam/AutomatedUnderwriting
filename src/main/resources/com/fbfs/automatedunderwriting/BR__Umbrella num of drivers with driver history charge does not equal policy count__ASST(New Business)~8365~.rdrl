@@ -1,0 +1,34 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.UmbrellaVehiclePremium;
+import java.lang.Number;
+
+rule "BR__Umbrella num of drivers with driver history charge does not equal policy count__ASST(New Business)~8365~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Driver( hasHistoryCharge == true , driverReference : driverReference)
+		cntDriverWithHistoryCharge : Number( ) from accumulate ( Driver( hhc : hasHistoryCharge == true ),
+			count(hhc)) 
+		umbrellaCoverage : UmbrellaCoverage( coverageNumber : coverageNumber)
+		(UmbrellaVehiclePremium( numberOfDriversWithHistoryCharge < cntDriverWithHistoryCharge.intValue() ) from umbrellaCoverage.vehiclePremium)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8365: Umbrella number of drivers with driver history charge does not equal policy count" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insert( fact0 );
+end

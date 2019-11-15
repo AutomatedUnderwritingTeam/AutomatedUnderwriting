@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Watercraft;
+
+rule "BR__Watercraft Has Been Added With Great Lakes Surcharge__UND(Change)~3185~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Watercraft( added == true , hasGreatLakesCharge == true , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "3185: Watercraft has been added with Great Lakes surcharge." );
+		fact0.setAddAction( "Review Watercraft Year, Make, Model" );
+		fact0.setAddAction( "Review Stated Amount" );
+		fact0.setAddAction( "Review Garaging" );
+		fact0.setAddAction( "Review for Sailboat" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

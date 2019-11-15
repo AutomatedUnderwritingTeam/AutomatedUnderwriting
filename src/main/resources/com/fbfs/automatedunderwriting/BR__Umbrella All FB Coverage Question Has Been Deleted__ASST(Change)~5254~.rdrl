@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+
+
+
+rule "BR__Umbrella All FB Coverage Question Has Been Deleted__ASST(Change)~5254~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( previousIsAllFarmBureauCoverage != null  , isAllFarmBureauCoverage == false , previousIsAllFarmBureauCoverage == true , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "5254: Umbrella 'All Underlying Coverage with us' question has been deleted." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

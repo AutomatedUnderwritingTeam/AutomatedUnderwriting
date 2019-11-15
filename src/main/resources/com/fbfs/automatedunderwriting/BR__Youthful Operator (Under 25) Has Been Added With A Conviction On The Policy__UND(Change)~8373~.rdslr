@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.au.model.count.CntDriver;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.License;
+
+rule "BR__Youthful Operator (Under 25) Has Been Added With A Conviction On The Policy__UND(Change)~8373~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Policy( $state : state)
+		>( Term( effectiveDate >= "30-Sep-2016" , eval( $state == "KS"  || $state == "MN" || $state == "NM" || $state == "UT" )) or Term( effectiveDate >= "23-Jun-2017" , eval( $state == "AZ"  ||  $state == "IA" || $state == "NE" || $state == "SD" )) )
+		>Driver( drvUnitAtRiskNumber : unitAtRiskNumber, licenseList : licenseList, age < 25 , driverReference : driverReference, added == true )
+		>CntDriver( unitAtRiskNumber == drvUnitAtRiskNumber , cntCogenGroup1ConvictionsWithin60 > 0 || cntCogenGroup2ConvictionsWithin60 > 0 || cntCogenGroup3ConvictionsWithin48 > 1 )
+		There are more than 0 accidents and convictions on the driver license list
+		CntDriver total Cogen grp 1, 2 and 3 convictions within 60 months more than 0
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8373: Youthful operator (under 25) has been added with a conviction on the policy." );
+		>fact0.setAddAction( "Review Driver Assignment" );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( driverReference );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( drvUnitAtRiskNumber );
+		>insertLogical( fact0 );
+end

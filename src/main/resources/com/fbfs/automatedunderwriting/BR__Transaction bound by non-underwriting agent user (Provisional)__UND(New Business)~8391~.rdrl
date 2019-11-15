@@ -1,0 +1,30 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_NonUnderwritingAgent;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Transaction bound by non-underwriting agent user (Provisional)__UND(New Business)~8391~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		DM_NonUnderwritingAgent( )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8391:  Transaction bound by a non-underwriting agent/user" );
+		fact0.setAddAction( "Review Policy" );
+		fact0.setAddAction( "Manually Accept the Transaction" );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		insertLogical( fact0 );
+		AutoAcceptor fact1 = new AutoAcceptor();
+		fact1.setAutoAcceptable( false );
+		insertLogical( fact1 );
+end

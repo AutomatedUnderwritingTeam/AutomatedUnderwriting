@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Driver;
+
+rule "BR__SR22 Filing Reason Has Been Deleted For A Driver__UND(Change)~0795~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Driver( sr22FilingReason : sr22FilingReason != null , previousSr22FilingReason : previousSr22FilingReason != null , eval( previousSr22FilingReason.length > 0 ), driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber, eval( sr22FilingReason.length == 0 ))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0795: SR-22 filing reason has been deleted for a driver." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( driverReference );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		fact0.setPriority( "High" );
+		insert( fact0 );
+end

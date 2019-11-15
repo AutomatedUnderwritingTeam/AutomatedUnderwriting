@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+
+
+rule "BR__Rewritten NM Policy__UND(Rewrite)~8240~"
+	agenda-group "BR_Rewrite"
+	dialect "mvel"
+	when
+		Policy( state == "NM" )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8240: New Mexico Rewrite Policy." );
+		fact0.setAddAction( "Check For UM/UDM Stacking Rejection/selection Form" );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		insert( fact0 );
+end

@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Watercraft;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Umbrella Num of Large Sailboats (Over 45 Feet) Does Not Equal Policy Count__CSR(New Business - Change)~2959~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, umbSailboats : vehiclePremium.numberOfLargeSailboats)
+		CntPolicy( policySailboats : cntLargeSailboats)
+		eval( umbSailboats != policySailboats )
+		( Watercraft( type == "WA"  || == "WS" , previousLength != null , previousLength < 45 , length >= 45 , hp : horsepower, php : previousHorsepower != null , eval( hp != php )) or Watercraft( type == "WA"  || == "WS" , length : length < 45 , previousLength : previousLength >= 45 , eval( length != previousLength )) or Watercraft( added == true , length >= 45 ) or Watercraft( deleted == true , length >= 45 ) or UmbrellaCoverage( added == true ) or UmbrellaCoverage( numSailboats : vehiclePremium.numberOfLargeSailboats, prevNumSailboats : vehiclePremium.previousNumberOfLargeSailboats != null , eval( numSailboats != prevNumSailboats )) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "2959: Number of large sailboats (over 45 feet) on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Sailboats over 45 Feet" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,39 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.HouseholdMember;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Vehicle LOB Added and Insured Over 15 Years Old is Not A Driver__ASST(Change)~7593~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>VehicleLineOfBusiness( added == true )
+		>Term( effectiveDate : effectiveDate)
+		>Client( $clientReference : clientReference, supplementList : supplementList)
+		>not (Driver( driverReference == $clientReference )) 
+		>householdMember : HouseholdMember( clientReference == $clientReference )
+		The clients age is more than 15 and is not a nonPermanant driver
+		R7592, 7593 - Household Member is not an aternate head of household
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "7593: Vehicle LOB added and Insured over 15 years old is not a driver." );
+		>fact0.setAddAction( "Review Named Insured" );
+		>fact0.setAddAction( "Review household relationship" );
+		>fact0.setAddAction( "Review for Change Transaction Date Equal to Prior Transaction Date" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( $clientReference );
+		>fact0.setAddLink( "Policy Level Information link" );
+		>fact0.setAddBookmark( "PolicyLevelInformation" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "INSD" );
+		>fact0.setMgmtReportingUnitAtRisk( $clientReference );
+		>insert( fact0 );
+end

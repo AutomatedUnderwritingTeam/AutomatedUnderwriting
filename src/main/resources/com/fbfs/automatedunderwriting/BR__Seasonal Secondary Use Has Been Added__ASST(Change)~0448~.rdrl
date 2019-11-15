@@ -1,0 +1,22 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+rule "BR__Seasonal Secondary Use Has Been Added__ASST(Change)~0448~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Dwelling( unitAtRiskNumber : unitAtRiskNumber, previousIsUsedSeasonally != null  , isUsedSeasonally == true , previousIsUsedSeasonally == false )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0448: Seasonal/Secondary use has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

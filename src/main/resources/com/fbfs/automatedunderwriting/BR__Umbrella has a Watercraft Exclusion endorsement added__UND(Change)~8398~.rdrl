@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.FormHeader;
+
+rule "BR__Umbrella has a Watercraft Exclusion endorsement added__UND(Change)~8398~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( $coverageNumber : coverageNumber)
+		FormHeader( formNumber matches ".*EU008(.|\n|\r)*" , added == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8398: Umbrella Watercraft Exclusion Added." );
+		fact0.setAddAction( "Review Vehicle" );
+		fact0.setAddAction( "Review Policy" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( $coverageNumber );
+		insertLogical( fact0 );
+end

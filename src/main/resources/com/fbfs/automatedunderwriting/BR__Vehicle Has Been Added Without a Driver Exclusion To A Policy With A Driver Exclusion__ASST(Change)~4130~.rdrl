@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.FormHeader;
+
+rule "BR__Vehicle Has Been Added Without a Driver Exclusion To A Policy With A Driver Exclusion__ASST(Change)~4130~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( added == true , $unitAtRiskNumber : unitAtRiskNumber, type != "TB" && type != "TC" && type != "TL" && type != "TR" && type != "TN" && type != "TP" && type != "TA" && type != "TD" && type != "TS" && type != "TT" && type != "TU" && type != "TF" )
+		not (FormHeader( unitAtRiskNumber == $unitAtRiskNumber , formNumber matches ".*EX002(.|\n|\r)*" )) 
+		exists (FormHeader( unitAtRiskNumber != $unitAtRiskNumber , formNumber matches ".*EX002(.|\n|\r)*" )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "4130: Driver Exclusion Endorsement on a vehicle and another vehicle has been added." );
+		fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

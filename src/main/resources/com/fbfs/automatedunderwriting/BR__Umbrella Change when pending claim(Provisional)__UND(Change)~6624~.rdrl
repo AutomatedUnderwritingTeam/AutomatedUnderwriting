@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Umbrella Change when pending claim(Provisional)__UND(Change)~6624~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		DM_CurrentTransaction( transactionEffectiveDate : effectiveDate)
+		UmbrellaCoverage( coverageNumber : coverageNumber, currentState != null , deleted != true )
+		lossOccurrenceSummary : LossOccurrenceSummary( dateOccurred after ( transactionEffectiveDate ) )
+		(ClaimSummary( coverageCode == "UMBR" ) from lossOccurrenceSummary.claimSummaryList)
+	then
+		AutoAcceptor fact0 = new AutoAcceptor();
+		fact0.setAutoAcceptable( false );
+		insert( fact0 );
+		WorkItemReason fact1 = new WorkItemReason();
+		fact1.setType( "Policy" );
+		fact1.setQueue( "Undw" );
+		fact1.setReason( "6624: Umbrella change with pending claim(Provisional)." );
+		fact1.setAddAction( "Review Claims" );
+		fact1.setAddLink( "Umbrella link" );
+		fact1.setAddBookmark( "Umbrella" );
+		fact1.setAddBookmarkUnit( "None" );
+		fact1.setMgmtReportingCategory( "COV" );
+		fact1.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact1 );
+end

@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+
+rule "BR__Umbrella Num of Truck Tractors Does Not Equal Policy Count__CSR(New Business - Change)~2955~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, umbNumTrucks : vehiclePremium.numberOfTruckTractors)
+		CntPolicy( policyNumTrucks : cntTruckTractor)
+		eval (umbNumTrucks != policyNumTrucks)
+		( Vehicle( added == true , type == "ST" ) or Vehicle( deleted == true , type == "ST" ) or UmbrellaCoverage( added == true ) or UmbrellaCoverage( numTrucks : vehiclePremium.numberOfTruckTractors, prevNumTrucks : vehiclePremium.previousNumberOfTruckTractors != null  , eval( numTrucks != prevNumTrucks )) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "2955: Number of truck tractors on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review truck tractors" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

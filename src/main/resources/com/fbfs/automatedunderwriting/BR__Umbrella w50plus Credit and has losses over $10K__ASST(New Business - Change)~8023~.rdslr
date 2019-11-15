@@ -1,0 +1,38 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.LossOccurrence;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.PaymentRecoverySummary;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.trap.model.AutoClaim;
+import com.fbfs.pc.trap.model.PropertyClaim;
+
+rule "BR__Umbrella w50plus Credit and has losses over $10K__ASST(New Business - Change)~8023~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>Term( effectiveDate : effectiveDate)
+		>UmbrellaCoverage( has50PlusCredit == true , coverageNumber : coverageNumber)
+		>( UmbrellaCoverage( added != null , added == true ) or UmbrellaCoverage( previousHas50PlusCredit != null , previousHas50PlusCredit == false ) or LineOfBusiness( added != null , added == true , lineOfBusiness == "PRPL"  || == "PRPL" ) )
+		R8023: The policy has either a Trap or FB loss more than $10K with the last 36 months
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "8023: Policy w/50+ Umbrella credit and the policy has either a Trap or FB loss more than $10K." );
+		>fact0.setAddAction( "Review 50+ Umbrella Credit" );
+		>fact0.setAddAction( "Remove 50+ Credit" );
+		>fact0.setAddAction( "Remove 50+ Umbrella Credit Diary" );
+		>fact0.setAddAction( "Review Property/Vehicle/Umbrella Rating" );
+		>fact0.setAddLink( "Umbrella link" );
+		>fact0.setAddBookmark( "Umbrella" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		>insertLogical( fact0 );
+end

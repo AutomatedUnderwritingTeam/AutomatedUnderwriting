@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Watercraft;
+
+rule "BR__Watercraft Class Has Changed to Class 3__UND(Change)~3232~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Watercraft( previousBoatClass != null , eval( convertToDouble(boatClass) == 3 ), eval( convertToDouble(previousBoatClass) != 3 ), unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "3232: Watercraft class has changed to 3." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

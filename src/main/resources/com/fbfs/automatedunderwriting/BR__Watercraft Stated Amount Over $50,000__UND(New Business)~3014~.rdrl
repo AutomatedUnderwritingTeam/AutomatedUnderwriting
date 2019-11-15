@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Watercraft;
+
+rule "BR__Watercraft Stated Amount Over $50,000__UND(New Business)~3014~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Watercraft( statedAmount > 50000 , unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "3014: Watercraft has a stated amount over $50,000." );
+		fact0.setAddAction( "Review HP and size of watercraft" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

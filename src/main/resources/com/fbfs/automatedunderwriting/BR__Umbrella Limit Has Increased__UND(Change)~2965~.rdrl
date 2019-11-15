@@ -1,0 +1,23 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+
+rule "BR__Umbrella Limit Has Increased__UND(Change)~2965~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( previousLimit1 != null , limit1 > ( previousLimit1 ) , coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "2965: Umbrella limit has increased." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

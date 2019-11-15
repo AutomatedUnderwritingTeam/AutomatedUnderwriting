@@ -1,0 +1,36 @@
+package com.fbfs.automatedunderwriting;
+
+import java.lang.Number;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.au.model.count.CntPolicy;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__Vehicle Use Has Changed To Business__ASST(Change)~8376~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		Vehicle( vehicleUse == "B" , previousVehicleUse != null , previousVehicleUse != "B" , $unitAtRiskNumber : unitAtRiskNumber)
+		Policy( $state : state)
+		( Term( effectiveDate >= "29-Sep-2016" , eval( $state == "KS"  || $state == "MN"  || $state == "NM"  || $state == "UT" )) or Term( effectiveDate >= "23-Jun-2017" , eval( $state == "AZ"  || $state == "IA"  || $state == "NE"  || $state == "SD" )) )
+		Driver( $driverReference : driverReference)
+		Client( clientReference == $driverReference , clientSupplementList : supplementList)
+		CntPolicy( $cntBusinessUseVehicles : cntBusinessUseVehicles, cntDriversWithBusUseOccupation < $cntBusinessUseVehicles )
+		not (Vehicle( vehicleUse == "B" , deleted == true )) 
+		not (Vehicle( deleted != true , vehicleUse != "B" , previousVehicleUse == "B" , unitAtRiskNumber != $unitAtRiskNumber )) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8376: Vehicle use has changed to business." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

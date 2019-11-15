@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+import com.fbfs.pc.ecd.model.Location;
+
+rule "BR__Small Farm Ranch Location with acres more than 45__UND(New Business)~7750~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness"
+	when
+		>location : Location( $locationNumber : locationNumber)
+		>(LocationSupplement( locationUse == "S" , totalAcres > 45 ) from location.supplement)
+		The location is a property location
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "7750: Small farm/ranch with acres more than 45." );
+		>fact0.setAddAction( "Review Eligibility for Small Farm/Ranch Discount" );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Change Location To A Regular Farm/Ranch Location" );
+		>fact0.setAddLink( "Location link" );
+		>fact0.setAddBookmark( "PropLocation" );
+		>fact0.setAddBookmarkUnit( $locationNumber );
+		>fact0.setMgmtReportingCategory( "LOC" );
+		>fact0.setMgmtReportingUnitAtRisk( $locationNumber );
+		>insertLogical( fact0 );
+end

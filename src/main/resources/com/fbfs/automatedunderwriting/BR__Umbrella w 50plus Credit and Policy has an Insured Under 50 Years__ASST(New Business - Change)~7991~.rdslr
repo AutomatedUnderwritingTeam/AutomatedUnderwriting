@@ -1,0 +1,34 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+
+rule "BR__Umbrella w 50plus Credit and Policy has an Insured Under 50 Years__ASST(New Business - Change)~7991~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>LineOfBusiness( deleted != null , lineOfBusiness == "UMB" )
+		>umbrellaCoverage : UmbrellaCoverage( has50PlusCredit == true , coverageNumber : coverageNumber)
+		>client : Client( $clientReference : clientReference)
+		>(clientSupplement : ClientSupplement( clientClass == "IN" ) from client.supplementList)
+		R7991 The client is a named insured with an age less than 50  or has a child relationship with an age 14-21
+		R7991 The named insured or child has been added or 50 Plus Credit added or new business
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "7991: Policy w/50+ Umbrella credit and has insured under 50." );
+		>fact0.setAddAction( "Review 50+ Umbrella Credit" );
+		>fact0.setAddAction( "Remove 50+ Credit" );
+		>fact0.setAddAction( "Remove 50+ Umbrella Credit Diary" );
+		>fact0.setAddAction( "Review Property/Vehicle/Umbrella Rating" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( $clientReference );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		>insertLogical( fact0 );
+end

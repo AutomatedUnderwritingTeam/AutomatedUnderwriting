@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+
+rule "BR__Umbrella w 50plus Credit and no Prop or Veh or Not All FB Coverage__ASST(New Business-Change)~8006~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness_Change"
+	when
+		>umbrellaCoverage : UmbrellaCoverage( has50PlusCredit == true , coverageNumber : coverageNumber, isAllFarmBureauCoverage : isAllFarmBureauCoverage)
+		R8006 No Property LOB or No Vehicle LOB or Not All FB Underlying Coverage
+		>( UmbrellaCoverage( added != null , added == true ) or LineOfBusiness( deleted != null , deleted == true , lineOfBusiness == "PRPL"  || == "VEH" ) or UmbrellaCoverage( previousIsAllFarmBureauCoverage != null , previousIsAllFarmBureauCoverage == true ) or UmbrellaCoverage( previousHas50PlusCredit != null , previousHas50PlusCredit == false ) )
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "8006: Policy w/50+ Umbrella credit and no Property LOB or Vehicle LOB or not all underlying insurance with FB." );
+		>fact0.setAddAction( "Review 50+ Umbrella Credit" );
+		>fact0.setAddAction( "Remove 50+ Credit" );
+		>fact0.setAddAction( "Remove 50+ Umbrella Credit Diary" );
+		>fact0.setAddAction( "Review Property/Vehicle/Umbrella Rating" );
+		>fact0.setAddLink( "Umbrella link" );
+		>fact0.setAddBookmark( "Umbrella" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		>insertLogical( fact0 );
+end

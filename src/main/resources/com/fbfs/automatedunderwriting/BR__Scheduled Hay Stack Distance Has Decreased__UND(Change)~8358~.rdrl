@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Hay;
+
+rule "BR__Scheduled Hay Stack Distance Has Decreased__UND(Change)~8358~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Hay( $unitAtRiskCode : unitAtRiskCode, $unitAtRiskNumber : unitAtRiskNumber, $coverageList : coverageList, $previousStackingDistance : previousStackingDistance, $stackingDistance : stackingDistance)
+		(Coverage( coverageCode == "FPPS" ) from $coverageList)
+		eval(convertToDouble($previousStackingDistance) > convertToDouble($stackingDistance))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw Farm" );
+		fact0.setReason( "8358:  Scheduled hay stack distance has decreased." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Stack Distance" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( $unitAtRiskCode+$unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

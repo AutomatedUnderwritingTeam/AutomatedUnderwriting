@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.au.model.count.CntPolicy;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Umbrella Num of Recreational Vehicles (SNOW, ATV, DB, MP) Does Not Equal Policy Count__CSR(New Business - Change)~2951~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, umbNumVeh : vehiclePremium.numberOfRecreationalVehicles)
+		CntPolicy( policyNumVeh : cntRecreationalVehicles)
+		eval( umbNumVeh != policyNumVeh )
+		( Vehicle( type == "M3"  || == "M4"  || == "M5"  || == "SN"  || == "MP"  || == "MD" , added == true ) or Vehicle( type == "M3"  || == "M4"  || == "M5"  || == "SN"  || == "MP"  || == "MD" , deleted == true ) or UmbrellaCoverage( added == true ) or UmbrellaCoverage( numRec : vehiclePremium.numberOfRecreationalVehicles, prevNumRec : vehiclePremium.previousNumberOfRecreationalVehicles != null , eval( numRec != prevNumRec )) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "2951: Number of recreational vehicles (SNOW, ATV, DB, MP) on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Recreational Vehicle" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

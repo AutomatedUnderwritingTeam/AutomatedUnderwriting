@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.au.model.count.CntPolicy;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+
+rule "BR__Umbrella Num of Named Insureds Does Not Equal Policy Count__CSR(New Business - Change)~3417~"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness_Change"
+	when
+		CntPolicy( cntPolicyNamedInsured : cntPolicyNamedInsured)
+		UmbrellaCoverage( numberOfNamedInsureds != cntPolicyNamedInsured , deleted != true , coverageNumber : coverageNumber)
+		policy : Policy( )
+		( UmbrellaCoverage( added != null , added == true ) or UmbrellaCoverage( previousNumberOfNamedInsureds != null , numberOfNamedInsureds != ( previousNumberOfNamedInsureds ) ) or 		ClientRelationship( type == "IN" , added == true || deleted == true ) from policy.clientRelationshipList
+ )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "3417: Number of named insureds on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "insured folder link" );
+		fact0.setAddBookmark( "InsuredFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

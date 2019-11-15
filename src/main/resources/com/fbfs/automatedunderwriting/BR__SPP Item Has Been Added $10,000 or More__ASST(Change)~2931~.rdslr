@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+
+rule "BR__SPP Item Has Been Added $10,000 or More__ASST(Change)~2931~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>schedulePersonalProperty : ScheduledPersonalProperty( added == true , unitAtRiskNumber : unitAtRiskNumber, $amountInsured : amountInsured > 9999 )
+		>Coverage( coverageCode : coverageCode, $coverageNumber : coverageNumber)
+		The coverage is a schedule personal property
+		>((Coverage( coverageNumber == $coverageNumber, coverageCode == "DOCKS", eval($amountInsured > 14999)) from schedulePersonalProperty.coverageList) or (Coverage( coverageNumber == $coverageNumber, coverageCode == "MBLEQ", eval($amountInsured > 19999)) from schedulePersonalProperty.coverageList) or (Coverage( coverageNumber == $coverageNumber, coverageCode != "MBLEQ", coverageCode != "DOCKS", eval($amountInsured > 9999)) from schedulePersonalProperty.coverageList))
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "2931: Scheduled personal property item has been added $10,000 or more." );
+		>fact0.setAddAction( "Review Appraisal" );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Scheduled personal property class link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( coverageCode + $coverageNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

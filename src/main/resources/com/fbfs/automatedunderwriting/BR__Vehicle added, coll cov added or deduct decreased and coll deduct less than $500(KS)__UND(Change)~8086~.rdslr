@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Vehicle added, coll cov added or deduct decreased and coll deduct less than $500(KS)__UND(Change)~8086~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Policy( state == "KS" )
+		>collCoverage1 : Coverage( coverageNumber1 : coverageNumber, coverageCode == "COLL" , deductable1 : deductable < 500 , added == true || previousDeductable > "499" )
+		>vehicle1 : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, vehicle1CoverageList : coverageList)
+		>(Coverage( coverageNumber == coverageNumber1 ) from vehicle1CoverageList)
+		Another vehicle with the same collision deductible does not exist
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8086: Vehicle added or deductible decreased and collision deductible less than $500." );
+		>fact0.setAddAction( "Increase Deductible" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

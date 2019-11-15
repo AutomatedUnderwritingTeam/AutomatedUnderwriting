@@ -1,0 +1,37 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.UmbrellaVehiclePremium;
+import com.fbfs.pc.au.model.count.CntPolicy;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__Umbrella"
+	dialect "mvel"
+	agenda-group "BR_NewBusiness_Change"
+	when
+		umbrellaCoverage : UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, vehiclePremium : vehiclePremium, numberOfDriversExceeding5MeritPoints : vehiclePremium.numberOfDriversExceeding5MeritPoints)
+		CntPolicy( cntVeh5PlusMeritPoints : cntVeh5PlusMeritPoints != ( numberOfDriversExceeding5MeritPoints ) )
+		( UmbrellaCoverage( added == true ) or 		UmbrellaVehiclePremium( previousNumberOfDriversExceeding5MeritPoints != null , numberOfDriversExceeding5MeritPoints != ( previousNumberOfDriversExceeding5MeritPoints ) ) from umbrellaCoverage.vehiclePremium
+ or vehicle : Vehicle( added == true || deleted == true , eval( vehicle.getMeritPointList().size() >0 )) or CntPolicy( cntVeh5PlusMeritPoints != ( numberOfDriversExceeding5MeritPoints ) ) )
+			(Term( effectiveDate < "30-Sep-2016" ) and Policy( state == "KS"  || == "MN" || == "NM" || == "UT") or
+				     Term( effectiveDate < "23-Jun-2017" ) and Policy( state == "AZ"  || == "IA" || == "NE" || == "SD"))
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "2983: Number of vehicles with over 5 merit points on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

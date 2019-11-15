@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Dwelling;
+
+
+rule "BR__Residence Year Built Has Changed and residence less than 20 years__UND(Change)~0433~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Term( effectiveDate : effectiveDate)
+		Dwelling( unitAtRiskNumber : unitAtRiskNumber, previousYearBuild != null  , yearbuilt : yearBuild != ( previousYearBuild ) , dwellingType != "H1", dwellingType != "H2", dwellingType != "H3", dwellingType != "H4", dwellingType != "M1", dwellingType != "M2", dwellingType != "M3" )
+		eval(calculateYears(yearbuilt, effectiveDate) < 21)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "0433: Residence year built has changed." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

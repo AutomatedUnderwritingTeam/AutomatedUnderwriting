@@ -1,0 +1,22 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.User;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_RenewalTransaction;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Semi Automatic Renewals Stay Provisional for HO users(Renewal)"
+	agenda-group "BR_Renewal"
+	dialect "mvel"
+	when
+		DM_RenewalTransaction( )
+		Term( renewalIndicator == "P" )
+		currentTransaction : DM_CurrentTransaction( )
+		(User( branch == "HO1"  || == "HO2"  || == "HO3" ) from currentTransaction.user)
+	then
+		AutoAcceptor fact0 = new AutoAcceptor();
+		fact0.setAutoAcceptable( false );
+		insert( fact0 );
+end

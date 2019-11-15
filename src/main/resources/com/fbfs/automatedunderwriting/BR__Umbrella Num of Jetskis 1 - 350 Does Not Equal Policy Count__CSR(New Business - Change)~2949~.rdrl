@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Umbrella Num of Jetskis 1 - 350 Does Not Equal Policy Count__CSR(New Business - Change)~2949~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, umbNumJetskis : vehiclePremium.numberOf1To350CcJetskis)
+		CntPolicy( policyJetskiCount : cntJetskis350)
+		eval( policyJetskiCount != umbNumJetskis )
+		( Vehicle( type == "WJ" , previousEngineCapacity < 1  || > 350 , engineCapacity >= 1 && engineCapacity <= 350 ) or Vehicle( type == "WJ" , engineCapacity < 1  || > 350 , previousEngineCapacity >= 1 && previousEngineCapacity <= 350 ) or Vehicle( type == "WJ" , added == true , engineCapacity > 0 && engineCapacity < 350 ) or Vehicle( type == "WJ" , deleted == true , engineCapacity >= 1 && engineCapacity <= 350 ) or UmbrellaCoverage( numJetskis : vehiclePremium.numberOf1To350CcJetskis, prevNumJetskis : vehiclePremium.previousNumberOf1To350CcJetskis != null , eval( numJetskis != prevNumJetskis )) or UmbrellaCoverage( added == true ) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "2949: Number of jetskis 1-350 ccs on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Jetskis 1-350 ccs" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

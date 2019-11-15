@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Watercraft;
+import com.fbfs.pc.ecd.model.OutboardMotor;
+
+rule "BR__Watercraft Outboard Motor HP Over 250__UND(New Business)~5260~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		watercraft : Watercraft( unitAtRiskNumber : unitAtRiskNumber)
+		(OutboardMotor( horsepower > 250 ) from watercraft.outboardMotorList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "5260: Outboard motor HP over 250." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

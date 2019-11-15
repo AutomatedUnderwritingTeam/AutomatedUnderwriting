@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+
+
+rule "BR__SPP Class Deductible Has Decreased__ASST(Change)~4152~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Coverage( coverageCode : coverageCode, coverageNumber : coverageNumber, previousDeductable != null  , deductable < ( previousDeductable ) )
+		The coverage is a schedule personal property
+		>scheduledPersonalProperty : ScheduledPersonalProperty( unitAtRiskNumber : unitAtRiskNumber)
+		>Coverage( coverageNumber == coverageNumber ) from scheduledPersonalProperty.coverageList
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "4152: Scheduled personal property class deductible has decreased." );
+		>fact0.setAddAction( "Review for Claims" );
+		>fact0.setAddLink( "Scheduled personal property class link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( coverageCode + coverageNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

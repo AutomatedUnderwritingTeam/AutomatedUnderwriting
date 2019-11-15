@@ -1,0 +1,26 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.SolidFuelHeat;
+
+rule "BR__Residence Solid Fuel Heat Has Been Deleted__UND(Change)~1490~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber)
+		exists (		SolidFuelHeat( deleted == true , applianceType != "01",  applianceType != "02" ) from dwelling.solidFuelHeatList
+) 
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "1490: Residence solid fuel heat has been deleted." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Residence link" );
+		fact0.setAddBookmark( "RS" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

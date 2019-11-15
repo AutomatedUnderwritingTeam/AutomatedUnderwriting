@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.VehicleCoverageSupplement;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__School Bus Endorsement Has Been Added__ASST(Change)~0695~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		Coverage( $coverageNumber : coverageNumber, vehicleCoverageSupplement : vehicleSupplement != null )
+		(VehicleCoverageSupplement( usedAsSchoolBus == true , previousUsedAsSchoolBus == false ) from vehicleCoverageSupplement)
+		vehicle : Vehicle( coverageList : coverageList, unitAtRiskNumber : unitAtRiskNumber)
+		(coverage : Coverage( coverageNumber == $coverageNumber ) from coverageList)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "0695: School Bus Endorsement has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end

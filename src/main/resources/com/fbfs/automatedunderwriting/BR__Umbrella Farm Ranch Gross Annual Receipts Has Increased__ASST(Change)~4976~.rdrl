@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.UmbrellaPropertyPremium;
+
+
+rule "BR__Umbrella Farm Ranch Gross Annual Receipts Has Increased__ASST(Change)~4976~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		umbrellaCoverage : UmbrellaCoverage( coverageNumber : coverageNumber)
+		UmbrellaPropertyPremium( previousAnnualFarmReceipts != null  , annualFarmReceipts > ( previousAnnualFarmReceipts ) ) from umbrellaCoverage.propertyPremium
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "4976: Umbrella farm/ranch gross annual receipts has increased." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Vehicle added, comp cov added,  or deduct decreased and comp deduct less than $250(KS)__UND(Chante)~8088~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Policy( state == "KS" )
+		>compCoverage1 : Coverage( coverageNumber1 : coverageNumber, coverageCode == "COMP" , deductable1 : deductable < 250 , added == true || previousDeductable > 249 )
+		>vehicle1 : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, vehicle1CoverageList : coverageList)
+		>(Coverage( coverageNumber == coverageNumber1 ) from vehicle1CoverageList)
+		Another vehicle with the same comprehensive deductible does not exist
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "8088: Vehicle added or deductible decreased and comprehensive deductible less than $250." );
+		>fact0.setAddAction( "Increase Deductible" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

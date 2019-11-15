@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__UM UDM Stacked coverage deleted(NM)__CSR(Change)~6404~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		vehicle : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, deleted != true )
+		Coverage( coverageCode == "UIBI" || coverageCode == "UDRBI" || coverageCode == "UDCSL" || coverageCode == "UMCSL" , $coverageNumber : coverageNumber, deleted == true )
+		(Coverage( coverageNumber == $coverageNumber ) from vehicle.coverageList)
+		not (		Coverage( coverageCode == "UIBI" || coverageCode == "UDRBI" || coverageCode == "UDCSL" || coverageCode == "UMCSL" , deleted != true ) from vehicle.coverageList
+) 
+		Policy( state == "NM" )
+		Term( effectiveDate < "30-Sep-2019")
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "6404: UM/UDM coverage deleted from the vehicle" );
+		fact0.setAddAction( "Check For UM/UDM Stacking Rejection/selection Form" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		insertLogical( fact0 );
+end

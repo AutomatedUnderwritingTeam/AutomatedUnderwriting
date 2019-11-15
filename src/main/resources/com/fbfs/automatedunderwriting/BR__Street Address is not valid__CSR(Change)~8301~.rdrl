@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+
+rule "BR__Street Address is not valid__CSR(Change)~8301~"
+	dialect "mvel"
+	agenda-group "BR_Change"
+	when
+		Location( isInvalidStreet == true , locationNumber : locationNumber)
+		UnitAtRisk( locationNumber == locationNumber , lineOfBusiness == "PRPL" , deleted != true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "8301:  Street Address is not valid." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Verify Address" );
+		fact0.setAddAction( "Verify Primary FD" );
+		fact0.setAddAction( "Verify Miles" );
+		fact0.setAddLink( "Location link" );
+		fact0.setAddBookmark( "PropLocation" );
+		fact0.setAddBookmarkUnit( locationNumber );
+		fact0.setMgmtReportingCategory( "LOC" );
+		fact0.setMgmtReportingUnitAtRisk( locationNumber );
+		insertLogical( fact0 );
+end

@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+
+rule "BR__Umbrella Num of Motorboats over 300 Does Not Equal Policy Count__CSR(New Business - Change)~2961~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, umbNumBoats : vehiclePremium.numberOfOver300MphMotorboats)
+		CntPolicy( policyNumBoats : cntMotorBoatsOver300)
+		eval (umbNumBoats != policyNumBoats)
+		( Vehicle( type == "WI"  || == "WB"  || == "WO" , horsepower >= 300 , previousHorsepower != null  , previousHorsepower < 300 ) or Vehicle( type == "WI"  || == "WB"  || == "WO" , horsepower < 300 , previousHorsepower >= 301 ) or Vehicle( type == "WI"  || == "WB"  || == "WO" , added == true , horsepower >= 301 ) or Vehicle( type == "WI"  || == "WB"  || == "WO" , deleted == true , horsepower >= 301 ) or UmbrellaCoverage( added == true ) or UmbrellaCoverage( numBoats : vehiclePremium.numberOfOver300MphMotorboats, prevNumBoats : vehiclePremium.previousNumberOfOver300MphMotorboats != null  , eval( numBoats != prevNumBoats )) )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "CSR" );
+		fact0.setReason( "2961: Number of motorboats over 300 HP on the policy does not match the umbrella." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review watercraft over 300 HP" );
+		fact0.setAddLink( "Umbrella link" );
+		fact0.setAddBookmark( "Umbrella" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setAddLink( "Vehicle folder link" );
+		fact0.setAddBookmark( "VehicleFolder" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "COV" );
+		fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		insertLogical( fact0 );
+end

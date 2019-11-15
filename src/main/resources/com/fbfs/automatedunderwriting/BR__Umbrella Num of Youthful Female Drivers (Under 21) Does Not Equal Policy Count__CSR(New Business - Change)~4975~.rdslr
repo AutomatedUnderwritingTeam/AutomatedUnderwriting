@@ -1,0 +1,36 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.UmbrellaCoverage;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.au.model.count.CntPolicy;
+import com.fbfs.pc.ecd.model.UmbrellaVehiclePremium;
+
+rule "BR__Umbrella Num of Youthful Female Drivers (Under 21) Does Not Equal Policy Count__CSR(New Business - Change)~4975~"
+	agenda-group "BR_NewBusiness_Change"
+	dialect "mvel"
+	when
+		>UmbrellaCoverage( deleted != true , coverageNumber : coverageNumber, umbNumDrivers : vehiclePremium.numberOfFemaleYouthOperators)
+		>CntPolicy( cntYouthfulFemaleDrivers != ( umbNumDrivers ) )
+		R4975 Condition 1x  -  Umbrella added - condition 1
+		R4975 Condition 2x  -   OR Driver with age less than 21 added or deleted
+		R4975 Condition 3x  -  OR The Umbrella's number of youthful female operators has changed or been added
+		R4975 Condition4x  -   OR a driver's age has changed, GT or EQ to 21 or now LT 21,  resulting in a youthful operator change status
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "CSR" );
+		>fact0.setReason( "4975: Number of female youthful drivers (under 21) on the policy does not match the umbrella." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Umbrella link" );
+		>fact0.setAddBookmark( "Umbrella" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setAddLink( "insured folder link" );
+		>fact0.setAddBookmark( "InsuredFolder" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "COV" );
+		>fact0.setMgmtReportingUnitAtRisk( coverageNumber );
+		>insertLogical( fact0 );
+end

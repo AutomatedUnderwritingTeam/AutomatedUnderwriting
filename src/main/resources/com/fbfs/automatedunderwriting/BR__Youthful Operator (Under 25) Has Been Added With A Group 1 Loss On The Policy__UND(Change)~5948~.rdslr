@@ -1,0 +1,41 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.PriorLoss;
+import com.fbfs.pc.ecd.model.License;
+import com.fbfs.pc.ecd.model.AccidentConviction;
+import com.fbfs.pc.au.model.count.CntDriver;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Policy;
+
+rule "BR__Youthful Operator (Under 25) Has Been Added With A Group 1 Loss On The Policy__UND(Change)~5948~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Policy( $state : state)
+		>( Term( effectiveDate < "30-Sep-2016" , eval( $state == "KS"  || $state == "MN" || $state == "NM" || $state == "UT" )) or Term( effectiveDate < "23-Jun-2017" , eval( $state == "AZ"  || $state == "IA" || $state == "NE" || $state == "SD" )) )
+		>Term( termEffectiveDate : effectiveDate)
+		>Vehicle( assignedDriver : assignedDriver, vehUnitAtRiskNumber : unitAtRiskNumber, ( primaryClassification matches "3" && ageClassification matches "[12]" )|| ( primaryClassification matches "2" && ageClassification matches "[12F]" )|| ( primaryClassification matches "5" && ageClassification matches "[123567]" )|| ( primaryClassification matches "7" && ageClassification matches "[12]" )|| ( primaryClassification matches "6" && ageClassification matches "[125]" ), frequentDriver : frequentDriver)
+		>Driver( drvUnitAtRiskNumber : unitAtRiskNumber, licenseList : licenseList, driverReference : driverReference, added == true , frequentVehicle : frequentVehicle)
+		R5948 - Driver drives the vehicle
+		>priorLoss : PriorLoss( priorLossSupplement : supplement != null , dateOfLoss : dateOfLoss != null , eval( calculateMonths(dateOfLoss, termEffectiveDate) <= 36 ))
+		R5948 - Driver with second loss within 36 months
+		R5948 - Or Vehicle with prior loss within 36 months
+		R5948 - Or Driver has Trap Grop 1 convictions within 36 months
+		R5948 - Or Driver licenses has accidents and convictions within 36 months
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "5948: Youthful operator (under 25) has been added with a Group 1 loss on the policy." );
+		>fact0.setAddAction( "Review Driver Assignment" );
+		>fact0.setAddAction( "Review Underwriting Reports" );
+		>fact0.setAddLink( "Insured link" );
+		>fact0.setAddBookmark( "Insured" );
+		>fact0.setAddBookmarkUnit( driverReference );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( drvUnitAtRiskNumber );
+		>insert( fact0 );
+end
