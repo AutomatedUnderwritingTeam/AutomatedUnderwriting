@@ -47,19 +47,19 @@
     </dependency>
     <dependency>
       <groupId>fbfs</groupId>
-      <artifactId>AURulesModel-2019.03.6</artifactId>
+      <artifactId>aurulesmodel</artifactId>
       <version>2019.03.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>fbfs</groupId>
-      <artifactId>ecd-2019.11.23</artifactId>
+      <artifactId>ecd</artifactId>
       <version>2019.11.23</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>fbfs</groupId>
-      <artifactId>trapobjects-2019.08.38</artifactId>
+      <artifactId>trapobjects</artifactId>
       <version>2019.08.38</version>
       <scope>compile</scope>
     </dependency>
