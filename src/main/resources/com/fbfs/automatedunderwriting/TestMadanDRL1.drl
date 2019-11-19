@@ -15,7 +15,7 @@ rule "TestMadanDRL1"
                                 WorkItemReason fact0 = new WorkItemReason();
                                 fact0.setType( "Policy" );
                                 fact0.setQueue( "Undw" );
-                                fact0.setReason( "5484:TestMadanDRL1 :12345" );
+                                fact0.setReason( "5484:TestMadanDRL1 :123456789" );
                                 fact0.setAddAction( "General Review" );
                                 fact0.setAddAction( "Review for farm/ranch income" );
                                 fact0.setAddLink( "Liability link" );
