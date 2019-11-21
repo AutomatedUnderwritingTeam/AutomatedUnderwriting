@@ -2,20 +2,15 @@ package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__1990 to 2010 Private Passenger Vehicle Symbol Change Over 26__UND(Change)~8042~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
 		Vehicle( type == "PP"  || == "PF"  || == "VA"  || == "PC"  || == "VC"  || == "VM" , previousSymbol : previousSymbol != null , eval( convertToDouble(symbol) > 26 ), eval( convertToDouble(previousSymbol)<27 ), unitAtRiskNumber : unitAtRiskNumber, vehYear : year, eval( vehYear > 1989  && vehYear < 2011 ))
-	(
-(Term(effectiveDate < "30-Sep-2018") and 
-Policy($state : state == "KS" || == "MN" || == "NM" || == "UT"))  or
-(Term(effectiveDate < "23-Jun-2019") and
-(Policy(state == "AZ" || == "IA" || == "NE" || == "SD" )))
-)
-
-	
+		( Term( ) or Policy( $state : state == "KS"  || == "MN"  || == "NM"  || == "UT" ) or Term( ) or Policy( state == "AZ"  || == "IA"  || == "NE"  || == "SD" ) )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
