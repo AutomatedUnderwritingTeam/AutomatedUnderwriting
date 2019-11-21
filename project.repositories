@@ -4,7 +4,7 @@
       <include>true</include>
       <metadata>
         <id>local</id>
-        <url>/tmp/.m2/repository</url>
+        <url>C:\Users\E013448/.m2/repository</url>
         <source>LOCAL</source>
       </metadata>
     </repository>
@@ -14,14 +14,6 @@
         <id>central</id>
         <url>https://repo.maven.apache.org/maven2</url>
         <source>PROJECT</source>
-      </metadata>
-    </repository>
-    <repository>
-      <include>true</include>
-      <metadata>
-        <id>jboss-brms-bpmsuite-repository</id>
-        <url>file:///opt/pam-maven-repo/rhba-7.5.0.GA-maven-repository/maven-repository</url>
-        <source>SETTINGS</source>
       </metadata>
     </repository>
   </repositories>
