@@ -2,15 +2,7 @@
   <repositories>
     <repository>
       <include>true</include>
-      <metadata>
-        <id>local</id>
-        <url>C:\Users\E013448/.m2/repository</url>
-        <source>LOCAL</source>
-      </metadata>
-    </repository>
-    <repository>
-      <include>true</include>
-      <metadata>
+      <metadata>1
         <id>central</id>
         <url>https://repo.maven.apache.org/maven2</url>
         <source>PROJECT</source>
