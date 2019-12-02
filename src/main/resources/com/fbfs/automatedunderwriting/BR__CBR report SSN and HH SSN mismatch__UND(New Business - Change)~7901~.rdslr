@@ -7,6 +7,7 @@ import com.fbfs.pc.ecd.model.Client;
 import com.fbfs.pc.ecd.model.ClientSupplement;
 import com.fbfs.pc.au.model.trap.TrapCbrReport;
 import com.fbfs.pc.trap.model.ReturnedClient;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__CBR report SSN and HH SSN mismatch__UND(New Business - Change)~7901~"
 	agenda-group "BR_NewBusiness_Change"

@@ -4,6 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.ecd.model.PrivatePassenger;
 import com.fbfs.pc.ecd.model.MeritPoint;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__Low Mileage Vehicle(MN)__ASST(New Business)~7946~"
 	agenda-group "BR_NewBusiness"

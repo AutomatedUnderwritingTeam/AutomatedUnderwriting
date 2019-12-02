@@ -6,6 +6,7 @@ import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.ecd.model.ClientRelationship;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Motorcycle;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__No UM UDM coverage on added vehicle (NM)__CSR(Change)~6402~"
 	agenda-group "BR_Change"
