@@ -4,6 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Vehicle;
 import com.fbfs.pc.ecd.model.Policy; 
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__No UM UDM coverage on vehicle(NM)__CSR(New Business, Rewrite)~6405~"
 	dialect "mvel"

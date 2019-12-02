@@ -4,6 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Vehicle;
 import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__UM UDM Stacked Coverage and AOI more than $1M (NM)__CSR(Change)~8239~"
 	agenda-group "BR_Change"

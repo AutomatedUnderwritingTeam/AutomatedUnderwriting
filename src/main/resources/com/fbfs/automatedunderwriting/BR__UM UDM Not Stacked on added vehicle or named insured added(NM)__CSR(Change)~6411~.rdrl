@@ -5,6 +5,7 @@ import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Vehicle;
 import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.ecd.model.ClientRelationship;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__UM UDM Not Stacked on added vehicle or named insured added(NM)__CSR(Change)~6411~"
 	agenda-group "BR_Change"

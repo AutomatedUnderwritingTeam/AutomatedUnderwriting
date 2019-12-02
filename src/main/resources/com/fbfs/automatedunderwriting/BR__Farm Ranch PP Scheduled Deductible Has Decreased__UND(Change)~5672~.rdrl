@@ -4,6 +4,8 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.UnitAtRisk;
 import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
 
 rule "BR__Farm Ranch PP Scheduled Deductible Has Decreased__UND(Change)~5672~"
 	dialect "mvel"

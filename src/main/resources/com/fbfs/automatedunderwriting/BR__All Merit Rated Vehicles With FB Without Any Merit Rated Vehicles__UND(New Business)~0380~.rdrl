@@ -4,6 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
 import com.fbfs.pc.ecd.model.PropertyLineOfBusinessSupplement;
 import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
 
 rule "BR__All Merit Rated Vehicles With FB Without Any Merit Rated Vehicles__UND(New Business)~0380~"
 	agenda-group "BR_NewBusiness"
