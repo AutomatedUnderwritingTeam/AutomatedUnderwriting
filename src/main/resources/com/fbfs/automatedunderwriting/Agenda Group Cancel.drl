@@ -2,8 +2,6 @@ package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
 import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
-import com.fbfs.pc.ecd.model.Vehicle;
-import com.fbfs.pc.ecd.model.Policy;
 
 
 rule "Agenda Group Cancel"
