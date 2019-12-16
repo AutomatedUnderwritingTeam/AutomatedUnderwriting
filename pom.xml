@@ -53,20 +53,20 @@
     </dependency>
     <dependency>
       <groupId>fbfs</groupId>
-      <artifactId>ECD</artifactId>
+      <artifactId>AURulesModel</artifactId>
+      <version>2019.03.6</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>fbfs</groupId>
+      <artifactId>ecd-2019.11.23</artifactId>
       <version>2019.11.23</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>fbfs</groupId>
-      <artifactId>TrapObjects</artifactId>
-      <version>2019.03.38</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>fbfs</groupId>
-      <artifactId>AURulesModel</artifactId>
-      <version>2019.03.6</version>
+      <artifactId>trapobjects-2019.08.38</artifactId>
+      <version>2019.08.38</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
