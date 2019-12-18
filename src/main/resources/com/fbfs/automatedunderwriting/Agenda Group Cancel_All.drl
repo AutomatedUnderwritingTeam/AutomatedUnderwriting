@@ -2,6 +2,7 @@ package com.fbfs.automatedunderwriting;
 import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
 
 
+
 rule "Agenda Group Cancel_All"
 
     agenda-group "control"
