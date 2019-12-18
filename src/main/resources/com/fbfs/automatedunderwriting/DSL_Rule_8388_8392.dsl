@@ -13,8 +13,8 @@
 		
 		
 		(eval(numberOfDwellings > 5) and eval(numberOfDwellings < 11) and eval($deductable < 5000)) or
-		 (eval(numberOfDwellings > 5) and eval($deductable2 != 0)and  eval($deductable2 < 10000)) or
-		(eval(numberOfDwellings > 5) and eval($deductable2 == 0) and eval($deductable < 10000)) or
+		 (eval(numberOfDwellings > 5) and eval(numberOfDwellings < 11) and eval($deductable2 != 0)and  eval($deductable2 < 10000)) or
+		(eval(numberOfDwellings > 5) and eval(numberOfDwellings < 11) and eval($deductable2 == 0) and eval($deductable < 10000)) or
 		
 		
 		
