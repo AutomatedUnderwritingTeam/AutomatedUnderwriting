@@ -3,7 +3,6 @@ package com.fbfs.automatedunderwriting;
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.FarmMachinery;
 
-
 rule "BR__Machinery has been added with Replacement cost amount 100001 or greater__UND(New Business)~8399~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
@@ -16,7 +15,7 @@ rule "BR__Machinery has been added with Replacement cost amount 100001 or greate
 		fact0.setReason( "8399: Machinery has been added with Replacement cost amount $100,001 or greater" );
 		fact0.setAddAction( "Machinery Valuation Worksheet" );
 		fact0.setAddAction( "FB Memo" );
-		fact0.setAddAction( "Review FPP Item(s)" );
+		fact0.setAddAction( "Review FPP" );
 		fact0.setAddLink( "Farm/ranch personal property link" );
 		fact0.setAddBookmark( "None" );
 		fact0.setAddBookmarkUnit( $unitAtRiskCode+$unitAtRiskNumber );
