@@ -12,17 +12,13 @@
 		 (eval(numberOfDwellings < 6) and eval($deductable2 != 0) and eval($deductable2 < 2500)) or
 		(eval(numberOfDwellings < 6) and eval($deductable2 == 0) and eval($deductable < 2500)) or
 		
-		
 		(eval(numberOfDwellings > 5) and eval(numberOfDwellings < 11) and eval($deductable < 2500)) or
 		 (eval(numberOfDwellings > 5) and eval(numberOfDwellings < 11) and eval($deductable2 != 0)and  eval($deductable2 < 5000)) or
 		(eval(numberOfDwellings > 5) and eval(numberOfDwellings < 11) and eval($deductable2 == 0) and eval($deductable < 5000)) or
-		
 			
 		(eval(numberOfDwellings > 10) and eval(numberOfDwellings < 20) and eval($deductable < 2500)) or
 		 (eval(numberOfDwellings > 10) and eval(numberOfDwellings < 20) and eval($deductable2 != 0)and  eval($deductable2 < 10000)) or
 		(eval(numberOfDwellings > 10) and eval(numberOfDwellings < 20) and eval($deductable2 == 0) and eval($deductable <10000)) or
-		
-		
 		
 		
 		(eval(numberOfDwellings > 19) and eval($deductable < 2500)) or
