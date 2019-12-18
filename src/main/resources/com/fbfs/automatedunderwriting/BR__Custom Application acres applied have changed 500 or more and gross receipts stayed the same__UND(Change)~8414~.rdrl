@@ -10,7 +10,7 @@ rule "BR__Custom Application acres applied have changed 500 or more and gross re
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		Term( effectiveDate > "14-Mar-2020" )
+		Term( effectiveDate > "25-Apr-2020" )
 		liability : Liability( added != true , $unitAtRiskNumber : unitAtRiskNumber)
 		BusinessLiability( added != true , businessType == "00032" , previousGrossReceipts == null , previousAcresSprayed != null , acresSprayed > ( previousAcresSprayed + 499 ) || acresSprayed < ( previousAcresSprayed - 499 ) , $coverageNumber : coverageNumber)
 		exists (		Coverage( coverageNumber == $coverageNumber ) from liability.coverageList
