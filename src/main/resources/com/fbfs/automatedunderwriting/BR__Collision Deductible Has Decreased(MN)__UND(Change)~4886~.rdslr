@@ -10,6 +10,7 @@ import com.fbfs.pc.ecd.model.ClaimSummary;
 import com.fbfs.pc.ecd.model.PriorLoss;
 import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
 import com.fbfs.pc.trap.model.AutoClaim;
+import com.fbfs.pc.ecd.model.CoverageUarXref;
 
 rule "BR__Collision Deductible Has Decreased(MN)__UND(Change)~4886~"
 	agenda-group "BR_Change"
@@ -18,7 +19,8 @@ rule "BR__Collision Deductible Has Decreased(MN)__UND(Change)~4886~"
 		>Policy( state == "MN" )
 		>Term( effectiveDate : effectiveDate)
 		>vehicle : Vehicle( unitAtRiskNumber : unitAtRiskNumber)
-		>(Coverage( coverageCode == "COLL" , eval( deductable < previousDeductable )) from vehicle.coverageList)
+		>CoverageUarXref( unitAtRiskNumber == unitAtRiskNumber , coverageCode == "COLL" , $coverageNumber : coverageNumber)
+		>Coverage( coverageNumber == $coverageNumber , eval( deductable < previousDeductable ))
 		There is a collision Prior Loss within 48 months or a collision P3 Loss within 48 months or a collision Trap Auto Claim within 36 months
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
