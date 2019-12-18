@@ -11,12 +11,12 @@ rule "BR__Driver Added And MVR With SVC To Review__ASST(Change)~5655~"
 	when
 		Driver( driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber, added == true )
 		Client( clientReference == driverReference , trapId : trapId)
-		exists (TrapDrivingRecord( trapId == trapId , svcCodeNeedsReviewed == true )) 
+		exists (TrapDrivingRecord( trapId == trapId , svcCodeNeedsReviewed == true , $svc : drivingRecord.svcCode)) 
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Asst Undw" );
-		fact0.setReason( "5655: Driver has been added and MVR with SVC code to review." );
+		fact0.setReason( "5655: Driver has been added and MVR with SVC code \" + $svc + \" to review." );
 		fact0.setAddAction( "Review Underwriting Reports" );
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddLink( "Insured link" );

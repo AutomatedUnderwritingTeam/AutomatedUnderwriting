@@ -15,7 +15,7 @@ rule "BR__Replacement cost amount has increased on Machinery to 100001 or greate
 		fact0.setReason( "8401: Replacement cost amount has increased on Machinery to $100,001 or greater" );
 		fact0.setAddAction( "Machinery Valuation Worksheet" );
 		fact0.setAddAction( "FB Memo" );
-		fact0.setAddAction( "Review FPP Item(s)" );
+		fact0.setAddAction( "Review FPP" );
 		fact0.setAddLink( "Farm/ranch personal property link" );
 		fact0.setAddBookmark( "None" );
 		fact0.setAddBookmarkUnit( $unitAtRiskCode+$unitAtRiskNumber );
