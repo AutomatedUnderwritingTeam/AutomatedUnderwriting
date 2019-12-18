@@ -1,3 +1,5 @@
+package com.fbfs.automatedunderwriting;
+
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Term;
 import com.fbfs.pc.ecd.model.Liability;
@@ -10,12 +12,12 @@ rule "BR__Pollution Underwriting questions are yes__UND(New Business)~8415~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
-		Term( effectiveDate > "14-Mar-2020" )
-		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber )
-		BusinessLiability ( businessType == "00032", $coverageNumber : coverageNumber )
-		(Coverage( coverageNumber == $coverageNumber ) from liability.coverageList)
+		Term( effectiveDate > "25-Apr-2020" )
+		liability : Liability( $unitAtRiskNumber : unitAtRiskNumber)
+		BusinessLiability( businessType == "00032" , $coverageNumber : coverageNumber)
+		Coverage( coverageNumber == $coverageNumber ) from liability.coverageList
 		Policy( underwritingQuestionList : underwritingQuestionList)
-		(UnderwritingQuestion( answer == true , deleteTransaction == null, questionNum == "1001" || == "1002" || == "1003" ) from underwritingQuestionList)
+		UnderwritingQuestion( answer == true , deleteTransaction == null , questionNum == "1001"  || == "1002"  || == "1003" ) from underwritingQuestionList
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
