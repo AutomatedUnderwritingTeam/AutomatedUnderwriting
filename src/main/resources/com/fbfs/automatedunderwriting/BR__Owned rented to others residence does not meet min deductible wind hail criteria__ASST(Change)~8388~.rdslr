@@ -5,13 +5,15 @@ import com.fbfs.pc.ecd.model.Dwelling;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Term;
 import java.lang.Number;
+import com.fbfs.pc.ecd.model.CoverageUarXref;
 
 rule "BR__Owned rented to others residence does not meet min deductible wind hail criteria__ASST(Change)~8388~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
 		>dwelling : Dwelling( occupancyStatus == "OR" , $unitAtRiskNumber : unitAtRiskNumber)
-		>(coverage : Coverage( coverageCode == "STRUC"  || == "CONDO" , $deductable : deductable, $deductable2 : deductable2) from dwelling.coverageList)
+		coverage : Coverage( coverageCode == "STRUC"  || == "CONDO" , $deductable : deductable, $deductable2 : deductable2) from dwelling.coverageList
+		>CoverageUarXref( )
 		>Term( effectiveDate >= "30-Sep-2017" )
 		R8388 R8392 Owned rented to others dwellings do not meet minimum deductible for wind and hail
 	then
