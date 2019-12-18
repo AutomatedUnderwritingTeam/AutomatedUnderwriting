@@ -10,17 +10,18 @@ rule "BR__Custom Application gross receipts changed by more than 10000 and acres
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		Term( effectiveDate > "14-Mar-2020" )
+		Term( effectiveDate > "25-Apr-2020" )
 		liability : Liability( added != true , $unitAtRiskNumber : unitAtRiskNumber)
-		BusinessLiability( added != true , businessType == "00032", previousAcresSprayed == null, previousGrossReceipts != null, (grossReceipts > (previousGrossReceipts + 9999)) || (grossReceipts < (previousGrossReceipts - 9999)), $coverageNumber : coverageNumber)
-		exists ( Coverage( coverageNumber == $coverageNumber ) from liability.coverageList ) 
+		BusinessLiability( added != true , businessType == "00032" , previousAcresSprayed == null , previousGrossReceipts != null , grossReceipts > ( previousGrossReceipts + 9999 ) || grossReceipts < ( previousGrossReceipts - 9999 ) , $coverageNumber : coverageNumber)
+		exists (		Coverage( coverageNumber == $coverageNumber ) from liability.coverageList
+) 
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
 		fact0.setReason( "8413: Custom Application annual receipts has changed by more than 10,000 and acres applied stayed same." );
 		fact0.setAddAction( "FB Memo" );
-		fact0.setAddAction( "Review Custom Application" );
+		fact0.setAddAction( "Add Driver Exclusion Endorsement" );
 		fact0.setAddAction( "Review Annual Gross Receipts" );
 		fact0.setAddAction( "Review Number of acres where pesticide are applied" );
 		fact0.setAddLink( "Business liability link" );
