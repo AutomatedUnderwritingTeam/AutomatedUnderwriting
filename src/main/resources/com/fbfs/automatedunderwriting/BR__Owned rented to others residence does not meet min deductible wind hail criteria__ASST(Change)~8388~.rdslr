@@ -12,8 +12,8 @@ rule "BR__Owned rented to others residence does not meet min deductible wind hai
 	dialect "mvel"
 	when
 		>dwelling : Dwelling( occupancyStatus == "OR" , $unitAtRiskNumber : unitAtRiskNumber)
-		>CoverageUarXref( coverageCode == "STRUC" || coverageCode == "CONDO" , unitAtRiskNumber == $unitAtRiskNumber , $coverageCode : coverageCode)
-		>coverage : Coverage( coverageCode == $coverageCode , $deductable : deductable, $deductable2 : deductable2)
+		>CoverageUarXref( coverageCode == "STRUC" || coverageCode == "CONDO" , unitAtRiskNumber == $unitAtRiskNumber , $coverageNumber : coverageNumber)
+		>coverage : Coverage( coverageNumber == $coverageNumber , $deductable : deductable, $deductable2 : deductable2)
 		>Term( effectiveDate >= "30-Sep-2017" )
 		R8388 R8392 Owned rented to others dwellings do not meet minimum deductible for wind and hail
 	then
