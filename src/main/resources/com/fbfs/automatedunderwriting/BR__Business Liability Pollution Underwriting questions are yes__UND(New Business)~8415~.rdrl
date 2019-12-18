@@ -8,7 +8,7 @@ import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.ecd.model.UnderwritingQuestion;
 
-rule "BR__Pollution Underwriting questions are yes__UND(New Business)~8415~"
+rule "BR__Business Liability Pollution Underwriting questions are yes__UND(New Business)~8415~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
