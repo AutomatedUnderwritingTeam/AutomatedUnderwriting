@@ -9,9 +9,8 @@ rule "BR__SPP Item Amount Of Insurance Has Increased and Over $5,000__ASST(Chang
 	dialect "mvel"
 	when
 		>scheduledPersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber, amountInsured > 5000 , previousAmountInsured != null , amountInsured > ( previousAmountInsured ) )
-		>Coverage( $coverageNumber : coverageNumber, coverageCode : coverageCode)
+		Coverage( coverageNumber : coverageNumber == $coverageNumber , coverageCode : coverageCode) from scheduledPersonalProperty.coverageList
 		The coverage is a schedule personal property
-		>(Coverage( coverageNumber == $coverageNumber ) from scheduledPersonalProperty.coverageList)
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
