@@ -9,7 +9,7 @@ rule "BR__SPP Item Amount Of Insurance Has Increased and Over $5,000__ASST(Chang
 	dialect "mvel"
 	when
 		>scheduledPersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber, amountInsured > 5000 , previousAmountInsured != null , amountInsured > ( previousAmountInsured ) )
-		Coverage( $coverageCode : coverageCode, $coverageNumber : coverageNumber) from scheduledPersonalProperty.coverageList
+		Coverage( coverageCode : coverageCode, coverageNumber : coverageNumber) from scheduledPersonalProperty.coverageList
 		The coverage is a schedule personal property
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
@@ -20,7 +20,7 @@ rule "BR__SPP Item Amount Of Insurance Has Increased and Over $5,000__ASST(Chang
 		>fact0.setAddAction( "Review Appraisal" );
 		>fact0.setAddLink( "Scheduled personal property class link" );
 		>fact0.setAddBookmark( "None" );
-		>fact0.setAddBookmarkUnit( coverageCode + $coverageNumber );
+		>fact0.setAddBookmarkUnit( coverageCode + coverageNumber );
 		>fact0.setMgmtReportingCategory( "UAR" );
 		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
 		>insertLogical( fact0 );
