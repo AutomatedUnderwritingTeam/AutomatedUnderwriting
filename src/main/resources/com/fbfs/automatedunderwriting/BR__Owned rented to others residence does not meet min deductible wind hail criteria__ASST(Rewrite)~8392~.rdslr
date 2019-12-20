@@ -5,7 +5,6 @@ import com.fbfs.pc.ecd.model.Dwelling;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Term;
 import java.lang.Number;
-import com.fbfs.pc.ecd.model.CoverageUarXref;
 
 rule "BR__Owned rented to others residence does not meet min deductible wind hail criteria__ASST(Rewrite)~8392~"
 	agenda-group "BR_Rewrite_All"
