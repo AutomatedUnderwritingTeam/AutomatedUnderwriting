@@ -8,8 +8,10 @@ rule "BR__SPP Item Amount Of Insurance Has Increased and Over $5,000__ASST(Chang
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
+
 		>scheduledPersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber, amountInsured > 5000 , previousAmountInsured != null , amountInsured > ( previousAmountInsured ) )
 		>Coverage( coverageCode : coverageCode, coverageNumber : coverageNumber) from scheduledPersonalProperty.coverageList
+
 		The coverage is a schedule personal property
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
