@@ -10,10 +10,10 @@ rule "BR__Custom Application Business Liability has been added__UND(Change)~8412
 	dialect "mvel"
 	agenda-group "BR_Change"
 	when
-		Term( effectiveDate > "14-Mar-2020" )
-		liability : Liability( added == true, $unitAtRiskNumber : unitAtRiskNumber)
-		BusinessLiability ( added == true, businessType == "00032", $coverageNumber : coverageNumber )
-		(Coverage( coverageNumber == $coverageNumber ) from liability.coverageList)
+		Term( effectiveDate > "25-Apr-2020" )
+		liability : Liability( added == true , $unitAtRiskNumber : unitAtRiskNumber)
+		BusinessLiability( added == true , businessType == "00032" , $coverageNumber : coverageNumber)
+		Coverage( coverageNumber == $coverageNumber ) from liability.coverageList
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
