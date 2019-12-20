@@ -12,7 +12,7 @@ rule "BR__Owned rented to others residence does not meet min deductible wind hai
 	when
 		>Term( effectiveDate >= "30-Sep-2017" )
 		>dwelling : Dwelling( occupancyStatus == "OR" , $unitAtRiskNumber : unitAtRiskNumber)
-		Coverage( coverageCode == "STRUC" || coverageCode == "CONDO" , $deductable : deductable, $deductable2 : deductable2) from dwelling.coverageList
+		>Coverage( coverageCode == "STRUC" || coverageCode == "CONDO" , $deductable : deductable, $deductable2 : deductable2) from dwelling.coverageList
 		R8388 R8392 Owned rented to others dwellings do not meet minimum deductible for wind and hail
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
