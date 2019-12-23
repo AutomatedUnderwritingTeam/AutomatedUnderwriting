@@ -1,7 +1,9 @@
-package automatedunderwriting;
+package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Vehicle;
+import com.fbfs.pc.ecd.model.Policy;	
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__1990 to 2010 Private Passenger Vehicle Symbol Change Over 26__UND(Change)~8042~"
 	agenda-group "BR_Change"
