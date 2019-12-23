@@ -18,7 +18,7 @@ rule "BR__Collision Deductible Has Decreased(MN)__UND(Change)~4886~"
 		>Policy( state == "MN" )
 		>Term( effectiveDate : effectiveDate)
 		>vehicle : Vehicle( unitAtRiskNumber : unitAtRiskNumber)
-		Coverage( coverageCode == "COLL" , eval( deductable < previousDeductable )) from vehicle.coverageList
+		>Coverage( coverageCode == "COLL" , eval( deductable < previousDeductable )) from vehicle.coverageList
 		There is a collision Prior Loss within 48 months or a collision P3 Loss within 48 months or a collision Trap Auto Claim within 36 months
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
