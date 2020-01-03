@@ -303,7 +303,7 @@ function int getLossSettlementRank(String lossSettlement) {
 		return 3;
 	}
 	if (lossSettlement.equals("FIR")) {
-		return 3;
+		return 2;
 	}
 	if (lossSettlement.equals("RPC")) {
 		return 5;
