@@ -21,7 +21,7 @@ rule "BR__Custom Application acres applied have changed 500 or more and gross re
 		fact0.setQueue( "Undw" );
 		fact0.setReason( "8414: Acres applied have changed 500 or more and annual receipts on Custom Application stayed the same." );
 		fact0.setAddAction( "FB Memo" );
-		fact0.setAddAction( "Add Driver Exclusion Endorsement" );
+		fact0.setAddAction( "Review Custom Application" );
 		fact0.setAddAction( "Review Annual Gross Receipts" );
 		fact0.setAddAction( "Review Number of acres where pesticide are applied" );
 		fact0.setAddLink( "Business liability link" );
