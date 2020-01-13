@@ -6,19 +6,18 @@ import com.fbfs.pc.ecd.model.SpecificUnderwritingQuestion;
 import com.fbfs.pc.ecd.model.UnitAtRisk;
 
 
-rule "BR__Pollution Underwriting questions are yes__UND(Change)~8416~"
-	agenda-group "BR_Change"
+rule "BR__Business Liability Pollution Underwriting questions are yes__UND(New Business)~8415~"
+	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
 		Term( effectiveDate > "25-Apr-2020" )
 		UnitAtRisk( $unitAtRiskNumber : unitAtRiskNumber; $specificUnderwritingQuestionList : specificUnderwritingQuestionList)						
-		SpecificUnderwritingQuestion( answer == true , added == true || previousAnswer == false, deleteTransaction == null, questionNumber == "1001"  || == "1002"  || == "1003" ) from $specificUnderwritingQuestionList
-
+		SpecificUnderwritingQuestion( answer == true , deleteTransaction == null , questionNumber == "1001"  || == "1002"  || == "1003" ) from $specificUnderwritingQuestionList
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
-		fact0.setReason( "8416: Pollution Underwriting questions have changed to yes." );
+		fact0.setReason( "8415: Pollution Underwriting questions are yes." );
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddAction( "Review Pollution Application Tank questions for acceptability" );
 		fact0.setAddAction( "Review Pollution Application Tank information for acceptability" );
