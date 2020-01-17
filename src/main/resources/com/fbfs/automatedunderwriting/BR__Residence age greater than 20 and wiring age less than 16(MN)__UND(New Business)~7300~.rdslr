@@ -21,7 +21,6 @@ rule "BR__Residence age greater than 20 and wiring age less than 16(MN)__UND(New
 		>fact0.setQueue( "Undw" );
 		>fact0.setReason( "7300: Residence is over 20 years and wiring is less than 16." );
 		>fact0.setAddAction( "FB Memo" );
-		>fact0.setAddAction( "Add Driver Exclusion Endorsement" );
 		>fact0.setAddAction( "Review Electricians Statement" );
 		>fact0.setAddLink( "Residence link" );
 		>fact0.setAddBookmark( "RS" );
