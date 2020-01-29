@@ -14,7 +14,7 @@ rule "BR__Farm Ranch PP Item Type of Other__UND(New Business)~8262~"
 		fact0.setQueue( "Undw" );
 		fact0.setReason( "8262: Farm/ranch personal property item type is 'Other' ." );
 		fact0.setAddAction( "FB Memo" );
-		fact0.setAddAction( "Review FPP Item(s)" );
+		fact0.setAddAction( "Review FPP" );
 		fact0.setAddLink( "Farm/ranch personal property link" );
 		fact0.setAddBookmark( "None" );
 		fact0.setAddBookmarkUnit( unitAtRiskCode+unitAtRiskNumber );
