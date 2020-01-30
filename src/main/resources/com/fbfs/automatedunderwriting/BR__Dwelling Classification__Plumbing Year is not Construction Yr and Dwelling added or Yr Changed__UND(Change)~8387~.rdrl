@@ -4,7 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Dwelling;
 import com.fbfs.pc.ecd.model.Term;
 
-rule "BR__Dwelling Classification__Plumbing Year is not Construction Yr and Dwelling added or Yr Changed and Class 1__UND(Change)~8387~"
+rule "BR__Dwelling Classification__Plumbing Year is not Construction Yr and Dwelling added or Yr Changed__UND(Change)~8387~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
