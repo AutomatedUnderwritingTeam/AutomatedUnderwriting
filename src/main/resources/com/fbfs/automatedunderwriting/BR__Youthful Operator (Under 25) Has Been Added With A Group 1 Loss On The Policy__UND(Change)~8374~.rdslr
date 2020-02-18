@@ -20,7 +20,7 @@ rule "BR__Youthful Operator (Under 25) Has Been Added With A Group 1 Loss On The
 		>priorLoss : PriorLoss( priorLossSupplement : supplement != null , dateOfLoss : dateOfLoss != null , eval( calculateMonths(dateOfLoss, termEffectiveDate) <= 36 ))
 		
 		R5948 - Driver with second loss within 36 months
-		R5948 - Or Vehicle with prior loss within 36 months
+		R5948 - Or Vehicle with non Group 3 prior loss within 36 months
 		R5948 - Or Driver has Trap Grop 1 convictions within 36 months
 		R5948 - Or Driver licenses has accidents and convictions within 36 months
 	then
