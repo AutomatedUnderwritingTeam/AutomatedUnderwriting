@@ -14,13 +14,13 @@ rule "BR__Driver Added And MVR With SVC Group Number That Is Not Defined__ASST(C
 		Policy( policyState : state)
 		Driver( $driverReference : driverReference, $unitAtRiskNumber : unitAtRiskNumber, licenseList : licenseList, added == true )
 		Client( clientReference == $driverReference , $trapId : trapId)
-		TrapDrivingRecord( trapId == $trapId , $groupNumber : drivingRecord.groupNumber, eval( $groupNumber == "" || $groupNumber == null ))
+		TrapDrivingRecord( trapId == $trapId , $groupNumber : drivingRecord.groupNumber,  $svc : drivingRecord.svcCode, eval( $groupNumber == "" || $groupNumber == null ))
 		(License( licenseState == policyState ) from licenseList)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Asst Undw" );
-		fact0.setReason( "5975: Driver has been added and MVR with SVC/Group number that is not defined." );
+		fact0.setReason( "5975: Driver has been added and MVR with SVC/Group number " + $svc + " that is not defined." );
 		fact0.setAddAction( "Review Underwriting Reports" );
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddLink( "Insured link" );
