@@ -4,6 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItem;
 import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
 import com.fbfs.pc.au.model.declarativemodel.DM_NewBusinessTransaction;
 import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+import com.fbfs.pc.au.model.control.AURulesControlVariables;
 
 
 rule "TR__WorkItem Task Type PMP_T_DNR_NB"
@@ -16,7 +17,8 @@ when
 	DM_NewBusinessTransaction()
 	//DM_AutomatedUnderwritingUser()
 	DM_CurrentTransaction (effectiveDate : effectiveDate ) 
-	eval(calculateDaysBetween(effectiveDate, new Date()) < 40)
+	AURulesControlVariables (runDate : runDate)
+	eval(calculateDaysBetween(effectiveDate, runDate) < 40)
 then
 	workItem.setTaskType("PMP_T_DNR_NB");
         DM_TaskType taskType = new DM_TaskType("PMP_T_DNR_NB");

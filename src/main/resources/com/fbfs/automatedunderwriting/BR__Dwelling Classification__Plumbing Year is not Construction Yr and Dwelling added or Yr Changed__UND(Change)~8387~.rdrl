@@ -8,7 +8,7 @@ rule "BR__Dwelling Classification__Plumbing Year is not Construction Yr and Dwel
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		Dwelling( unitAtRiskNumber : unitAtRiskNumber, plumbingYear > 0, yearBuild > 0, yearBuild : yearBuild != ( plumbingYear ) , added == true || previousPlumbingYear != null || previousYearBuild != null )
+		Dwelling( unitAtRiskNumber : unitAtRiskNumber, plumbingYear > 0, yearBuild > 0, yearBuild : yearBuild != ( plumbingYear ) , added == true || previousPlumbingYear != null || previousYearBuild != null, dwellingClass != "2" && != "3" )
 		Term( effectiveDate >= "23-Jun-2017" )
 	then
 		WorkItemReason fact0 = new WorkItemReason();

@@ -8,7 +8,7 @@ rule "BR__Dwelling Classification__Wiring Year is not the Construction Year__UND
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
-		Dwelling( wiringYear : wiringYear > 0, unitAtRiskNumber : unitAtRiskNumber, yearBuild : yearBuild != wiringYear )
+		Dwelling( wiringYear : wiringYear > 0, unitAtRiskNumber : unitAtRiskNumber, yearBuild : yearBuild != wiringYear, dwellingClass != "2" && != "3" )
 		Term( effectiveDate >= "23-Jun-2017" )
 	then
 		WorkItemReason fact0 = new WorkItemReason();

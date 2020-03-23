@@ -4,6 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItem;
 import com.fbfs.pc.au.model.declarativemodel.DM_ChangeTransaction;
 import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
 import com.fbfs.pc.au.model.declarativemodel.DM_TaskType;
+import com.fbfs.pc.au.model.control.AURulesControlVariables;
 
 
 
@@ -16,7 +17,8 @@ when
 	workItem : WorkItem( type == "Policy" )	
 	DM_ChangeTransaction()	
 	DM_CurrentTransaction (effectiveDate : effectiveDate ) 
-	eval(calculateDaysBetween(effectiveDate, new Date()) < 40)
+	AURulesControlVariables (runDate : runDate)
+	eval(calculateDaysBetween(effectiveDate, runDate) < 40)
 then
 	workItem.setTaskType("PMP_T_DNR_CHG");
         DM_TaskType taskType = new DM_TaskType("PMP_T_DNR_CHG");
