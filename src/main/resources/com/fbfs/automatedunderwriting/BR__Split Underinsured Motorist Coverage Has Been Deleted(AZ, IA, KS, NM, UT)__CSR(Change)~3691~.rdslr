@@ -16,6 +16,14 @@ rule "BR__Split Underinsured Motorist Coverage Has Been Deleted(AZ, IA, KS, NM, 
 		R3691 - There is no UM or UDM on another vehicle
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
-		>fact0.setType( "" );
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "CSR" );
+		>fact0.setReason( "3691: Split Underinsured Motorist coverage has been deleted from an existing vehicle." );
+		>fact0.setAddAction( "Review Document in Workflow" );
+		>fact0.setAddLink( "Vehicle link" );
+		>fact0.setAddBookmark( "VE" );
+		>fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
 		>insert( fact0 );
 end
