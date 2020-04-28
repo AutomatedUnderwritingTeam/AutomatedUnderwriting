@@ -8,6 +8,7 @@ import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__Split Underinsured Motorist Coverage Has Been Deleted(AZ, IA, KS, NM, UT)__CSR(Change)~3691~"
 	dialect "mvel"
+	agenda-group "BR_Change"
 	when
 		R3691 R3692 Effective for states AZ, KS, IA, UT and Effective MN prior to 9/30/19
 		>$vehicle : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, deleted != true )
