@@ -26,5 +26,5 @@ rule "BR__Split Underinsured Motorist Coverage Has Been Deleted(AZ, IA, KS, NM, 
 		>fact0.setAddBookmarkUnit( $unitAtRiskNumber );
 		>fact0.setMgmtReportingCategory( "UAR" );
 		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
-		>insert( fact0 );
+		>insertLogical( fact0 );
 end
