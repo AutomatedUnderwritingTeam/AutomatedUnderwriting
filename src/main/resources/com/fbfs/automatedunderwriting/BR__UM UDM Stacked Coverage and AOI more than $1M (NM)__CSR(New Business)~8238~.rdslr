@@ -4,6 +4,7 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Vehicle;
 import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__UM UDM Stacked Coverage and AOI more than $1M (NM)__CSR(New Business)~8238~"
 	agenda-group "BR_NewBusiness"
@@ -12,7 +13,7 @@ rule "BR__UM UDM Stacked Coverage and AOI more than $1M (NM)__CSR(New Business)~
 		>vehicle : Vehicle( unitAtRiskNumber : unitAtRiskNumber)
 		>Coverage( coverageCode == "UDCSL"  || == "UMCSL"  || == "UIBI"  || == "UDRBI" , coverageNumber : coverageNumber, vehicleSupplement != null , vehicleSupplement.stackable != null , vehicleSupplement.stackable == true )
 		>Policy( state == "NM" )
-		>Term( effectiveDate < "30-Sep-2019")
+		>Term( effectiveDate < "30-Sep-2019" )
 		>(Coverage( coverageNumber == coverageNumber ) from vehicle.coverageList)
 		R8238 - UM Stacked coverages greater than 10000000
 	then
