@@ -1,13 +1,15 @@
 package com.fbfs.automatedunderwriting;
+
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.AggregateFarm;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__Farm Ranch PP Item Type of Other__UND(New Business)~8262~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
 		AggregateFarm( itemType == "OT" , unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber)
-		Term( effectiveDate < "23-Jun-2018" )
+		Term( )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
