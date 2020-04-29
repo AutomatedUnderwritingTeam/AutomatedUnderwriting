@@ -9,7 +9,7 @@ rule "BR__Farm Ranch PP Item Type of Other__UND(New Business)~8262~"
 	dialect "mvel"
 	when
 		AggregateFarm( itemType == "OT" , unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber)
-		Term( )
+		Term( effectiveDate < "23-Jun-2018" )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
