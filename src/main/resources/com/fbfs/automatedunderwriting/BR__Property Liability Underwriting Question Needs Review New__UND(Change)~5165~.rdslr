@@ -15,15 +15,15 @@ rule "BR__Property Liability Underwriting Question Needs Review New__UND(Change)
 		>Policy( $underwritingQuestionList : underwritingQuestionList)
 		R5165  The property underwriting questions need reviewed because it was changed or added new
 	then
-        >WorkItemReason fact0 = new WorkItemReason();
-        >fact0.setType( "Policy" );
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
 		>fact0.setQueue( "Undw" );
 		>fact0.setReason( "5165: Property/liability underwriting question needs review (Change)." );
 		>fact0.setAddAction( "Review Question" );
 		>fact0.setAddAction( "FB Memo" );
 		>fact0.setAddLink( "Underwriting questions link" );
 		>fact0.setAddBookmark( "UnderwritingQuestions" );
-	    >fact0.setAddBookmarkUnit( "None" );
+		>fact0.setAddBookmarkUnit( "None" );
 		>fact0.setMgmtReportingCategory( "PLOB" );
 		>fact0.setMgmtReportingUnitAtRisk( "PLOB" );
 		>insert( fact0 );
