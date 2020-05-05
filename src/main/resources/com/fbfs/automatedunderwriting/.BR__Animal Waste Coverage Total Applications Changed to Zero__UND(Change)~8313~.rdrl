@@ -1,0 +1,21 @@
+<org.uberfire.java.nio.base.Properties serialization="custom">
+  <unserializable-parents/>
+  <map>
+    <default>
+      <loadFactor>0.75</loadFactor>
+      <threshold>12</threshold>
+    </default>
+    <int>16</int>
+    <int>5</int>
+    <string>dcore.description[0]</string>
+    <string>Description Field</string>
+    <string>dcore.subject[0]</string>
+    <string>Subject field</string>
+    <string>dcore.source[0]</string>
+    <string>Source field</string>
+    <string>dcore.relation[0]</string>
+    <string></string>
+    <string>dcore.type[0]</string>
+    <string>Type field</string>
+  </map>
+</org.uberfire.java.nio.base.Properties>
