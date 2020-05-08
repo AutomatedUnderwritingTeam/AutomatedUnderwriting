@@ -13,7 +13,7 @@ rule "BR__Hay Added__UND(New Business)~8417~"
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw Farm" );
-		fact0.setReason( "8355:  Hay added." );
+		fact0.setReason( "8417:  Hay added." );
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddAction( "Review Quantity" );
 		fact0.setAddAction( "Review Stack Limit" );
