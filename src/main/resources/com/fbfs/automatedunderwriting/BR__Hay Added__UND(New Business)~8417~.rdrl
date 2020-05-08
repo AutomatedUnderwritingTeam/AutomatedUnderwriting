@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.Hay;
+
+rule "BR__Hay Added__UND(New Business)~8417~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Hay( unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw Farm" );
+		fact0.setReason( "8355:  Hay added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Quantity" );
+		fact0.setAddAction( "Review Stack Limit" );
+		fact0.setAddAction( "Review Total Unit Value" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "None" );
+		fact0.setAddBookmarkUnit( unitAtRiskCode+unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		insertLogical( fact0 );
+end
