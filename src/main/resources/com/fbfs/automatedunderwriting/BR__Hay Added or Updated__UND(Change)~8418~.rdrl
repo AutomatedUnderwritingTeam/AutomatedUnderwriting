@@ -8,7 +8,8 @@ rule "BR__Hay Added or Updated__UND(Change)~8418~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		Hay( unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber, added == true || currentState == "updated" )
+	     DM_CurrentTransaction( currentTransactionNumber : transactionNumber)
+	     Hay( unitAtRiskCode : unitAtRiskCode, unitAtRiskNumber : unitAtRiskNumber, transactionNumber == currentTransactionNumber, status != "D"  )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
