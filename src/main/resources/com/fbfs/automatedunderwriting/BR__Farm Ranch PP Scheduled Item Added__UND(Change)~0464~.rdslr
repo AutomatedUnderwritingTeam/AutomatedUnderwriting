@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.au.model.count.CntPolicy;
+
+rule "BR__Farm Ranch PP Scheduled Item Added__UND(Change)~0464~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>unitAtRisk : UnitAtRisk( added == true , $unitAtRiskNumber : unitAtRiskNumber, unitAtRiskCode : unitAtRiskCode)
+		>CntPolicy( $cntTotalAcres : cntTotalAcres)
+		R0464 The coverage limit is greater than 5000 and total acres over 100 or limit is greater than 250000
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "0464: Scheduled farm/ranch personal property item has been added." );
+		>fact0.setAddAction( "General Review" );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Farm/ranch personal property link" );
+		>fact0.setAddBookmark( "None" );
+		>fact0.setAddBookmarkUnit( unitAtRiskCode + $unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

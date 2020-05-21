@@ -8,9 +8,8 @@ rule "BR__Farm Truck Tractor On The Policy__UND(New Business)~3017~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
-		vehicle : Vehicle( type == "ST" , unitAtRiskNumber : unitAtRiskNumber )
-		CntPolicy( $cntTotalAcres : cntTotalAcres )
-		((eval( $cntTotalAcres < 500 )) or eval(vehicle.getRadiusOperation() > 100))
+		vehicle : Vehicle( type == "ST" , $unitAtRiskNumber : unitAtRiskNumber)
+		( CntPolicy( cntTotalAcres < 500 ) or Vehicle( radiusOperation > 100 , unitAtRiskNumber == $unitAtRiskNumber ) )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setQueue( "Undw" );
