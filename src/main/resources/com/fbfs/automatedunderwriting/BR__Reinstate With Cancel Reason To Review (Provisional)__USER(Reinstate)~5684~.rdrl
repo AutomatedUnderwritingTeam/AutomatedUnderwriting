@@ -1,9 +1,10 @@
 package com.fbfs.automatedunderwriting;
+
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Term;
 import com.fbfs.pc.au.model.declarativemodel.DM_ReinstatementTransaction;
 import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
-
+import com.fbfs.pc.au.model.control.AutoAcceptor;
 
 rule "BR__Reinstate With Cancel Reason To Review (Provisional)__USER(Reinstate)~5684~"
 	agenda-group "BR_Reinstate"

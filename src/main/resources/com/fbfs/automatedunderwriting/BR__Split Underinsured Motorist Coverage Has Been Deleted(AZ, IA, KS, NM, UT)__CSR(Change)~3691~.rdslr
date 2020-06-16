@@ -7,10 +7,10 @@ import com.fbfs.pc.ecd.model.Vehicle;
 import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__Split Underinsured Motorist Coverage Has Been Deleted(AZ, IA, KS, NM, UT)__CSR(Change)~3691~"
-	agenda-group "BR_Change"
 	dialect "mvel"
+	agenda-group "BR_Change"
 	when
-		>(Policy( state == "AZ"  || == "IA"  || == "KS"  || == "UT" ) || (Policy( state == "NM") && Term( effectiveDate < "30-Sep-2019")))
+		R3691 R3692 Effective for states AZ, KS, IA, UT and Effective NM prior to 9/30/19
 		>vehicle : Vehicle( $unitAtRiskNumber : unitAtRiskNumber, deleted != true )
 		>(Coverage( deleted == true , coverageCode == "UDRBI" ) from vehicle.coverageList)
 		R3691 - No CSL UD coverage has been added

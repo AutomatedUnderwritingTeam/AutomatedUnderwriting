@@ -12,7 +12,7 @@ rule "BR__All Merit Rated Vehicles With FB Without Any Merit Rated Vehicles__UND
 	when
 		PropertyLineOfBusiness( supplementList : supplementList != null )
 		(PropertyLineOfBusinessSupplement( areAllMeritRatedVehiclesFBInsured == true ) from supplementList)
-		not (Vehicle( type == "PP"  || == "PC"  || == "PF"  || == "PN"  || == "PT" ) and LineOfBusiness(lineOfBusiness  == "VEH"))
+		not (Vehicle( type == "PP"  || == "PC"  || == "PF"  || == "PN"  || == "PT" ) and LineOfBusiness(lineOfBusiness  == "VEH")) 
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );

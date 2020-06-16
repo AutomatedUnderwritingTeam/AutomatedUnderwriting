@@ -16,7 +16,7 @@ rule "BR__Full Glass Has Been Added__ASST(Change)~0729~"
 	dialect "mvel"
 	when
 		>Term( effectiveDate : effectiveDate)
-		>Vehicle( coverageList : coverageList, unitAtRiskNumber : unitAtRiskNumber, added != true )
+		>Vehicle( $coverageList : coverageList, $unitAtRiskNumber : unitAtRiskNumber, added != true )
 		The vehicle has a full glass coverage that has been added
 		There is not another vehicle with previous full glass coverage
 		There is a glass Prior Loss or Auto Claim within 36 months or a comp Prior Loss or Auto Claim with payment under $100
@@ -28,9 +28,9 @@ rule "BR__Full Glass Has Been Added__ASST(Change)~0729~"
 		>fact0.setAddAction( "FB Memo" );
 		>fact0.setAddLink( "Vehicle link" );
 		>fact0.setAddBookmark( "VE" );
-		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setAddBookmarkUnit( $unitAtRiskNumber );
 		>fact0.setMgmtReportingCategory( "UAR" );
-		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
 		>fact0.setAddAction( "Review for Claims" );
 		>insertLogical( fact0 );
 end

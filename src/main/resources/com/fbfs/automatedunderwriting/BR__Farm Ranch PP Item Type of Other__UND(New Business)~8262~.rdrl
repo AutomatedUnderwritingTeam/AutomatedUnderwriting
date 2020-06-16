@@ -1,6 +1,8 @@
 package com.fbfs.automatedunderwriting;
+
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.AggregateFarm;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "BR__Farm Ranch PP Item Type of Other__UND(New Business)~8262~"
 	agenda-group "BR_NewBusiness"
