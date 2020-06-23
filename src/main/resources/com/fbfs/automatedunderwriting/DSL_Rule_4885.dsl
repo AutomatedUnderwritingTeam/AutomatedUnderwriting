@@ -9,4 +9,11 @@ Number( intValue > 1) from accumulate ( los : LossOccurrenceSummary(eval(calcula
 or
 Number( intValue > 1) from accumulate ( pl : PriorLoss(eval(calculateMonths(dateOfLoss, effectiveDate) <= 48), lossDescription1 matches "(?i).*Comp(.||\r)*" || lossDescription2 matches "(?i).*Comp(.||\r)*" ), count(pl)) or
       			(TrapClueAutoReport( clueAutoReport : clueAutoReport) and  
- 	   			Number( intValue > 1) from accumulate ( autoClaim : AutoClaim ( claimDate : date, claimPaymentList: claimPaymentList, eval(calculateMonths(claimDate, effectiveDate) <= 48), eval(totalAutoClaimPayments(claimPaymentList) > 0), claimType matches "(?i).*Comprehensive(.||\r)*") from clueAutoReport.autoClaimList, count(autoClaim))))
+ 	   			Number( intValue > 1) from accumulate ( autoClaim : AutoClaim ( claimDate : date, claimPaymentList: claimPaymentList, eval(calculateMonths(claimDate, effectiveDate) <= 48), eval(totalAutoClaimPayments(claimPaymentList) > 0), claimType matches "(?i).*Comprehensive(.||\r)*") from clueAutoReport.autoClaimList, count(autoClaim)))
+				
+				
+or
+		  (TrapClueAutoReport( clueAutoReport2 : clueAutoReport) and  
+		 		AutoClaim ( claimDate2 : date, eval(calculateMonths(claimDate2, effectiveDate) <= 36), claimPaymentList2: claimPaymentList, eval(totalAutoClaimPayments(claimPaymentList2) > 0)) from clueAutoReport2.autoClaimList and
+				AutoClaimPayment(claimDesc matches "(?i).*Comprehensive(.||\r)*") from claimPaymentList2)     					
+)
