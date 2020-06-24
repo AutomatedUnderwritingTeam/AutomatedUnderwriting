@@ -7,7 +7,7 @@ rule "BR__Motorcycle equipment increased to $5,000 or more__ASST(Change)~8322~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		vehicle : Motorcycle( unitAtRiskNumber : unitAtRiskNumber, prevEquipmentAmount : previousEquipmentAmount != null , equipmentAmount > prevEquipmentAmount  &&| >= 5000 )
+		vehicle : Motorcycle( unitAtRiskNumber : unitAtRiskNumber, prevEquipmentAmount : previousEquipmentAmount != null , equipmentAmount > prevEquipmentAmount  && >= 5000 )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setQueue( "Asst Undw" );
