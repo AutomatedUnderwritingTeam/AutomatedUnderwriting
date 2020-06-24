@@ -6,3 +6,5 @@ not(Vehicle( coverageList2 : coverageList, $unitAtRiskNumber != unitAtRiskNumber
  (eval($vehicleSupplement2.previousGlassIndicator == null))
 )
 )
+) 
+
