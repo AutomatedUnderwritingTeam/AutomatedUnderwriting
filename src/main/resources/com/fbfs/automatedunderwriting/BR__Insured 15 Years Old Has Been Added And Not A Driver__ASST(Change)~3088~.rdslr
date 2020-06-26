@@ -11,7 +11,7 @@ import com.fbfs.pc.ecd.model.Household;
 import com.fbfs.pc.ecd.model.ClientRelationship;
 import com.fbfs.pc.ecd.model.HouseholdMember;
 
-rule "BR__Insured 15 Years Old Has Been Added And Not A Driver__ASST(Change)~3088~"
+rule "BR__Insured 16 Years Old Has Been Added And Not A Driver__ASST(Change)~3088~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
