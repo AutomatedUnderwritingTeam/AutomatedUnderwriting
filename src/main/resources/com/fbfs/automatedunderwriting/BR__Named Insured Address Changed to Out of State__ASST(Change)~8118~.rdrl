@@ -1,30 +1,38 @@
 package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.ecd.model.ClientAddress;
+import com.fbfs.pc.ecd.model.ClientRelationship;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
 import com.fbfs.pc.ecd.model.Dwelling;
-import com.fbfs.pc.ecd.model.Liability;
-import com.fbfs.pc.ecd.model.FormHeader;
 
-rule "BR__Residence Deleted leaving only owned rented residence__ASST(Change)~8249~"
+rule "BR__Named Insured Address Changed to Out of State__ASST(Change)~8118~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		Dwelling( deleted == true , occupancyStatus == "OO"  || == "TN" , $unitAtRiskNumber : unitAtRiskNumber)
-		not (Dwelling( occupancyStatus == "OO"  || == "TN" , deleted != true )) 
-		Dwelling( deleted != true , $unitAtRiskNumberDW : unitAtRiskNumber, occupancyStatus == "OR" || occupancyStatus == "UN" )
-		not (Liability( liabUAR : unitAtRiskNumber) and FormHeader( unitAtRiskNumber == liabUAR , deleted != true , formNumber matches ".*EL009(.|\\n|\\r)*" )) 
-		not (FormHeader( deleted != true , unitAtRiskNumber == $unitAtRiskNumberDW , formNumber matches ".*EL009(.|\\n|\\r)*" )) 
+		DM_CurrentTransaction( $effectiveDate : effectiveDate)
+		Policy( $clientRelationshipList : clientRelationshipList, $state : state)
+		Client( $clientReference : clientReference, $addressList : addressList)
+		(ClientAddress( eval( areDatesSame(effectiveDate, $effectiveDate) ), state != $state ) from $addressList)
+		(ClientRelationship( type == "40" , clientReference == $clientReference ) from $clientRelationshipList)
+		( LineOfBusiness( lineOfBusiness == "VEH" , deleted != true ) or Dwelling( deleted != true , occupancyStatus == "TN" || occupancyStatus == "OO" ) )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Asst Undw" );
-		fact0.setReason( "8249:  Residence deleted leaving only owned rented residence." );
-		fact0.setAddAction( "FB Memo" );
-		fact0.setAddAction( "Cancel Entire Policy" );
-		fact0.setAddLink( "Residence link" );
-		fact0.setAddBookmark( "RS" );
-		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
-		fact0.setMgmtReportingCategory( "UAR" );
-		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
-		insertLogical( fact0 );
+		fact0.setReason( "8118: First Named Insured address changed to out of state." );
+		fact0.setAddAction( "Review Named Insured" );
+		fact0.setAddAction( "Review for Eligibility" );
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( $clientReference );
+		fact0.setAddLink( "Policy Level Information link" );
+		fact0.setAddBookmark( "PolicyLevelInformation" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( $clientReference );
+		insert( fact0 );
 end
