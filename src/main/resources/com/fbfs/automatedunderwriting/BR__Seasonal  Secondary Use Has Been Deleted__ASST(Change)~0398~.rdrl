@@ -9,7 +9,7 @@ rule "BR__Seasonal  Secondary Use Has Been Deleted__ASST(Change)~0398~"
 	dialect "mvel"
 	when
 		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, previousIsUsedSeasonally != null  , isUsedSeasonally == false , previousIsUsedSeasonally == true )
-		not (Dwelling( deleted != true , $unitAtRiskNumberDW : unitAtRiskNumber, occupancyStatus == "OO" || occupancyStatus == "UN" || occupancyStatus == "TN")
+		not (Dwelling( deleted != true , $unitAtRiskNumberDW : unitAtRiskNumber, occupancyStatus == "OO" || occupancyStatus == "UN" || occupancyStatus == "TN"))
 		not (Liability( liabUAR : unitAtRiskNumber) and FormHeader( unitAtRiskNumber == liabUAR , deleted != true , formNumber matches ".*EL009(.|\\n|\\r)*" )) 
 		not (FormHeader( deleted != true , unitAtRiskNumber == $unitAtRiskNumberDW , formNumber matches ".*EL009(.|\\n|\\r)*" )) 
 	then
