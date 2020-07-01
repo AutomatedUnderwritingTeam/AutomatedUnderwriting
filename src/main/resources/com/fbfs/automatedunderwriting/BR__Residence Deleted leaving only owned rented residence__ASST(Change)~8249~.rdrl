@@ -12,8 +12,8 @@ rule "BR__Residence Deleted leaving only owned rented residence__ASST(Change)~82
 		Dwelling( deleted == true , occupancyStatus == "OO"  || == "TN" , $unitAtRiskNumber : unitAtRiskNumber)
 		not (Dwelling( occupancyStatus == "OO"  || == "TN" , deleted != true )) 
 		Dwelling( deleted != true , $unitAtRiskNumberDW : unitAtRiskNumber, occupancyStatus == "OR" || occupancyStatus == "UN" )
-		not (Liability( liabUAR : unitAtRiskNumber) and FormHeader( unitAtRiskNumber == liabUAR , deleted != true , formNumber matches ".*EL009(.|\\n|\\r)*" )) 
-		not (FormHeader( deleted != true , unitAtRiskNumber == $unitAtRiskNumberDW , formNumber matches ".*EL009(.|\\n|\\r)*" )) 
+		not (Liability( liabUAR : unitAtRiskNumber) and FormHeader( unitAtRiskNumber == liabUAR , deleted != true , formNumber matches ".*EL009(.|\n|\r)*" )) 
+		not (FormHeader( deleted != true , unitAtRiskNumber == $unitAtRiskNumberDW , formNumber matches ".*EL009(.|\n|\r)*" )) 
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
