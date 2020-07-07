@@ -5,7 +5,7 @@ import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Dwelling;
 
 rule "BR__Residence Amount of Insurance Has Increased $20,000 - $50,000__ASST(Change)~4154~"
-	agenda-group "BR_Change"
+	agenda-group "BR_Obsolete"
 	dialect "mvel"
 	when
 		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber)
