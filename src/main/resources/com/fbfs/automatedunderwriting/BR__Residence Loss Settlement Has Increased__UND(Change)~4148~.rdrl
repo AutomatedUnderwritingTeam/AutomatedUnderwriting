@@ -1,14 +1,18 @@
 package com.fbfs.automatedunderwriting;
+
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Dwelling;
-
-
+import com.fbfs.pc.ecd.model.Coverage;
 
 rule "BR__Residence Loss Settlement Has Increased__UND(Change)~4148~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		Dwelling( unitAtRiskNumber : unitAtRiskNumber, eval( isStringNull(previousLossSettlement)==false ), eval( getLossSettlementRank(lossSettlement) >  getLossSettlementRank(previousLossSettlement)  ))
+		$dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, $lossSettlement : lossSettlement, $previousLossSettlement : previousLossSettlement != null )
+		($coverage : Coverage( coverageCode == "STRUC" ) from $dwelling.coverageList)
+		( 		(Dwelling( previousRoofingYear == null , eval( getLossSettlementRank(lossSettlement) >  getLossSettlementRank(previousLossSettlement) )) from $dwelling)
+ or 		(Coverage( eval( $previousLossSettlement=="RPC" ), eval( getLossSettlementRank($lossSettlement) >  getLossSettlementRank($previousLossSettlement) ), previousLimit1 == null || limit1 <= $coverage.previousLimit1 ) from $coverage)
+ )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
