@@ -13,6 +13,7 @@ rule "BR__Split Uninsured Motorist Coverage Has Been Deleted(AZ, IA, KS,  NM,  U
 		R3691 R3692 Effective for states AZ, KS, IA, UT and Effective NM prior to 9/30/19
 		>vehicle : Vehicle( deleted != true , $unitAtRiskNumber : unitAtRiskNumber)
 		>(Coverage( deleted == true , coverageCode == "UIBI" ) from vehicle.coverageList)
+		>not (Coverage( coverageCode == "COMP" , deleted != true ) from vehicle.coverageList)
 		R3692 - No CSL UM coverage has been added
 		R3692 - There is no UM or UDM on another vehicle
 	then
