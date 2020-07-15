@@ -6,6 +6,8 @@ import com.fbfs.pc.ecd.model.Client;
 import com.fbfs.pc.ecd.model.ClientAddress;
 import com.fbfs.pc.ecd.model.ClientRelationship;
 import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.ecd.model.LineOfBusiness;
+import com.fbfs.pc.ecd.model.Dwelling;
 
 rule "BR__Named Insured Address Changed to Out of State__ASST(Change)~8118~"
 	agenda-group "BR_Change"
@@ -16,6 +18,7 @@ rule "BR__Named Insured Address Changed to Out of State__ASST(Change)~8118~"
 		Client( $clientReference : clientReference, $addressList : addressList)
 		(ClientAddress( eval( areDatesSame(effectiveDate, $effectiveDate) ), state != $state ) from $addressList)
 		(ClientRelationship( type == "40" , clientReference == $clientReference ) from $clientRelationshipList)
+		( LineOfBusiness( lineOfBusiness == "VEH" , deleted != true ) or Dwelling( deleted != true , occupancyStatus == "TN" || occupancyStatus == "OO" ) )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );

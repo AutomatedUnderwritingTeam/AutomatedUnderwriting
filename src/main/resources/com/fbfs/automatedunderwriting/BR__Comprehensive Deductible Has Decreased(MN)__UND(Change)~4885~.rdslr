@@ -10,6 +10,8 @@ import com.fbfs.pc.ecd.model.ClaimSummary;
 import com.fbfs.pc.ecd.model.PriorLoss;
 import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
 import com.fbfs.pc.trap.model.AutoClaim;
+import com.fbfs.pc.trap.model.AutoClaimPayment;
+import com.fbfs.pc.trap.model.ClaimPayment;
 
 rule "BR__Comprehensive Deductible Has Decreased(MN)__UND(Change)~4885~"
 	agenda-group "BR_Change"

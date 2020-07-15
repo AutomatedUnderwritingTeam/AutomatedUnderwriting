@@ -2,13 +2,16 @@ package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.FormHeader;
 
 rule "BR__Owned rented to others residence added without an owner occupied residence__ASST(Change)~6655~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
 		Dwelling( added == true , occupancyStatus == "OR" , unitAtRiskNumber : unitAtRiskNumber)
-		not (Dwelling( occupancyStatus == "OO"  || == "TN" , deleted != true )) 
+		not (Dwelling( deleted != true , occupancyStatus == "OO" || occupancyStatus == "UN" || occupancyStatus == "TN"))
+		not (Liability( liabUAR : unitAtRiskNumber) and FormHeader( unitAtRiskNumber == liabUAR , deleted != true , formNumber matches ".*EL009(.|\n|\r)*" )) 
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
