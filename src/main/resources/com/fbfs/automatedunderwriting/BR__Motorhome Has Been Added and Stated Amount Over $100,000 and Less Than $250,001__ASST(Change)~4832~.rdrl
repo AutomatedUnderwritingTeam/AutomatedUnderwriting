@@ -1,0 +1,25 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Vehicle;
+
+rule "BR__Motorhome Has Been Added and Stated Amount Over $100,000 and Less Than $250,001__ASST(Change)~4832~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		vehicle : Vehicle( type == "VM" , added == true , $unitAtRiskNumber : unitAtRiskNumber, statedAmount > 100000 && statedAmount <= 250000 )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4832: Motorhome has been added with stated amount $100,001-250,000." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Photo" );
+		fact0.setAddAction( "Review for School or Tour Bus" );
+		fact0.setAddLink( "Vehicle link" );
+		fact0.setAddBookmark( "VE" );
+		fact0.setAddBookmarkUnit( $unitAtRiskNumber );
+		fact0.setMgmtReportingCategory( "UAR" );
+		fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
+		fact0.setType( "Policy" );
+		insertLogical( fact0 );
+end
