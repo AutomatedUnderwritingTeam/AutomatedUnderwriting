@@ -1,0 +1,33 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser; 
+import com.fbfs.pc.ecd.model.Outbuilding;
+import com.fbfs.pc.ecd.model.Liability;
+
+
+rule "BR__Policy Has a Prop Liab LOB and Does Not Include A Residence has Outbuilding__UND(New Business)~4980~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		DM_AutomatedUnderwritingUser( )
+		PropertyLineOfBusiness( )
+		not (Dwelling( )) 
+		Outbuilding()
+		Liability()
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "4980: Policy has a prop liab, does not have residence but has outbuilding." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddLink( "Main Overview link" );
+		fact0.setAddBookmark( "MainOverview" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "POLC" );
+		fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		fact0.setAddAction( "General Review" );
+		fact0.setAddAction( "Cancel Entire Policy" );
+		insert( fact0 );
+end
