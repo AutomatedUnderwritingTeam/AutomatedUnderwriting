@@ -13,7 +13,7 @@ rule "BR__Vehicle Driver Underwriting Question Needs Review (Change)__UND(Change
 	when
 		VehicleLineOfBusiness( deleted != true )
 		Policy( underwritingQuestionList : underwritingQuestionList)
-		(UnderwritingQuestion( lineOfBusiness == "VEH" , answer == true , questionNum != "1" , added == true || previousAnswer != null , deleteTransaction == null ) from underwritingQuestionList)
+		(UnderwritingQuestion( lineOfBusiness == "VEH" , answer == true , questionNum == "39" || == "25" , added == true || previousAnswer != null , deleteTransaction == null ) from underwritingQuestionList)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
