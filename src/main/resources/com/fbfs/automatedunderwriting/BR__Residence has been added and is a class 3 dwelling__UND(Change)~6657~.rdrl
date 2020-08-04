@@ -1,5 +1,3 @@
-package com.fbfs.automatedunderwriting;
-
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.Dwelling;
@@ -8,7 +6,7 @@ rule "BR__Residence has been added and is a class 3 dwelling__UND(Change)~6657~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		dwelling : Dwelling( added == true , dwellingClass == "3" , unitAtRiskNumber : unitAtRiskNumber, dwellingType != "MH" || lossSettlement != "ACV")
+		dwelling : Dwelling( added == true , dwellingClass == "3" , unitAtRiskNumber : unitAtRiskNumber)
 		(Coverage( coverageCode == "STRUC" ) from dwelling.coverageList)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
