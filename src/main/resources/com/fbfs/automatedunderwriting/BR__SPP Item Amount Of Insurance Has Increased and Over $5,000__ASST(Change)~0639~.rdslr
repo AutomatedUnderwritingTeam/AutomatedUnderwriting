@@ -10,9 +10,9 @@ rule "BR__SPP Item Amount Of Insurance Has Increased and Over $5,000__ASST(Chang
 	when
 
 	    >$coverage : Coverage( $coverageNumber : coverageNumber, coverageCode : coverageCode)
-		>scheduledPersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber, amountInsured > 5000 , previousAmountInsured != null , amountInsured > ( previousAmountInsured ), coverageList contains $coverage )
+		>scheduledPersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber, $amountInsured : amountInsured > 5000 , previousAmountInsured != null , amountInsured > ( previousAmountInsured ), coverageList contains $coverage )
 		The coverage is a schedule personal property		
-
+		>((Coverage( coverageNumber == $coverageNumber, coverageCode == "DOCKS", eval($amountInsured > 14999)) from scheduledPersonalProperty.coverageList) or (Coverage( coverageNumber == $coverageNumber, coverageCode == "MBLEQ", eval($amountInsured > 19999)) from scheduledPersonalProperty.coverageList))
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
