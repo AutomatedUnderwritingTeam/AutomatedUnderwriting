@@ -1,3 +1,17 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+import com.fbfs.pc.ecd.model.Liability;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Coverage;
+import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+import com.fbfs.pc.au.model.declarativemodel.DM_TenantOnlyPolicy;
+import java.lang.Number;
+
+
 rule 'TR__Definition Tenant Only Policy'
 dialect 'mvel'
 agenda-group "IT_Rules"
