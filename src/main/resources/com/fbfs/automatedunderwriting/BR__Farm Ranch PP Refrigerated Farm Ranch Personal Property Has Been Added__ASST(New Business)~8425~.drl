@@ -16,8 +16,8 @@ rule "BR__Farm Ranch PP Refrigerated Farm Ranch Personal Property Has Been Added
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddAction( "Review for Claims" );
 		fact0.setAddLink( "Farm/ranch personal property link" );
-		fact0.setAddBookmark( "None" );
-		fact0.setAddBookmarkUnit( $coverageCode + $coverageNumber );
+		fact0.setAddBookmark( "FarmBlanket" );
+		fact0.setAddBookmarkUnit( "None" );
 		fact0.setMgmtReportingCategory( "FPPO" );
 		fact0.setMgmtReportingUnitAtRisk( "FPPO" );
 		insertLogical( fact0 );
