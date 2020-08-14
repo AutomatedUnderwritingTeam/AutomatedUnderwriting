@@ -1,0 +1,31 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_CancellationTransaction;
+import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.au.model.control.AutoAcceptor;
+
+rule "BR__Policy Cancellation Is Backdated 30 or More Days (Provisional)__UND(Cancel)~5679~"
+	agenda-group "BR_Cancel"
+	dialect "mvel"
+	when
+		>DM_CancellationTransaction( )
+		>DM_AutomatedUnderwritingUser( )
+		The policy change is back dated more than 29
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Undw" );
+		>fact0.setReason( "5679: Cancelled policy is backdated 30 or more days (Provisional)." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddLink( "Policy Level Information link" );
+		>fact0.setAddBookmark( "PolicyLevelInformation" );
+		>fact0.setAddBookmarkUnit( "None" );
+		>fact0.setMgmtReportingCategory( "POLC" );
+		>fact0.setMgmtReportingUnitAtRisk( "POLC" );
+		>insert( fact0 );
+		>AutoAcceptor fact1 = new AutoAcceptor();
+		>fact1.setAutoAcceptable( false );
+		>insert( fact1 );
+end

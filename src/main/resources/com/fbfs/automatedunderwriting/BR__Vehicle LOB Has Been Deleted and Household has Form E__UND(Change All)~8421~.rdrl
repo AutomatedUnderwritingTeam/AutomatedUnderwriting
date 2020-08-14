@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.Household;
+
+
+rule "BR__Vehicle LOB Has Been Deleted and Household has Form E__UND(Change All)~8421~"
+	agenda-group "BR_Change_All"
+	dialect "mvel"
+	when
+		Household( headOfHousehold != null , hhClientReference : headOfHousehold.clientReference, hasFormE == true )
+		VehicleLineOfBusiness( deleted == true )
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8421:  Vehicles have Form E  and Vehicle LOB removed" );
+		fact0.setAddAction( "Send Form K" );		
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( hhClientReference );
+		fact0.setMgmtReportingCategory( "VLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "VLOB" );
+		insert( fact0 );
+end
+
