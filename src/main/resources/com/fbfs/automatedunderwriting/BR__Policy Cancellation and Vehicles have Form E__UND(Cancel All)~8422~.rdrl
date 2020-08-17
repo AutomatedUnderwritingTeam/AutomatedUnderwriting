@@ -15,7 +15,7 @@ rule "BR__Policy Cancellation and Vehicles have Form E__UND(Cancel All)~8422~"
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
-		fact0.setReason( "'8422:  Cancelled policy and Vehicles have Form E" );
+		fact0.setReason( "8422:  Cancelled policy and Vehicles have Form E" );
 		fact0.setAddAction( "Send Form K" );		
 		fact0.setAddLink( "Household link" );
 		fact0.setAddBookmark( "Household" );
