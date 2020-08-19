@@ -8,9 +8,10 @@ rule "BR__HPP Deductible Has Decreased__ASST(Change)~0459~"
 	dialect "mvel"
 	agenda-group "BR_Change"
 	when
-		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber)
-		exists (		Coverage( coverageCode == "HPP" , previousDeductable != null , eval( deductable  < previousDeductable )) from dwelling.coverageList
-) 
+		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, occupancyStatus == "TN")
+		exists (Coverage( coverageCode == "HPP" , previousDeductable != null , eval( deductable  < previousDeductable )) from dwelling.coverageList) 
+		$lossOccurrenceSummary : LossOccurrenceSummary(eval(calculateMonths(dateOccurred, new Date()) <= 24))
+		($claimSummary: ClaimSummary(coverageCode == "HPP") from $lossOccurrenceSummary.claimSummaryList)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
