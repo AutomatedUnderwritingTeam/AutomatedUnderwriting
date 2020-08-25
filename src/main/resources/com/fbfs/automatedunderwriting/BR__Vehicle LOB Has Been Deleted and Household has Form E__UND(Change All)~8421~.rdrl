@@ -9,7 +9,7 @@ rule "BR__Vehicle LOB Has Been Deleted and Household has Form E__UND(Change All)
 	agenda-group "BR_Change_All"
 	dialect "mvel"
 	when
-		Household( headOfHousehold != null , hhClientReference : headOfHousehold.clientReference, hasFormE == true )
+		Household( headOfHousehold != null , hhClientReference : headOfHousehold.clientReference, hasFormE == true || previousHasFormE == true)
 		VehicleLineOfBusiness( deleted == true )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
