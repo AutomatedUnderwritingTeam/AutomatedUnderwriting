@@ -2,16 +2,19 @@ package com.fbfs.automatedunderwriting;
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Coverage;
 import com.fbfs.pc.ecd.model.ScheduledPersonalProperty;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.ClaimSummary;
 
 
 rule "BR__SPP Class Deductible Has Decreased__ASST(Change)~4152~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-		>Coverage( coverageCode : coverageCode, coverageNumber : coverageNumber, previousDeductable != null  , deductable < ( previousDeductable ) )
-		The coverage is a schedule personal property
-		>scheduledPersonalProperty : ScheduledPersonalProperty( unitAtRiskNumber : unitAtRiskNumber)
+		>$coverage : Coverage( coverageCode : coverageCode, coverageNumber : coverageNumber, previousDeductable != null  , deductable < ( previousDeductable ) )			
+		>scheduledPersonalProperty : ScheduledPersonalProperty( $unitAtRiskNumber : unitAtRiskNumber)		
 		>Coverage( coverageNumber == coverageNumber ) from scheduledPersonalProperty.coverageList
+		The coverage is a schedule personal property		
+                R4152 The SPP Amount of Insurance increased or the SPP has had a claim in the last 24 months
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
@@ -22,6 +25,6 @@ rule "BR__SPP Class Deductible Has Decreased__ASST(Change)~4152~"
 		>fact0.setAddBookmark( "None" );
 		>fact0.setAddBookmarkUnit( coverageCode + coverageNumber );
 		>fact0.setMgmtReportingCategory( "UAR" );
-		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>fact0.setMgmtReportingUnitAtRisk( $unitAtRiskNumber );
 		>insertLogical( fact0 );
 end

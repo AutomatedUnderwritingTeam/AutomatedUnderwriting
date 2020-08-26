@@ -9,7 +9,7 @@ rule "BR__Insured Underwriting Question Needs Review__UND (New Business)~5198~"
 	dialect "mvel"
 	when
 		Policy( underwritingQuestionList : underwritingQuestionList)
-		(UnderwritingQuestion( answer == true , deleteTransaction == null , lineOfBusiness != "VEH" && lineOfBusiness != "PRPL" && lineOfBusiness != "UMB" , questionNum != "1" && questionNum != "4" ) from underwritingQuestionList)
+		(UnderwritingQuestion( answer == true , deleteTransaction == null , lineOfBusiness != "VEH" && lineOfBusiness != "PRPL" && lineOfBusiness != "UMB" , questionNum == "7" ) from underwritingQuestionList)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );

@@ -2,9 +2,10 @@ package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
-import com.fbfs.pc.ecd.model.Policy;
+import com.fbfs.pc.ecd.model.Policy; 
 import com.fbfs.pc.ecd.model.UnderwritingQuestion;
 import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Coverage;
 import java.lang.Number;
 
 rule "BR__Property Liability Underwriting Question Needs Review New__UND(Change)~5165~"
@@ -13,12 +14,18 @@ rule "BR__Property Liability Underwriting Question Needs Review New__UND(Change)
 	when
 	PropertyLineOfBusiness( deleted != true )
 	Policy( $underwritingQuestionList : underwritingQuestionList)
-(	(UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum != "1", questionNum != "4", questionNum != "11", added == true || previousAnswer == false || (previousAnswerDetail != null && answerDetail != previousAnswerDetail)) from $underwritingQuestionList) or 
 (
-			(UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == false, questionNum == "11", added == true || previousAnswer == true || (previousAnswerDetail != null && answerDetail != previousAnswerDetail)) from $underwritingQuestionList)
-               and
-			   (Dwelling ( dwellingType == "MH", deleted != true ) )
-)
+( Dwelling( deleted != true, occupancyStatus == "OO" )  and
+ UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum == "42", added == true || previousAnswer == false || (previousAnswerDetail != null && answerDetail != previousAnswerDetail)) from $underwritingQuestionList) 
+  or 
+ ( Dwelling(occupancyStatus == "OO", added == true || previousOccupancyStatus != "OO" )  and
+ UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum == "42") from $underwritingQuestionList) 
+   or
+(Coverage( coverageCode == "HPP" , added == true) and 
+UnderwritingQuestion( lineOfBusiness == "PRPL" , questionNum == "13",  answer == true) from $underwritingQuestionList) 
+ or
+(Coverage( coverageCode == "HPP" , deleted != true) and 
+UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum == "13", added == true || previousAnswer == false || (previousAnswerDetail != null && answerDetail != previousAnswerDetail)) from $underwritingQuestionList) 
 )
 then
         WorkItemReason fact0 = new WorkItemReason();

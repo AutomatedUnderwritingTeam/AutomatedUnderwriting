@@ -11,7 +11,7 @@ rule "BR__Vehicle Driver Underwriting Question Needs Review__UND(New Business)~5
 	when
 		VehicleLineOfBusiness( )
 		Policy( underwritingQuestionList : underwritingQuestionList)
-		(UnderwritingQuestion( lineOfBusiness == "VEH" , answer == true , questionNum != "1" , deleteTransaction == null ) from underwritingQuestionList)
+		(UnderwritingQuestion( lineOfBusiness == "VEH" , answer == true , questionNum == "25" || == "39" , deleteTransaction == null ) from underwritingQuestionList)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );

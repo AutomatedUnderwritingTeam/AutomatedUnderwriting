@@ -11,7 +11,7 @@ rule "BR__Umbrella Underwriting Question Needs Review (New Business)__UND~5201~"
 	when
 		LineOfBusiness( lineOfBusiness == "UMB" )
 		Policy( underwritingQuestionList : underwritingQuestionList)
-		UnderwritingQuestion( lineOfBusiness == "UMB" , answer == true , questionNum != "1" ) from underwritingQuestionList
+		UnderwritingQuestion( lineOfBusiness == "UMB" , answer == true , questionNum == "59" ) from underwritingQuestionList
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
