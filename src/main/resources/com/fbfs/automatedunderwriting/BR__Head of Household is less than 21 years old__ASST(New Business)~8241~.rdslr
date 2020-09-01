@@ -6,15 +6,19 @@ import com.fbfs.pc.ecd.model.Term;
 import com.fbfs.pc.ecd.model.Client;
 import com.fbfs.pc.ecd.model.HouseholdMember;
 import com.fbfs.pc.ecd.model.ClientSupplement;
+import com.fbfs.pc.ecd.model.TransferredHousehold;
 
 rule "BR__Head of Household is less than 21 years old__ASST(New Business)~8241~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
 		>Term( $effectiveDate : effectiveDate)
-		> Household( $clientReference : headOfHousehold.clientReference)		
+		>$household : Household( $clientReference : headOfHousehold.clientReference, $householdMemberList : householdMemberList)		
 		>Client( clientReference == $clientReference , supplementList : supplementList)
 		R8241 - Client's age is less than 21 years old
+		R8241 - No household member over the age of 20 
+		R8241 - Household is not a Youth Transfer
+
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
