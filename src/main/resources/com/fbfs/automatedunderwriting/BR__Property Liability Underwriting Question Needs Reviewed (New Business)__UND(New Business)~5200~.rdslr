@@ -3,14 +3,16 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
 import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.ecd.model.UnderwritingQuestion;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Coverage;
 
-rule "BR__Property Liability Underwriting Question Needs Reviewed (New Business)__UND(New Business)~5200~"
+rule "BR__Property Liability Underwriting Question Needs Reviewed__UND(New Business)~5200~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
 		>PropertyLineOfBusiness( )
-		>Policy( underwritingQuestionList : underwritingQuestionList)
-		The property underwriting questions need reviewed
+		>Policy( $underwritingQuestionList : underwritingQuestionList)
+		The property underwriting questions - Is dwelling vacant andOr HPP located off premise in a storage facility -  need reviewed
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
