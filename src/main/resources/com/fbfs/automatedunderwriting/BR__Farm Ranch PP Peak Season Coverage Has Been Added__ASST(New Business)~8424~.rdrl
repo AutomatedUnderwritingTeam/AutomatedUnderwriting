@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+
+rule "BR__Farm Ranch PP Peak Season Coverage Has Been Added__ASST(New Business)~8424~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Coverage( added == true , coverageCode == "PEAK" , $coverageNumber : coverageNumber, $coverageCode : coverageCode)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8424: Peak Season has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review Dates and Amounts" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "FarmBlanket" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "FPPO" );
+		fact0.setMgmtReportingUnitAtRisk( "FPPO" );
+		insertLogical( fact0 );
+end

@@ -6,7 +6,7 @@ import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
 import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
 import com.fbfs.pc.au.model.control.AutoAcceptor;
 
-rule "BR__Cancelled Policy Is Backdated 30 or More Days (Provisional)__UND(Cancel)~5679~"
+rule "BR__Policy Cancellation Is Backdated 30 or More Days (Provisional)__UND(Cancel)~5679~"
 	agenda-group "BR_Cancel"
 	dialect "mvel"
 	when

@@ -1,0 +1,24 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Coverage;
+
+rule "BR__Farm Ranch PP Refrigerated Farm Ranch Personal Property Has Been Added__ASST(New Business)~8425~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		Coverage( added == true , coverageCode == "FRRC" , $coverageCode : coverageCode, $coverageNumber : coverageNumber)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Asst Undw" );
+		fact0.setReason( "8425: Refrigerated farm/ranch personal property has been added." );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Review for Claims" );
+		fact0.setAddLink( "Farm/ranch personal property link" );
+		fact0.setAddBookmark( "FarmBlanket" );
+		fact0.setAddBookmarkUnit( "None" );
+		fact0.setMgmtReportingCategory( "FPPO" );
+		fact0.setMgmtReportingUnitAtRisk( "FPPO" );
+		insertLogical( fact0 );
+end
