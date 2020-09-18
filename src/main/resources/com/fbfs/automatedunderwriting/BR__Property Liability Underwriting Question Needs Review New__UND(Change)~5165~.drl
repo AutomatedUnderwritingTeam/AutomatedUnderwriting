@@ -18,7 +18,7 @@ rule "BR__Property Liability Underwriting Question Needs Review New__UND(Change)
 ( Dwelling( deleted != true, occupancyStatus == "OO" )  and
  UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum == "42", added == true || previousAnswer == false || (previousAnswerDetail != null && answerDetail != previousAnswerDetail)) from $underwritingQuestionList) 
   or 
- ( Dwelling(occupancyStatus == "OO", added == true || previousOccupancyStatus != "OO" )  and
+ ( Dwelling(occupancyStatus == "OO", added == true || (previousOccupancyStatus != null && previousOccupancyStatus != "OO") )  and
  UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum == "42") from $underwritingQuestionList) 
    or
 (Coverage( coverageCode == "HPP" , added == true) and 
@@ -41,3 +41,4 @@ then
 		fact0.setMgmtReportingUnitAtRisk( "PLOB" );
 		insert( fact0 );
 end
+
