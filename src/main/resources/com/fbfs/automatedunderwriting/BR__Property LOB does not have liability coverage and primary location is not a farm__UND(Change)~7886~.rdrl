@@ -8,7 +8,7 @@ import com.fbfs.pc.ecd.model.UnitAtRisk;
 import com.fbfs.pc.ecd.model.Location;
 import com.fbfs.pc.ecd.model.LocationSupplement;
 
-rule "BR__Property LOB does not have liability coverage and has a farm location__UND(Change)~7886~"
+rule "BR__Property LOB does not have liability coverage and primary location is not a farm__UND(Change)~7886~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
@@ -16,12 +16,12 @@ rule "BR__Property LOB does not have liability coverage and has a farm location_
 		not (Coverage( coverageCode == "BIPDF"  || == "BIPDP" , deleted != true )) 
 		( Liability( deleted == true ) or UnitAtRisk( added == true , lineOfBusiness == "PRPL" ) or PropertyLineOfBusiness( added == true ) )
 		$location : Location( deleted != true) 
-		LocationSupplement( locationUse == "S" || locationUse == "F"  ) from $location.supplement 
+		LocationSupplement( isPrimaryLocation == true, locationUse != "S" && locationUse != "F"  ) from $location.supplement 		
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
-		fact0.setReason( "7886: Prop LOB without liab coverage and has farm location." );
+		fact0.setReason( "7886: Prop LOB without liab coverage and primary location is not a farm." );
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddLink( "Property/Liability Information link" );
 		fact0.setAddBookmark( "PropertyLiability" );
