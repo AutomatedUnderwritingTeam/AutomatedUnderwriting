@@ -11,7 +11,7 @@ rule "BR__Dwelling Classification__RoofingType Changed Class Increased and no FB
 	dialect "mvel"
 	when
 		>Term( effectiveDate : effectiveDate, expirationDate : expirationDate)
-		> dwelling : Dwelling( previousDwellingClass != null , eval( convertToDouble(dwellingClass) < convertToDouble(previousDwellingClass) ), previousRoofingType != null , roofingType != ( previousRoofingType ) , unitAtRiskNumber : unitAtRiskNumber, roofingType == "AS"  || == "CE"  || == "CS"  || == "CT"  || == "CW"  || == "MR"  || == "OT"  || == "RR"  || == "RB"  || == "SL"  || == "TI"  || == "WS" )
+		> dwelling : Dwelling( previousDwellingClass != null , eval( convertToDouble(dwellingClass) < convertToDouble(previousDwellingClass) ), previousRoofingType != null , roofingType != ( previousRoofingType ) , unitAtRiskNumber : unitAtRiskNumber, roofingType == "CE"  || == "CS"  || == "CT"  || == "CW"  || == "MR"  || == "OT"  || == "RR"  || == "RB"  || == "SL"  || == "TI"  || == "WS" )
 		There are no Dwelling storm hail or wind losses within the last 2 years
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
