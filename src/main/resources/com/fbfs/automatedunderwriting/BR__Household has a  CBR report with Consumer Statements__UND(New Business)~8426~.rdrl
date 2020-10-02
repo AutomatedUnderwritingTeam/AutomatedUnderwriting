@@ -1,0 +1,27 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapCbrReport;
+import com.fbfs.pc.trap.model.Remark;
+
+rule "BR__Household has a  CBR report with Consumer Statements__UND(New Business)~8426~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when		
+		Household($hhClientReference : headOfHousehold.clientReference)
+		Client( clientReference == ( $hhClientReference ) , $trapId : trapId)
+		$trapCbrReport : TrapCbrReport( trapId == $trapId )				
+		Remark(narrative matches "(?i).*CS(.||\r)*") from $trapCbrReport.cbrReport.remarkList	
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8426: Household's CBR Report has consumer statements." );
+		fact0.setAddAction( "Review Underwriting Reports" );		
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( $hhClientReference );		
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( $hhClientReference);
+		insertLogical( fact0 );
+end

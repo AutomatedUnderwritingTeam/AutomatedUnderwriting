@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.ecd.model.Driver;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapMvrReport;
+import com.fbfs.pc.trap.model.DriverRestriction;
+
+rule "BR__Driver Added with MVR that has Consumer Statements__UND(Change)~8429~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when		
+
+		Driver( $driverReference : driverReference, unitAtRiskNumber : unitAtRiskNumber, added == true )
+		Client( clientReference == $driverReference , $trapId : trapId)
+		$trapMvrReport : TrapMvrReport( trapId == $trapId)
+		DriverRestriction(narrative matches "(?i).*CS(.||\r)*") from $trapMvrReport.mvrReport.restrictionList	
+
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8429: Driver added and MVR Report has consumer statements." );
+		fact0.setAddAction( "Review Underwriting Reports" );		
+		fact0.setAddLink( "Insured link" );
+		fact0.setAddBookmark( "Insured" );
+		fact0.setAddBookmarkUnit( $driverReference );	
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( $driverReference);
+		insertLogical( fact0 );
+end
