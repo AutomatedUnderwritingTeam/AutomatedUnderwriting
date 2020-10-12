@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.ClaimSummary;
+import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Dwelling Classification__RoofingType Changed Class Increased and no FB Storm losses withn 24 mth__ASST(Change)~4932~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+		>Term( effectiveDate : effectiveDate, expirationDate : expirationDate)
+		> dwelling : Dwelling( previousDwellingClass != null , eval( convertToDouble(dwellingClass) < convertToDouble(previousDwellingClass) ), previousRoofingType != null , roofingType != ( previousRoofingType ) , unitAtRiskNumber : unitAtRiskNumber, roofingType == "CE"  || == "CS"  || == "CT"  || == "CW"  || == "MR"  || == "OT"  || == "RR"  || == "RB"  || == "SL"  || == "TI"  || == "WS" )
+		There are no Dwelling storm hail or wind losses within the last 2 years
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "4932: Dwelling Classification--roofing type has changed and class increased." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review Photo" );
+		>fact0.setAddLink( "Residence link" );
+		>fact0.setAddBookmark( "RS" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

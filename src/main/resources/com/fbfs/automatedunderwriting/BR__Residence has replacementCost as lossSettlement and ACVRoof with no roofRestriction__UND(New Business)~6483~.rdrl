@@ -2,17 +2,19 @@ package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.FormHeader;
 
-rule "BR__Residence has repair cost as the loss settlement and an ACV roof__UND(New Business)~6482~"
+rule "BR__Residence has replacementCost as lossSettlement and ACVRoof with no roofRestriction__UND(New Business)~6483~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
-		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, lossSettlement == "FIR" )
+		dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, lossSettlement == "RPR" )
+		not (FormHeader( unitAtRiskNumber == unitAtRiskNumber , formNumber matches ".*EP007(.|\n|\r)*" ))
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
-		fact0.setReason( "6482: Residence has repair cost as the loss settlement and an ACV roof." );
+		fact0.setReason( "6483: Residence has replacement cost as loss settlement, ACV roof with no roof restriction." );
 		fact0.setAddAction( "Review Marshall and Swift" );
 		fact0.setAddAction( "Review Photo" );
 		fact0.setAddAction( "FB Memo" );

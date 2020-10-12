@@ -1,5 +1,9 @@
-[when]The property underwriting questions need reviewed=		exists(
-		(UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum != "1"  && != "4"  && != "11" ) from underwritingQuestionList) or
-		(Number ( intValue > 0 ) from accumulate (dwelling : Dwelling ( dwellingType == "MH" ), count(dwelling)) and
-		 UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == false, questionNum == "11" ) from underwritingQuestionList)
-		)
+[when]The property underwriting questions - Is dwelling vacant andOr HPP located off premise in a storage facility -  need reviewed=		
+exists
+(
+( Dwelling(occupancyStatus == "OO" )  and
+ UnderwritingQuestion( lineOfBusiness == "PRPL" , answer == true, questionNum == "42") from $underwritingQuestionList) 
+or
+(Coverage( coverageCode == "HPP" ) and 
+UnderwritingQuestion( lineOfBusiness == "PRPL" , questionNum == "13",  answer == true) from $underwritingQuestionList) 
+)

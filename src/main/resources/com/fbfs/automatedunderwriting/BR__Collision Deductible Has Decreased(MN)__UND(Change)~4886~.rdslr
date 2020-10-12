@@ -12,16 +12,17 @@ import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
 import com.fbfs.pc.trap.model.AutoClaim;
 import com.fbfs.pc.trap.model.AutoClaimPayment;
 import com.fbfs.pc.trap.model.ClaimPayment;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
 
 rule "BR__Collision Deductible Has Decreased(MN)__UND(Change)~4886~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
 		>Policy( state == "MN" )
-		>Term( effectiveDate : effectiveDate)
+		>DM_CurrentTransaction( effectiveDate : effectiveDate)
 		>vehicle : Vehicle( unitAtRiskNumber : unitAtRiskNumber)
 		>Coverage( coverageCode == "COLL" , eval( deductable < previousDeductable )) from vehicle.coverageList
-		There is a collision Prior Loss within 48 months or a collision P3 Loss within 48 months or a collision Trap Auto Claim within 36 months
+		There are more than 1 Prior or P3 Collision Losses within 48 months or more than 1 collision Trap Auto Claim losses within 36 months
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );

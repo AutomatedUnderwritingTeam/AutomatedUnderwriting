@@ -2,20 +2,22 @@ package com.fbfs.automatedunderwriting;
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Liability;
 import com.fbfs.pc.ecd.model.FormHeader;
+import com.fbfs.pc.ecd.model.Dwelling;
 
 
-rule "BR__Liability Endorsement Has Been Deleted__ASST(Change)~0475~"
+rule "BR__Liability Endorsement Has Been Deleted and Seasonal or Rented Dwelling Remains__ASST(Change)~0475~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
 		>liability : Liability( unitAtRiskNumber : unitAtRiskNumber, deleted != true )
-		>formHeader : FormHeader( unitAtRiskNumber == unitAtRiskNumber , deleted == true , formNumber : formNumber)
+		>formHeader : FormHeader( unitAtRiskNumber == unitAtRiskNumber , deleted == true , formNumber : formNumber)	
+		>Dwelling( deleted != true, isUsedSeasonally == true || occupancyStatus == "OR" || occupancyStatus == "UN") 		
 		R0475 - The form is not a certificate of insurance
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
 		>fact0.setQueue( "Asst Undw" );
-		>fact0.setReason( "0475: Liability endorsement has been deleted." );
+		>fact0.setReason( "0475: Liab endorsement deleted and seasonal or rented dwelling remains." );
 		>fact0.setAddAction( "FB Memo" );
 		>fact0.setAddLink( "Liability link" );
 		>fact0.setAddBookmark( "LB" );
