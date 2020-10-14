@@ -10,6 +10,7 @@ rule "Impl__WorkItem Pend Reason Roof Affidavit"
 	dialect "mvel"
 	when
 		policy : Policy( )
+		Term( effectiveDate < "24-Jan-2021")
 		(finalize : Finalize( woodHeatPhoto == true ) from policy.finalization)
 		DM_AutomatedUnderwritingUser( )
 	then
