@@ -2,14 +2,16 @@ package com.fbfs.automatedunderwriting;
 
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Location;
-import com.fbfs.pc.ecd.model.UnitAtRisk;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Outbuilding;
 
 rule "BR__Street Address is not valid__CSR(Change)~8301~"
 	dialect "mvel"
 	agenda-group "BR_Change"
 	when
-		Location( isInvalidStreet == true , locationNumber : locationNumber)
-		UnitAtRisk( locationNumber == locationNumber , lineOfBusiness == "PRPL" , deleted != true )
+		Location( isInvalidStreet == true , locationNumber : locationNumber, added == true )
+		(Dwelling( locationNumber == locationNumber , lineOfBusiness == "PRPL" , deleted != true ) ||
+		Outbuilding( locationNumber == locationNumber , lineOfBusiness == "PRPL" , deleted != true ) )		
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
