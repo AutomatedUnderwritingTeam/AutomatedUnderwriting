@@ -16,7 +16,7 @@ rule "BR__Insured Over 15 Years Old Has Been Added And Not A Driver__ASST(Change
 		>Vehicle( deleted != true )
 		>Term( effectiveDate : effectiveDate)
 		>Client( clientReference : clientReference, supplementList : supplementList, clientsClientReference : clientReference)
-		The clients age is more than 15 and is not a nonPermanant driver
+		The clients age is more than 15 and less than 24 and is not a nonPermanant driver
 		>not (Driver( driverReference == clientsClientReference )) 
 		R5183 The client has been added to a household and is not an alternate head of household
 	then
