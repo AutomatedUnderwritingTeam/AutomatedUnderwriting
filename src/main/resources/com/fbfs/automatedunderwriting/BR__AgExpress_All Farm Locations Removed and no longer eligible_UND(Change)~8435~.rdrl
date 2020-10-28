@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Location;
+import com.fbfs.pc.ecd.model.LocationSupplement;
+import com.fbfs.pc.au.model.declarativemodel.DM_AgExpress;
+import com.fbfs.pc.ecd.model.AgTier;
+
+rule "BR__AgExpress_All Farm Locations Removed and no longer eligible_UND(Change)~8435~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+	    DM_AgExpress()
+		AgTier(qualifies == false, previousQualifies != null &&  previousQualifies == true) 			
+		not(
+   		 $location : Location( deleted != true) and
+		LocationSupplement( locationUse == "S" || == "F") from $location.supplement)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8435: All farm locations removed, no longer eligible for AgExpress." );
+		fact0.setAddAction( "Review AG Eligibility" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Rewrite policy to FBPCIC" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "none" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );		
+		insertLogical( fact0 );
+end

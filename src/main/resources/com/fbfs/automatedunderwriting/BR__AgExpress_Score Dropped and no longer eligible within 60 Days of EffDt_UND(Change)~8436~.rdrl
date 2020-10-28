@@ -1,0 +1,32 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.au.model.declarativemodel.DM_AgExpress;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
+import com.fbfs.pc.ecd.model.AgTier;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__AgExpress_Score Dropped and no longer eligible within 60 Days of EffDt_UND(Change)~8436~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+	    DM_AgExpress()
+		AgTier(qualifies == false, previousQualifies != null &&  previousQualifies != true) 
+		Term( $effectiveDate : effectiveDate)
+		DM_CurrentTransaction( $changeEffectiveDate : effectiveDate)
+		eval( calculateDaysBetween($effectiveDate, $changeEffectiveDate) < 61)
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8436: Ag Score changed below eligibity score." );
+		fact0.setAddAction( "Review AG Eligibility" );
+		fact0.setAddAction( "FB Memo" );
+		fact0.setAddAction( "Rewrite policy to FBPCIC" );
+		fact0.setAddLink( "Property/Liability link" );
+		fact0.setAddBookmark( "PropertyLiability" );
+		fact0.setAddBookmarkUnit( "none" );
+		fact0.setMgmtReportingCategory( "PLOB" );
+		fact0.setMgmtReportingUnitAtRisk( "PLOB" );		
+		insertLogical( fact0 );
+end
