@@ -9,7 +9,7 @@ rule "BR__Policy Cancellation Express Related__PAYREC(Cancel)~7881~"
 	dialect "mvel"
 	when
 		DM_CancellationTransaction( )
-		Term( cancelReason == "CM" || cancelReason == "CU" )
+		Term( cancelReason == "CM" || == "CU" || == "CX" || == "NX" )
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "PayRec" );
