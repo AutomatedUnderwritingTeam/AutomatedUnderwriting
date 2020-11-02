@@ -5,8 +5,6 @@ import com.fbfs.pc.ecd.model.Driver;
 import com.fbfs.pc.ecd.model.Client;
 import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
 import com.fbfs.pc.ecd.model.ClientSupplement;
-import com.fbfs.pc.ecd.model.Household;
-import com.fbfs.pc.ecd.model.HouseholdMember;
 
 rule "BR__Driver Has Been Deleted__ASST(Change)~5541~"
 	agenda-group "BR_Change"
@@ -15,8 +13,7 @@ rule "BR__Driver Has Been Deleted__ASST(Change)~5541~"
 		>Driver( deleted == true , driverReference : driverReference, driverAge : age, unitAtRiskNumber : unitAtRiskNumber, driverMaritalStatus : maritalStatus, isEmployeeDriver == null || isEmployeeDriver == false )
 		>Client( clientReference == driverReference , firstClientSupplementList : supplementList)
 		>VehicleLineOfBusiness( deleted != true )
-		R5541 - The driver is a youthful operator
-		R5541 - OR The deleted driver is or was married and the household contains another person who is or was married
+		R5541 - The driver is a youthful operator		
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
