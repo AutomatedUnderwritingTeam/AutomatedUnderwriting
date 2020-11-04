@@ -2,28 +2,35 @@ package com.fbfs.automatedunderwriting;
 import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.PriorCarrier;
+import com.fbfs.pc.ecd.model.PolicySupplement;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.TransferredHousehold;
+
 
 
 rule "BR__CIF Date is more than 5 years prior to the policy effective date__UND(New Business)~8296~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
-		>Policy( $continuedInforceDate : continuedInForceDate)
+		>$policy : Policy( $continuedInforceDate : continuedInForceDate)
 		>Term( $effectiveDate : effectiveDate)
 		>eval(calculateMonths($continuedInforceDate, $effectiveDate) > 60)
-		R8296 Effective for states AZ, IA, NE, SD
-		R8296 Effective 09/27/2012 for states KS, MN, NM, UT
+        R8296 R7629 - Policy is not a rewrite		
+        R8296 R7629 - Policy is not a Youthful Transfer	
+		R8296 R7629 - Policy was not infilled
+        R8296 R7629 - Prior carrier is not a Farm Bureau related carrier
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
 		>fact0.setQueue( "Undw" );
 		>fact0.setReason( "8296: CIF date is more than 5 years prior to the policy effective date." );
 		>fact0.setAddAction( "Correct CIF Date to no greater than 60 months unless based upon prior insurance with FBFS" );
+		>fact0.setAddAction( "FB Memo" );
 		>fact0.setAddLink( "Policy Level Information link" );
 		>fact0.setAddBookmark( "PolicyLevelInformation" );
 		>fact0.setAddBookmarkUnit( "None" );
 		>fact0.setMgmtReportingCategory( "POLC" );
-		>fact0.setMgmtReportingUnitAtRisk( "POLC" );
-		>fact0.setAddAction( "Correct CIF Date to no greater than 60 months unless based upon prior insurance with FBFS" );
+		>fact0.setMgmtReportingUnitAtRisk( "POLC" );		
 		>insert( fact0 );
 end
