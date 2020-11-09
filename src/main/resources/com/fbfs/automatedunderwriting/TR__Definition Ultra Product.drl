@@ -1,16 +1,17 @@
 package com.fbfs.automatedunderwriting;
 
-import com.fbfs.pc.au.model.declarativemodel.DM_AgExpress;
+import com.fbfs.pc.au.model.declarativemodel.DM_Ultra;
 import com.fbfs.pc.ecd.model.Policy;
 
 
-rule "TR__Definition AgExpress Product"
+rule "TR__Definition Ultra Product"
 
 agenda-group "IT_Rules"
 when
-	Policy(company == "810" && productCode == "AGXPR")
+	Policy(company == "810" && productCode == "ULTRA")
 then
-	DM_AgExpress agExpress = new DM_AgExpress();
-	insert(agExpress);
+	DM_Ultra ultra = new DM_Ultra();
+	insert(ultra);
 
 end
+
