@@ -5,7 +5,7 @@ import com.fbfs.pc.ecd.model.Finalize;
 import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
 import com.fbfs.pc.ecd.model.Term;
 
-rule "Impl__WorkItem Pend Reason Roof Affidavit"
+rule "Impl__WorkItem Pend Roof Affidavit"
 	agenda-group "IT_WorkItem"
 	dialect "mvel"
 	when
