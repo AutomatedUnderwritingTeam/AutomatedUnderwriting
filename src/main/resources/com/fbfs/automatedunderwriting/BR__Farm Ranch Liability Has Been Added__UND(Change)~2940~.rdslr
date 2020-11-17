@@ -14,9 +14,8 @@ rule "BR__Farm Ranch Liability Has Been Added__UND(Change)~2940~"
 		>liability : Liability( unitAtRiskNumber : unitAtRiskNumber, added == true )
 		>Coverage( coverageCode == "BIPDF" ) from liability.coverageList 
 		>$location : Location( )
-R2940 - No previous personal liability on the policy or
-R2940 - Property Lob added or 
-R2940 - Primary location is not a farm ranch location
+                R2940 - No previous personal liability on the policy or
+                R2940 - Property Lob added 
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
