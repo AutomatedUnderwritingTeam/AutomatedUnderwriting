@@ -4,4 +4,4 @@
 	 PropertyLineOfBusiness( added == true )
 
 ) 
-or
+)
