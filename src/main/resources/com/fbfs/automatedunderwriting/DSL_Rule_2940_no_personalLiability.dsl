@@ -1,6 +1,5 @@
-[when]R2940 - No previous personal liability on the policy or =
+[when]R2940 - No previous personal liability on the policy=
 (
-(  not(Coverage(coverageCode == "BIPDP")) and	  
-  LocationSupplement( isPrimaryLocation == true, locationUse != "S" && locationUse != "F"  ) from $location.supplement
+(  not(Coverage(coverageCode == "BIPDP")))
 )
 or  
