@@ -1,7 +1,4 @@
-[when]R2940 - Property Lob added or =
-( 
-	 
-	 PropertyLineOfBusiness( added == true )
+[when]R2940 - Property Lob added =
 
-) 
+ (PropertyLineOfBusiness( added == true ))
 )
