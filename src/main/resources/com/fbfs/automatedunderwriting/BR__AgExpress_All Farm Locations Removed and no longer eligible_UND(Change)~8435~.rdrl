@@ -4,14 +4,20 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Location;
 import com.fbfs.pc.ecd.model.LocationSupplement;
 import com.fbfs.pc.au.model.declarativemodel.DM_AgExpress;
+import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
 import com.fbfs.pc.ecd.model.AgTier;
+import com.fbfs.pc.ecd.model.TransactionRecord;
+import com.fbfs.pc.ecd.model.Policy;
 
 rule "BR__AgExpress_All Farm Locations Removed and no longer eligible_UND(Change)~8435~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
+		$policy : Policy( )
 	    DM_AgExpress()
-		AgTier(qualifies == false, previousQualifies != null &&  previousQualifies == true) 			
+		DM_CurrentTransaction( $transactionNumber : transactionNumber)
+		TransactionRecord ( transactionNumber == $transactionNumber, $agTier : agTier ) from $policy.transactionList		
+		AgTier(qualifies == false, previousQualifies != null &&  previousQualifies == true) from $agTier		
 		not(
    		 $location : Location( deleted != true) and
 		LocationSupplement( locationUse == "S" || == "F") from $location.supplement)
