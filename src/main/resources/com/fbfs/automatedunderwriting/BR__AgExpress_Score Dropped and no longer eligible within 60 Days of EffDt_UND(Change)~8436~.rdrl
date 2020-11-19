@@ -5,15 +5,19 @@ import com.fbfs.pc.au.model.declarativemodel.DM_AgExpress;
 import com.fbfs.pc.au.model.declarativemodel.DM_CurrentTransaction;
 import com.fbfs.pc.ecd.model.AgTier;
 import com.fbfs.pc.ecd.model.Term;
+import com.fbfs.pc.ecd.model.TransactionRecord;
+import com.fbfs.pc.ecd.model.Policy;
 
 rule "BR__AgExpress_Score Dropped and no longer eligible within 60 Days of EffDt_UND(Change)~8436~"
 	agenda-group "BR_Change"
 	dialect "mvel"
 	when
-	    DM_AgExpress()
-		AgTier(qualifies == false, previousQualifies != null &&  previousQualifies != true) 
+		$policy : Policy()
+	    DM_AgExpress()		
 		Term( $effectiveDate : effectiveDate)
-		DM_CurrentTransaction( $changeEffectiveDate : effectiveDate)
+		DM_CurrentTransaction( $changeEffectiveDate : effectiveDate, $transactionNumber : transactionNumber)		
+		TransactionRecord ( transactionNumber == $transactionNumber, $agTier : agTier ) from $policy.transactionList	
+		AgTier(qualifies == false, previousQualifies != null &&  previousQualifies == true) from $agTier
 		eval( calculateDaysBetween($effectiveDate, $changeEffectiveDate) < 61)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
