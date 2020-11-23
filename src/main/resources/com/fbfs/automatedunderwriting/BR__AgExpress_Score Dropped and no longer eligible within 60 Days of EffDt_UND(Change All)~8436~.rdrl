@@ -8,8 +8,8 @@ import com.fbfs.pc.ecd.model.Term;
 import com.fbfs.pc.ecd.model.TransactionRecord;
 import com.fbfs.pc.ecd.model.Policy;
 
-rule "BR__AgExpress_Score Dropped and no longer eligible within 60 Days of EffDt_UND(Change)~8436~"
-	agenda-group "BR_Change"
+rule "BR__AgExpress_Score Dropped and no longer eligible within 60 Days of EffDt_UND(Change All)~8436~"
+	agenda-group "BR_Change_All"
 	dialect "mvel"
 	when
 		$policy : Policy()
