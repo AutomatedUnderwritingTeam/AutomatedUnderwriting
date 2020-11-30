@@ -15,9 +15,11 @@ rule "BR__AgExpress_All Farm Locations Removed and no longer eligible_UND(Change
 	when
 		$policy : Policy( )
 	    DM_AgExpress()
+		 TransactionRecord ( status == "A", $agTier2 : agTier) from $policy.transactionList		
+		AgTier(qualifies == true) from $agTier2	
 		DM_CurrentTransaction( $transactionNumber : transactionNumber)
-		TransactionRecord ( transactionNumber == $transactionNumber, $agTier : agTier ) from $policy.transactionList		
-		AgTier(qualifies == false, previousQualifies != null &&  previousQualifies == true) from $agTier		
+		TransactionRecord ( status == "P", transactionNumber == $transactionNumber, $agTier : agTier ) from $policy.transactionList		
+		AgTier(qualifies == false) from $agTier		
 		not(
    		 $location : Location( deleted != true) and
 		LocationSupplement( locationUse == "S" || == "F") from $location.supplement)
