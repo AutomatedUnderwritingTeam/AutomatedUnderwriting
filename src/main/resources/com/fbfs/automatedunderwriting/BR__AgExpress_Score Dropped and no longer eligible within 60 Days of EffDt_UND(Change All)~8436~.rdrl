@@ -25,7 +25,7 @@ rule "BR__AgExpress_Score Dropped and no longer eligible within 60 Days of EffDt
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
-		fact0.setReason( "8436: Ag Score changed below eligibity score." );
+		fact0.setReason( "8436: Ag Score changed below eligibility score." );
 		fact0.setAddAction( "Review AG Eligibility" );
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddAction( "Rewrite policy to FBPCIC" );
