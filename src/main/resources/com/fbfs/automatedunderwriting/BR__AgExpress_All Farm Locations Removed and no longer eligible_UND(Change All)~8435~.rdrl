@@ -27,7 +27,7 @@ rule "BR__AgExpress_All Farm Locations Removed and no longer eligible_UND(Change
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
-		fact0.setReason( "8435: All farm locations removed, no longer eligible for AgExpress." );
+		fact0.setReason( "8435: All farm locations removed, no longer eligible for Ag Express." );
 		fact0.setAddAction( "Review AG Eligibility" );
 		fact0.setAddAction( "FB Memo" );
 		fact0.setAddAction( "Rewrite policy to FBPCIC" );
