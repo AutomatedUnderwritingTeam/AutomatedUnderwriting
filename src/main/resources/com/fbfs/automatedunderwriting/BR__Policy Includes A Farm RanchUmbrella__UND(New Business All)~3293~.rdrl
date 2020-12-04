@@ -4,8 +4,8 @@ import com.fbfs.pc.ecd.model.UmbrellaCoverage;
 
 
 
-rule "BR__Policy Includes A Farm RanchUmbrella__UND(New Business)~3293~"
-	agenda-group "BR_NewBusiness"
+rule "BR__Policy Includes A Farm RanchUmbrella__UND(New Business All)~3293~"
+	agenda-group "BR_NewBusiness_All"
 	dialect "mvel"
 	when
 		UmbrellaCoverage( policyType == "F" , coverageNumber : coverageNumber)
