@@ -4,8 +4,8 @@ import com.fbfs.pc.ecd.model.UmbrellaCoverage;
 
 
 
-rule "BR__Personal Umbrella Has Been Added__UND(Change)~6334~"
-	agenda-group "BR_Change"
+rule "BR__Personal Umbrella Has Been Added__UND(Change All)~6334~"
+	agenda-group "BR_Change_All"
 	dialect "mvel"
 	when
 		UmbrellaCoverage( added == true , policyType == "P" , coverageNumber : coverageNumber)
