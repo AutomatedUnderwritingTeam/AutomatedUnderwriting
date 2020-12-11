@@ -14,7 +14,7 @@ rule "BR__AgExpress_Score Dropped and no longer eligible within 60 Days of EffDt
 	when
 		$policy : Policy()
 	    DM_AgExpress()		
-		Term( $effectiveDate : effectiveDate)		
+		Term( $effectiveDate : effectiveDate, term == "001")		
 		DM_CurrentTransaction( $changeEffectiveDate : effectiveDate, $transactionNumber : transactionNumber)		
 		TransactionRecord ( status == "P", transactionNumber == $transactionNumber, $agTier : agTier ) from $policy.transactionList
 		AgTier(qualifies == false) from $agTier
