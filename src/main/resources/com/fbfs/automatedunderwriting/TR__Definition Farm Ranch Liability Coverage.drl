@@ -14,6 +14,7 @@ agenda-group "IT_Rules"
 when
 (	        
 	 (exists(Coverage ( coverageCode == "BIPDF", deleted != true))) or
+	 (exists(DM_AgExpress()) or	 
           ( location : Location( locationNumber : locationNumber) and
 		 LocationSupplement( locationUse == "S" || locationUse == "F"  ) from location.supplement and
 		exists(	 UnitAtRisk(deleted != true, lineOfBusiness == "PRPL", locationNumber == locationNumber))) or
