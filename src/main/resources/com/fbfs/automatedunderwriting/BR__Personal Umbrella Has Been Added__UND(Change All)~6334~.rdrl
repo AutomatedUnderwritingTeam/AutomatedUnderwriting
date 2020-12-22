@@ -4,18 +4,18 @@ import com.fbfs.pc.ecd.model.UmbrellaCoverage;
 
 
 
-rule "BR__Policy Includes A Farm RanchUmbrella__UND(New Business)~3293~"
-	agenda-group "BR_NewBusiness"
+rule "BR__Personal Umbrella Has Been Added__UND(Change All)~6334~"
+	agenda-group "BR_Change_All"
 	dialect "mvel"
 	when
-		UmbrellaCoverage( policyType == "F" , coverageNumber : coverageNumber)
+		UmbrellaCoverage( added == true , policyType == "P" , coverageNumber : coverageNumber)
 	then
 		WorkItemReason fact0 = new WorkItemReason();
 		fact0.setType( "Policy" );
 		fact0.setQueue( "Undw" );
-		fact0.setReason( "3293: Policy includes a farm/ranch umbrella." );
-		fact0.setAddAction( "General Review" );
+		fact0.setReason( "6334: Personal umbrella has been added." );
 		fact0.setAddAction( "Review Umbrella Coverage" );
+		fact0.setAddAction( "General Review" );
 		fact0.setAddLink( "Umbrella link" );
 		fact0.setAddBookmark( "Umbrella" );
 		fact0.setAddBookmarkUnit( "None" );

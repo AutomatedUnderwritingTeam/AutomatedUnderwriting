@@ -8,6 +8,7 @@ import com.fbfs.pc.ecd.model.LossOccurrenceSummary;
 import com.fbfs.pc.ecd.model.PriorLoss;
 import com.fbfs.pc.au.model.trap.TrapCluePropertyReport;
 import com.fbfs.pc.trap.model.PropertyClaim;
+import com.fbfs.pc.trap.model.ClaimPayment;
 
 rule "BR__HPP Water Backup__UND(New Business)~8157~"
 	agenda-group "BR_NewBusiness"
@@ -16,7 +17,7 @@ rule "BR__HPP Water Backup__UND(New Business)~8157~"
 		>Term( effectiveDate : effectiveDate)
 		>dwelling : Dwelling( unitAtRiskNumber : unitAtRiskNumber, $coverageList : coverageList)
 		>Coverage( coverageCode == "WBP" ) from $coverageList
-		The change is back dated more that 29 days or there are prior water losses
+		R8157 The change is back dated more that 29 days or there are prior water losses within 48 months		
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );

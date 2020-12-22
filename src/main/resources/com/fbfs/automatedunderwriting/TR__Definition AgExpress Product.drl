@@ -1,0 +1,16 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.declarativemodel.DM_AgExpress;
+import com.fbfs.pc.ecd.model.Policy;
+
+
+rule "TR__Definition AgExpress Product"
+
+agenda-group "IT_Rules"
+when
+	Policy(company == "810" && productCode == "AGXPR")
+then
+	DM_AgExpress agExpress = new DM_AgExpress();
+	insert(agExpress);
+
+end

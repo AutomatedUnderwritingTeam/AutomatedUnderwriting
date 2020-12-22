@@ -6,6 +6,14 @@ import com.fbfs.pc.ecd.model.*;
  * This Drools Rule Language (DRL) file was not created from Guvnor
  * and should be manually edited.
  */
+rule "policyDefinition.AgTier"
+agenda-group "policyDefinition"
+	when
+		$p : Policy()
+		$at : AgTier() from $p.agTier
+	then
+		insert($at);
+end
 
 rule "policyDefinition.Term"
 agenda-group "policyDefinition"

@@ -3,8 +3,8 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.UmbrellaCoverage;
 
 
-rule "BR__Policy Includes a Personal Umbrella Over 2,000,000__UND(New Business)~6342~"
-	agenda-group "BR_NewBusiness"
+rule "BR__Policy Includes a Personal Umbrella Over 2,000,000__UND(New Business All)~6342~"
+	agenda-group "BR_NewBusiness_All"
 	dialect "mvel"
 	when
 		UmbrellaCoverage( policyType == "P" , limit1 > 2000000 , coverageNumber : coverageNumber)
