@@ -17,7 +17,7 @@ rule "BR__Vehicle LOB Added and Insured Over 15 Years Old is Not A Driver__ASST(
 		>Client( $clientReference : clientReference, supplementList : supplementList)
 		>not (Driver( driverReference == $clientReference )) 
 		>householdMember : HouseholdMember( clientReference == $clientReference )
-		The clients age is more than 15 and is not a nonPermanant driver
+		The clients age is more than 15 and less than 24 and is not a nonPermanant driver
 		R7592, 7593 - Household Member is not an aternate head of household
 	then
 		>WorkItemReason fact0 = new WorkItemReason();

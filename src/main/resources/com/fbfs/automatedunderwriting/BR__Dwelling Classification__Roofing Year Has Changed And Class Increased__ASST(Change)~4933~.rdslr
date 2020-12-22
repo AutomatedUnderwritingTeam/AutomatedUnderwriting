@@ -1,0 +1,28 @@
+package com.fbfs.automatedunderwriting;
+
+import com.fbfs.pc.au.model.workitem.WorkItemReason;
+import com.fbfs.pc.ecd.model.Dwelling;
+import com.fbfs.pc.ecd.model.Term;
+
+rule "BR__Dwelling Classification__Roofing Year Has Changed And Class Increased__ASST(Change)~4933~"
+	agenda-group "BR_Change"
+	dialect "mvel"
+	when
+	     >Term( $expirationDate : expirationDate)
+	     >Dwelling( previousRoofingYear != null , previousDwellingClass != null , $roofYear : roofingYear, roofingYear != ( previousRoofingYear ) , eval( convertToDouble(dwellingClass) < convertToDouble(previousDwellingClass) ), unitAtRiskNumber : unitAtRiskNumber)
+	     R4933 There are Dwelling storm hail or wind losses more than 2 years newer than the roof year or the roof year is 8 years older than the effective date year
+	
+	then
+		>WorkItemReason fact0 = new WorkItemReason();
+		>fact0.setType( "Policy" );
+		>fact0.setQueue( "Asst Undw" );
+		>fact0.setReason( "4933: Dwelling Classification--roofing year has changed and class increased." );
+		>fact0.setAddAction( "FB Memo" );
+		>fact0.setAddAction( "Review Photo" );
+		>fact0.setAddLink( "Residence link" );
+		>fact0.setAddBookmark( "RS" );
+		>fact0.setAddBookmarkUnit( unitAtRiskNumber );
+		>fact0.setMgmtReportingCategory( "UAR" );
+		>fact0.setMgmtReportingUnitAtRisk( unitAtRiskNumber );
+		>insertLogical( fact0 );
+end

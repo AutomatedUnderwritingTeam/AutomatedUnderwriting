@@ -4,21 +4,29 @@ import com.fbfs.pc.au.model.workitem.WorkItemReason;
 import com.fbfs.pc.ecd.model.Term;
 import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.trap.model.CoverageVerifierReport;
-import com.fbfs.pc.au.model.trap.CurrentCarrier;
 import com.fbfs.pc.au.model.trap.TrapCoverageVerifierReport;
+import com.fbfs.pc.ecd.model.PriorCarrier;
+import com.fbfs.pc.ecd.model.PolicySupplement;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.TransferredHousehold;
 
-rule "BR__CIF not current date and no current carrier report__UND(New Business)~7629~"
+
+rule "BR__CIF not current date and no coverage verifier report__UND(New Business)~7629~"
 	agenda-group "BR_NewBusiness"
 	dialect "mvel"
 	when
 		>Term( $effectiveDate : effectiveDate)
-		>Policy( $continuedInForceDate : continuedInForceDate != null , eval( calculateDaysBetween($continuedInForceDate, $effectiveDate) > 60 ))
-		R7629 Does not have Coverage Verifier and or Current Carrier
+		>$policy : Policy( $continuedInForceDate : continuedInForceDate != null , eval( calculateDaysBetween($continuedInForceDate, $effectiveDate) > 60 ))		
+		R7629 Does not have Coverage Verifier Report
+        R8296 R7629 - Policy is not a rewrite
+        R8296 R7629 - Policy is not a Youthful Transfer	
+		R8296 R7629 - Policy was not infilled
+        R8296 R7629 - Prior carrier is not a Farm Bureau related carrier		
 	then
 		>WorkItemReason fact0 = new WorkItemReason();
 		>fact0.setType( "Policy" );
 		>fact0.setQueue( "Undw" );
-		>fact0.setReason( "7629: CIF date is not the current date and should be reviewed ." );
+		>fact0.setReason( "7629: CIF date is not the current date and no coverage verifier report." );
 		>fact0.setAddAction( "Review for Proof Of Prior Insurance" );
 		>fact0.setAddAction( "FB Memo" );
 		>fact0.setAddLink( "Policy Level Information link" );

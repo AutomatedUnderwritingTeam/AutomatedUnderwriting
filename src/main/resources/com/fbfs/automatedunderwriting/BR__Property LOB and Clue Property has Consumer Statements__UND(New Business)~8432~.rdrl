@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.ecd.model.PropertyLineOfBusiness;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapCluePropertyReport;
+import com.fbfs.pc.trap.model.CluePropertyRemark;
+
+rule "BR__Property LOB and Clue Property has Consumer Statements__UND(New Business)~8432~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		PropertyLineOfBusiness( )
+		Household( headOfHousehold != null , $hhClientReference : headOfHousehold.clientReference)
+		Client( clientReference == ( $hhClientReference ) , $trapId : trapId)
+		$trapCluePropertyReport : TrapCluePropertyReport( trapId == $trapId)		
+		CluePropertyRemark(narrative matches "(?i).*CS(.||\r)*") from $trapCluePropertyReport.cluePropertyReport.cluePRemarksList		
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8432: Clue Property has consumer statements." );
+		fact0.setAddAction( "Review Underwriting Reports" );		
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( $hhClientReference );		
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( $hhClientReference);
+		insertLogical( fact0 );
+end

@@ -4,12 +4,14 @@ import com.fbfs.pc.au.model.workitem.WorkItemPendReason;
 import com.fbfs.pc.ecd.model.Finalize;
 import com.fbfs.pc.ecd.model.Policy;
 import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
+import com.fbfs.pc.ecd.model.Term;
 
 rule "Impl__WorkItem Pend Reason Limited Liability for Secondary Premise Endorsement"
 	agenda-group "IT_WorkItem"
 	dialect "mvel"
 	when
 		policy : Policy( )
+		Term( effectiveDate < "24-Jan-2021")
 		(finalize : Finalize( limitedLiabilityEndorsement == true ) from policy.finalization)
 		DM_AutomatedUnderwritingUser( )
 	then

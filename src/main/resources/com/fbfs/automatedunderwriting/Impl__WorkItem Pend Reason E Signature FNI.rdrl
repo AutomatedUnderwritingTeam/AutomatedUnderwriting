@@ -5,17 +5,17 @@ import com.fbfs.pc.ecd.model.Finalize;
 import com.fbfs.pc.au.model.declarativemodel.DM_AutomatedUnderwritingUser;
 import com.fbfs.pc.ecd.model.Term;
 
-rule "Impl__WorkItem Pend Reason ESignature Page"
+rule "Impl__WorkItem Pend Reason E Signature FNI"
 	agenda-group "IT_WorkItem"
 	dialect "mvel"
 	when
 		policy : Policy( )
-		Term( effectiveDate < "24-Jan-2021")
+		Term( effectiveDate >= "24-Jan-2021")
 		finalize : Finalize( policySignature == true ) from policy.finalization
 		DM_AutomatedUnderwritingUser( )
 	then
 		WorkItemPendReason fact0 = new WorkItemPendReason();
 		fact0.setType( "Policy" );
-		fact0.setPendReason( "PMP_D_ESIGN_PAGE" );
+		fact0.setPendReason( "PMP_D_ESIGN_CHG_FNI" );
 		insertLogical( fact0 );
 end

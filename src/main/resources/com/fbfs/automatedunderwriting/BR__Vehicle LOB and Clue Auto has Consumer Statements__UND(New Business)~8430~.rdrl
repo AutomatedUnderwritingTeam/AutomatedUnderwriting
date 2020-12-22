@@ -1,0 +1,29 @@
+package com.fbfs.automatedunderwriting;
+import com.fbfs.pc.ecd.model.VehicleLineOfBusiness;
+import com.fbfs.pc.ecd.model.Household;
+import com.fbfs.pc.ecd.model.Client;
+import com.fbfs.pc.au.model.trap.TrapClueAutoReport;
+import com.fbfs.pc.trap.model.ClueAutoRemark;
+
+rule "BR__Vehicle LOB and Clue Auto has Consumer Statements__UND(New Business)~8430~"
+	agenda-group "BR_NewBusiness"
+	dialect "mvel"
+	when
+		VehicleLineOfBusiness()
+		Household( headOfHousehold != null , $hhClientReference : headOfHousehold.clientReference)
+		Client( clientReference == ( $hhClientReference ) , $trapId : trapId)
+		$trapClueAutoReport : TrapClueAutoReport( trapId == $trapId)		
+		ClueAutoRemark(narrative matches "(?i).*CS(.||\r)*") from $trapClueAutoReport.clueAutoReport.clueARemarksList
+	then
+		WorkItemReason fact0 = new WorkItemReason();
+		fact0.setType( "Policy" );
+		fact0.setQueue( "Undw" );
+		fact0.setReason( "8430: Clue Auto has consumer statements." );
+		fact0.setAddAction( "Review Underwriting Reports" );		
+		fact0.setAddLink( "Household link" );
+		fact0.setAddBookmark( "Household" );
+		fact0.setAddBookmarkUnit( $hhClientReference );		
+		fact0.setMgmtReportingCategory( "INSD" );
+		fact0.setMgmtReportingUnitAtRisk( $hhClientReference);
+		insertLogical( fact0 );
+end
